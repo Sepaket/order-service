@@ -21,7 +21,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "eslint --fix --ext .js,.jsx,.ts,.tsx src --max-warnings=0"
+      "pre-commit": "node_modules/.bin/eslint --fix --ext .js,.ts, src --max-warnings=0"
     }
   },
   "keywords": [
