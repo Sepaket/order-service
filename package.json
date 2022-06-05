@@ -19,6 +19,11 @@
     "seed:undo:all": "node_modules/.bin/npx sequelize-cli db:seed:undo:all",
     "reset:db": "npm run migrate:undo:all && npm run migrate && npm run seed"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "eslint --fix --ext .js,.jsx,.ts,.tsx src --max-warnings=0"
+    }
+  },
   "keywords": [
     "express",
     "postgre",
