@@ -106,9 +106,6 @@ module.exports = class {
         name: {
           [this.op.substring]: query.keyword,
         },
-        postalCode: {
-          [this.op.substring]: query.keyword,
-        },
       },
     };
 

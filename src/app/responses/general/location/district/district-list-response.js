@@ -11,8 +11,7 @@ module.exports = class {
     this.op = Sequelize.Op;
     this.request = request;
     this.converter = snakeCaseConverter;
-
-    this.process();
+    return this.process();
   }
 
   async process() {

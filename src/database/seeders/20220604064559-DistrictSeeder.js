@@ -6,7 +6,7 @@ module.exports = {
     queryInterface.bulkDelete(table, null, { truncate: true }),
     queryInterface.bulkInsert(table, districts.map((item) => ({
       id: item.subDistrictId,
-      name: item.subDistrictName,
+      name: item.subDistrictName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
     }))),

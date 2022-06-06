@@ -14,7 +14,7 @@ module.exports = {
     queryInterface.bulkDelete(table, null, { truncate: true }),
     queryInterface.bulkInsert(table, subDistricts1.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -22,7 +22,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts2.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -30,7 +30,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts3.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -38,7 +38,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts4.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -46,7 +46,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts5.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -54,7 +54,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts6.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -62,7 +62,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts7.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -70,7 +70,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts8.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,
@@ -78,7 +78,7 @@ module.exports = {
     }))),
     queryInterface.bulkInsert(table, subDistricts9.map((item) => ({
       id: item.villageId,
-      name: item.villageName,
+      name: item.villageName.toLowerCase(),
       province_id: item.provinceId,
       city_id: item.districtId,
       district_id: item.subDistrictId,

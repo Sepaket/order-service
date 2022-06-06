@@ -8,6 +8,7 @@
     },
     "rules": {
       "no-async-promise-executor": 0,
+      "no-constructor-return": 0,
       "semi": ["error", "always"],
       "quotes": ["error", "single"]
     }

@@ -16,6 +16,7 @@ const validator = joi.object({
   page: joi.number().min(1).allow('', null),
   limit: joi.number().min(0).allow('', null),
   keyword: joi.string().allow('', null),
+  postal_code: joi.number().allow('', null),
   district_id: joi.any()
     .external((request) => isExist({ params: request, identifier: 'id' }))
     .required(),

@@ -37,9 +37,9 @@ module.exports = {
     }
   },
 
-  locationDetail: async (request, response, next) => {
-
-  },
+  // locationDetail: async (request, response, next) => {
+  //
+  // },
 
   provinceList: async (request, response, next) => {
     try {
