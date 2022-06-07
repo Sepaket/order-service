@@ -1,0 +1,354 @@
+[
+  {
+    "faq_id": 5,
+    "faq_pertanyaan": "Gimana cara dapetin diskon di sepapket ?",
+    "faq_kategori": 0,
+    "faq_jawaban": "Kamu cukup daftar akun di web site sepaket.co.id",
+    "created_at": "2022-03-18 08:19:15",
+    "updated_at": "2022-03-24 14:49:27"
+  },
+  {
+    "faq_id": 17,
+    "faq_pertanyaan": "Saya salah input pesanan, apakah bisa diedit?",
+    "faq_kategori": 0,
+    "faq_jawaban": "Untuk pesanan yang sudah diinput tidak dapat diedit. Namun kamu dapat menghapusnya dan membuat pesanan baru yang sudah diperbaiki.",
+    "created_at": "2022-03-23 16:55:07",
+    "updated_at": "2022-03-24 14:49:27"
+  },
+  {
+    "faq_id": 21,
+    "faq_pertanyaan": "Menu Create Order",
+    "faq_kategori": 12,
+    "faq_jawaban": "Menu ini digunakan untuk memulai order pengiriman barang.",
+    "created_at": "2022-03-24 14:53:36",
+    "updated_at": "2022-03-24 14:53:36"
+  },
+  {
+    "faq_id": 22,
+    "faq_pertanyaan": "Bagaimana cara membuat order pengiriman ?",
+    "faq_kategori": 12,
+    "faq_jawaban": "Kaka bisa mengikuti arahan sebagai berikut :\n•\tKlik menu create order\n•\tinput data dengan lengkap dan mengisi waktu penjemputan barang\n•\tSetelah selesai input data selanjutnya ke form order\n•\tinput data dengan lengkap dan Memilih metode pengiriman seperti : COD Atau Non COD\n•\tSetelah selesai input data di form order selanjutnya ke form Pratinjau order  dimana  Dapat melihat data yang telah  isi \n        sebelumnya jika sudah sesui dengan tujuan maka  klik tombol konfirmasi\n•\tNamun jika data yang telah diisi oleh  masih tidak sesuai seperti apa yang  inginkan maka  bisa kembali ke form order",
+    "created_at": "2022-03-24 14:54:07",
+    "updated_at": "2022-03-24 14:54:07"
+  },
+  {
+    "faq_id": 24,
+    "faq_pertanyaan": "Bagaimana cara cek orderan yang sedang proses kirim ?",
+    "faq_kategori": 13,
+    "faq_jawaban": "Kaka bisa mengikuti arahan sebagai berikut :\n\n•\tKlik menu tracking dari Web sepaket.co.id\n•\tInput nomor resi di kolom nomor resi\n•\tLalu sistem akan membaca dan memberikan informasi mengenai status pengiriman barang",
+    "created_at": "2022-03-24 14:55:31",
+    "updated_at": "2022-03-24 14:55:31"
+  },
+  {
+    "faq_id": 25,
+    "faq_pertanyaan": "Menu Tracking",
+    "faq_kategori": 13,
+    "faq_jawaban": "Menu ini digunakan untuk mengecek atau melacak  pengiriman barang.",
+    "created_at": "2022-03-24 14:56:21",
+    "updated_at": "2022-03-24 14:56:21"
+  },
+  {
+    "faq_id": 27,
+    "faq_pertanyaan": "Menu Create ticket",
+    "faq_kategori": 14,
+    "faq_jawaban": "Menu ini di gunakan untuk menyampaikan kendala pengirimanmu. \nJika kamu memiliki kendala pada pengiriman",
+    "created_at": "2022-03-24 15:06:30",
+    "updated_at": "2022-03-24 15:06:30"
+  },
+  {
+    "faq_id": 28,
+    "faq_pertanyaan": "Bagaimana cara melaporkan jika ada kendala dalam pengiriman ?",
+    "faq_kategori": 14,
+    "faq_jawaban": "kamu bisa mengikuti arahan sebagai berikut :\n•\tKlik menu ticket\n•\tKlik create ticket\n•\tInput data lengkap seperti: Nomer Resi, Judul Ticket, Kategori Kendala, Tingkat Urgensi, Isi Pesan\n•\tLalu cantumkan gambar bukti yang dimiliki dengan cara add attacment \n•\tJika  tidak Ingin upload gambar maka  langsung melakukan send message",
+    "created_at": "2022-03-24 15:07:45",
+    "updated_at": "2022-03-24 15:07:45"
+  },
+  {
+    "faq_id": 29,
+    "faq_pertanyaan": "Menu List Ticket",
+    "faq_kategori": 14,
+    "faq_jawaban": "Menu ini digunakan jika ingin melihat history ticket yang sudah pernah di buat . pada menu ini juga terdapat status . Status In Queue yang berarti ticket berada dalam antrian dan belum dibalas oleh tim bantuan ticketing, status Done berarti status ticket sudah selesai. Jika kamu ingin melihat history ticket",
+    "created_at": "2022-03-24 15:08:20",
+    "updated_at": "2022-03-24 15:08:20"
+  },
+  {
+    "faq_id": 30,
+    "faq_pertanyaan": "Bagaimana cara melihat laporan/ticket yang sudah di buat sebelum nya?",
+    "faq_kategori": 14,
+    "faq_jawaban": "Kamu bisa mengikuti arahan sebagai berikut :\n\n•\tKlik menu ticket lalu list ticket\n•\tPilih range tanggal yang diinginkan\n•\tKlik detail jika ingin melihat secara keseluruhan\n•\tInput pesan jika ingin membalan pesan dari admin sepaket\n•\tKlik comment jika sudah selesai",
+    "created_at": "2022-03-24 15:08:41",
+    "updated_at": "2022-03-24 15:08:41"
+  },
+  {
+    "faq_id": 31,
+    "faq_pertanyaan": "History Order",
+    "faq_kategori": 15,
+    "faq_jawaban": "Menu ini digunakan untuk melihat semua data pengiriman, Setiap pengiriman pesanan akan dikelompokkan menjadi Batch.",
+    "created_at": "2022-03-24 15:09:19",
+    "updated_at": "2022-03-24 15:09:19"
+  },
+  {
+    "faq_id": 32,
+    "faq_pertanyaan": "Bagaimana caara melihat data pengiriman yang sudah pernah di buat ?",
+    "faq_kategori": 15,
+    "faq_jawaban": "Jika kamu ingin melihat data pengiriman maka kamu bisa mengikuti arahan sebagai berikut :\n•\tKlik menu order lalu klik history order\n•\tPilih range tanggal yang diinginkan\n•\tJika  ingin melihat data secara keseluruhan  dan ingin print ulang AWB tersebut maka klik detail \n•\tJika ingin download data pengiriman maka klik button export excel",
+    "created_at": "2022-03-24 15:09:49",
+    "updated_at": "2022-03-24 15:09:49"
+  },
+  {
+    "faq_id": 33,
+    "faq_pertanyaan": "Menu Report",
+    "faq_kategori": 16,
+    "faq_jawaban": "Menu ini digunakan untuk melihat laporan data pengiriman secara keseluruhan.",
+    "created_at": "2022-03-24 15:10:21",
+    "updated_at": "2022-03-24 15:10:21"
+  },
+  {
+    "faq_id": 34,
+    "faq_pertanyaan": "Bagaimana cara melihat data-data pengiriman ?",
+    "faq_kategori": 16,
+    "faq_jawaban": "Jika kamu ingin melihat data-data pengiriman, kamu bisa mengikuti arahan sebagai berikut :\n•\tKlik menu report\n•\tKlik range tanggal untuk melihat data yang diinginkan sesuai tanggal\n•\tJika ingin melihat data pengiriman maka klik data yang diinginkan\n•\tJika ingin melihat data secara keseluruhan  maka klik button detail\n•\tJika ingin Download data yang sudah dipilih maka klik export excel",
+    "created_at": "2022-03-24 15:11:15",
+    "updated_at": "2022-03-24 15:11:15"
+  },
+  {
+    "faq_id": 35,
+    "faq_pertanyaan": "Menu Saldo & Mutasi",
+    "faq_kategori": 17,
+    "faq_jawaban": "Menu ini digunakan untuk melihat keseluruhan data yang berhubungan dengan keuangan.",
+    "created_at": "2022-03-24 15:12:46",
+    "updated_at": "2022-03-24 15:12:46"
+  },
+  {
+    "faq_id": 36,
+    "faq_pertanyaan": "Menu Saldo Tersedia",
+    "faq_kategori": 17,
+    "faq_jawaban": "Total saldo yang dapat digunakan untuk pembayaran NON-COD dan juga dapat dicairkan",
+    "created_at": "2022-03-24 15:13:50",
+    "updated_at": "2022-03-24 15:13:50"
+  },
+  {
+    "faq_id": 37,
+    "faq_pertanyaan": "Menu Dalam Proses Pengiriman",
+    "faq_kategori": 17,
+    "faq_jawaban": "Saldo yang sudah ditarik dan belum diproses oleh sepaket akan masuk ke menu ini",
+    "created_at": "2022-03-24 15:14:36",
+    "updated_at": "2022-03-24 15:14:36"
+  },
+  {
+    "faq_id": 38,
+    "faq_pertanyaan": "Menu Top Up Pending",
+    "faq_kategori": 17,
+    "faq_jawaban": "Proses Top Up masih belum melakukan proses pembayaran.",
+    "created_at": "2022-03-24 15:15:01",
+    "updated_at": "2022-03-24 15:15:01"
+  },
+  {
+    "faq_id": 39,
+    "faq_pertanyaan": "Bagaimana cara melihat data saldo dan mutasi?",
+    "faq_kategori": 17,
+    "faq_jawaban": "Jika ingin melihat data saldo & mutasi secara keseluruhan :\n•\tKlik Mutas & Saldo\n•\tKlik range tanggal yang diinginkan",
+    "created_at": "2022-03-24 15:15:17",
+    "updated_at": "2022-03-24 15:15:17"
+  },
+  {
+    "faq_id": 40,
+    "faq_pertanyaan": "Bagaimana ingin menarik saldo?",
+    "faq_kategori": 17,
+    "faq_jawaban": "Jika Ingin Tarik Saldo kamu bisa mengikuti arahan sebagai berikut :\n•\tKlik button Tarik Saldo\n•\tJika sudah mendaftarkan nomer rekening tujuan maka user dapat langsung melakukan penarikan  dengan input jumlah nominal saldo lalu klik Button Lanjutkan Penarikan \n•\tJika belum mendaftarkan data bank maka Input data terlebih dahulu di form pembayaran dan Input data bank",
+    "created_at": "2022-03-24 15:15:59",
+    "updated_at": "2022-03-24 15:15:59"
+  },
+  {
+    "faq_id": 41,
+    "faq_pertanyaan": "Bagaimana cara Top up saldo ?",
+    "faq_kategori": 17,
+    "faq_jawaban": "Jika Ingin Top Up saldo kamu bisa mengikuti arahan sebagai berikut :\n•\tKlik button tambah saldo\n•\tInput jumlah nominal\n•\tPilih metode pembayaran",
+    "created_at": "2022-03-24 15:16:26",
+    "updated_at": "2022-03-24 15:16:26"
+  },
+  {
+    "faq_id": 42,
+    "faq_pertanyaan": "Pembayaran apa saja yang tersedia jika ingin Top Up Saldo",
+    "faq_kategori": 17,
+    "faq_jawaban": "Untuk top up saldo bisa melakukan pembayaran melalui Bank Transfer, Ovo, Dana, Gopay, Shopeepay dan Linkaja",
+    "created_at": "2022-03-24 15:17:35",
+    "updated_at": "2022-03-24 15:17:35"
+  },
+  {
+    "faq_id": 44,
+    "faq_pertanyaan": "Apa itu sepaket?",
+    "faq_kategori": 18,
+    "faq_jawaban": "Sepaket merupakan perusahan startup yang bergerak di bidang agregator logistik. Kami “menghubungkan” para penjual (merchant) dengan penyedia jasa logistik (third party logistic-3PL). \nJadi, kamu tidak perlu lagi datang ke agen logistik saat akan mengirimkan barang. Kamu hanya perlu membuat order melalui sepaket.co.id",
+    "created_at": "2022-03-24 15:23:27",
+    "updated_at": "2022-03-24 15:23:27"
+  },
+  {
+    "faq_id": 45,
+    "faq_pertanyaan": "Sepaket bukanlah ekspedisi.",
+    "faq_kategori": 18,
+    "faq_jawaban": "Kami platform agregator yang bekerja sama dengan beberapa Ekspedisi untuk membantu mengirimkan paket kamu.",
+    "created_at": "2022-03-24 15:24:11",
+    "updated_at": "2022-03-24 15:24:11"
+  },
+  {
+    "faq_id": 46,
+    "faq_pertanyaan": "Sepaket bertanggung jawab atas paket kamu",
+    "faq_kategori": 18,
+    "faq_jawaban": "Kami akan membantu semua kendala kamu yang berhubungan dengan pengiriman. Jika terdapat kendala pada pengiriman kamu, hubungi kami dan akan kami bantu semaksimal mungkin.",
+    "created_at": "2022-03-24 15:24:32",
+    "updated_at": "2022-03-24 15:24:32"
+  },
+  {
+    "faq_id": 47,
+    "faq_pertanyaan": "Sepaket Mendengarkan",
+    "faq_kategori": 18,
+    "faq_jawaban": "Tim sepaket akan mendengarkan serta mengeksekusi review dan feedback yang diberikan oleh pengirim.",
+    "created_at": "2022-03-24 15:25:16",
+    "updated_at": "2022-03-24 15:25:16"
+  },
+  {
+    "faq_id": 48,
+    "faq_pertanyaan": "Sepaket Memonitor",
+    "faq_kategori": 18,
+    "faq_jawaban": "sepaket membantu memonitor pengiriman kamu terutama yang undelivered dan terkendala, ini untuk memaksimalkan semua kiriman agar dapat terkirim dengan lancar.",
+    "created_at": "2022-03-24 15:25:33",
+    "updated_at": "2022-03-24 15:25:33"
+  },
+  {
+    "faq_id": 49,
+    "faq_pertanyaan": "Sepaket Bertindak",
+    "faq_kategori": 18,
+    "faq_jawaban": "Jika terdapat bug di platform kami akan langsung melakukan fix. Dan jika ada permintaan fitur baru yang menarik dan penting, kami akan mewujudkannya.",
+    "created_at": "2022-03-24 15:25:48",
+    "updated_at": "2022-03-24 15:25:48"
+  },
+  {
+    "faq_id": 50,
+    "faq_pertanyaan": "Sepaket memberikan Banyak layanan",
+    "faq_kategori": 19,
+    "faq_jawaban": "SEPAKET menghadirkan berbagai layanan untuk membantu urusan pengiriman kamu,\nService Kami menyediakan jasa pengiriman untuk kamu, dengan berbagai keunggulan berikut:\n+ Bandingkan tarif pengiriman dari berbagai ekspedisi seperti JNE, Sicepat,Ninja dan lainnya cukup dari website kami.\n+ Tersedia berbagai pilihan ekspedisi ternama di Indonesia dalam satu platform.\n+ Gratis penjemputan paket ke lokasi Anda tanpa minimum order\nAnda tidak perlu lagi mengantarkan paket ke setiap agen ekspedisi.",
+    "created_at": "2022-03-24 15:27:49",
+    "updated_at": "2022-03-24 15:27:49"
+  },
+  {
+    "faq_id": 51,
+    "faq_pertanyaan": "Sepaket memberikan Diskon Ongkos Kirim",
+    "faq_kategori": 19,
+    "faq_jawaban": "Berlaku untuk semua pengiriman, baik COD maupun NON-COD. Semakin banyak volume pengiriman, maka diskon juga akan bertambah:\n \nKiriman 0 - 2.500 paket diskon 24%\n\nKiriman 2.500 - 5.000 paket diskon 26%\n\nKiriman 5.000 - 10.000 paket diskon 28%\n\nKiriman lebih dari 10.000 dapat diskon khusus",
+    "created_at": "2022-03-24 15:28:38",
+    "updated_at": "2022-03-24 15:28:38"
+  },
+  {
+    "faq_id": 52,
+    "faq_pertanyaan": "Sepaket memiliki Tim Support Khusus",
+    "faq_kategori": 19,
+    "faq_jawaban": "Kami siap membantu menyelesaikan segala kendala pengiriman kamu.. Live chat tersedia dari pukul 09.00 - 17.00 WIB. Diluar jam kantor dapat menghubungi kami di email cs@sepaket.co.id\nSelain itu kami juga menyediakan ticket prioritas.",
+    "created_at": "2022-03-24 15:28:52",
+    "updated_at": "2022-03-24 15:28:52"
+  },
+  {
+    "faq_id": 53,
+    "faq_pertanyaan": "sepaket Selalu Berimprovisasi",
+    "faq_kategori": 19,
+    "faq_jawaban": "Sepaket akan selalu berimprovisasi agar pengalaman kamu semakin baik. Dan tentu saja agar delivery rate kamu bisa maksimal !",
+    "created_at": "2022-03-24 15:29:06",
+    "updated_at": "2022-03-24 15:29:06"
+  },
+  {
+    "faq_id": 56,
+    "faq_pertanyaan": "Apa Itu Menu Register Atau Daftar ?",
+    "faq_kategori": 22,
+    "faq_jawaban": "Registrasi adalah sebuah pelayanan pendaftaran setiap program yang berfungsi untuk menghubungkan data pribadi anda dengan web/aplikasi yang anda ikuti tersebut.",
+    "created_at": "2022-04-20 13:50:00",
+    "updated_at": "2022-04-20 13:53:54"
+  },
+  {
+    "faq_id": 57,
+    "faq_pertanyaan": "Bagaimana cara registrasi atu mendaftar disepaket ?",
+    "faq_kategori": 22,
+    "faq_jawaban": "Jika kamu ingin menggunakan sepaket, kamu perlu mempunyai akun untuk masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik menu daftar yang terdapat di pojok kanan website • Lalu kamu bisa isi kolom dengan data yang dibutuhkan di kolom tersebut • Setelah kamu sudah mengisi semua kolom • Cek email kamu untuk melihat pesan yang dikirim oleh pihak sepaket untuk verifikasi akun kamu dan pastikan kamu sudah mengisi kolom email dengan benar dan tepat • setelah kamu sudah menerima email dari sepaket.co.id • Kamu bisa klik button verifikasi id • Dan akun kamu sudah dapat digunakan.",
+    "created_at": "2022-04-20 13:50:50",
+    "updated_at": "2022-04-20 13:57:16"
+  },
+  {
+    "faq_id": 58,
+    "faq_pertanyaan": "Apa Itu Menu Login ?",
+    "faq_kategori": 23,
+    "faq_jawaban": "Login adalah suatu Proses untuk masuk ke dalam sebuah layanan online yang berisi nama dan password.",
+    "created_at": "2022-04-20 13:51:58",
+    "updated_at": "2022-04-20 13:54:00"
+  },
+  {
+    "faq_id": 60,
+    "faq_pertanyaan": "Bagaimana cara login di sepaket ?",
+    "faq_kategori": 23,
+    "faq_jawaban": "Jika kamu ingin menggunakan sepaket, kamu perlu mempunyai akun untuk masuk kedalam dashboard dari sepaket.co.id, jika kamu sudah mempunyai akun, • Kamu bisa mengisi kolom Email dan Kata Sandi.\nKamu juga bisa login menggunakan akun Google ataupun Facebook kamu lohh, Caranya kamu bisa mengikuti arahan sebagai berikut : • Kamu bisa klik logo/simbol google ataupun logo facebook • Pastikan kamu sudah memasukan akun google dan akun facebook.",
+    "created_at": "2022-04-20 13:54:54",
+    "updated_at": "2022-04-20 13:54:54"
+  },
+  {
+    "faq_id": 61,
+    "faq_pertanyaan": "Apa Itu Ubah Sandi ?",
+    "faq_kategori": 24,
+    "faq_jawaban": "Ubah Sandi adalah sesuatu proses meriset sandi dari sandi yang lama menjadi sandi yang baru.",
+    "created_at": "2022-04-20 14:44:11",
+    "updated_at": "2022-04-20 14:44:11"
+  },
+  {
+    "faq_id": 62,
+    "faq_pertanyaan": "Bagaimana Cara Merubah Sandi Akun ?",
+    "faq_kategori": 24,
+    "faq_jawaban": "Jika kamu ingin merubah sandi kamu, kamu perlu masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik Navbar/ Garis 3 yang terdapat dikiri layar komputer/handphone kamu • Lalu kamu bisa klik setting • Lalu kamu klik biodata user • Selanjutnya kamu klik button GANTI KATA SANDI • Lalu isikan password lama dan isikan password baru • Dan passwordmu telah terganti.",
+    "created_at": "2022-04-20 14:44:32",
+    "updated_at": "2022-04-20 14:44:32"
+  },
+  {
+    "faq_id": 63,
+    "faq_pertanyaan": "Bagaimana Cara Menambah Sub User Pada Akun Seller ?",
+    "faq_kategori": 24,
+    "faq_jawaban": "Jika kamu ingin menambah sub user, kamu perlu masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik Navbar/ Garis 3 yang terdapat dikiri layar komputer/handphone kamu • Lalu kamu bisa klik setting • Lalu kamu klik user management • Klik button ADD USER • Input/Isi semua kolom • Lalu ceklis data atau Navbar yang akan di display pada user tersebut • Setelah semuanya sudah terisi, Klik button TAMBAH USER • Maka user telah ditambahkan",
+    "created_at": "2022-04-20 14:44:48",
+    "updated_at": "2022-04-20 14:44:48"
+  },
+  {
+    "faq_id": 64,
+    "faq_pertanyaan": "Bagaimana Cara Mengisi Data Pembayaran ?",
+    "faq_kategori": 24,
+    "faq_jawaban": "Jika kamu ingin mengisi data pembayaran, kamu perlu masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik Navbar/ Garis 3 yang terdapat dikiri layar komputer/handphone kamu • Lalu kamu bisa klik setting • Lalu klik pembayaran • Input/ Isi semua kolom dengan benar, karna kolom tersebut hanya bisa diisi 1 kali saja • Ketika sudah semua terisi • Langkah selanjutnya kamu bisa klik button SIMPAN • Ketika kamu melakukan kesalahan pada saat mengisi/menginput data tersebut silahkan hubungi Customer Service melalui Live Chat yang tertera di dashboard kamu",
+    "created_at": "2022-04-20 14:45:08",
+    "updated_at": "2022-04-20 14:45:08"
+  },
+  {
+    "faq_id": 65,
+    "faq_pertanyaan": "Bagaimana Cara Merubah/Meriset Sandi Karena Lupa Sandi ?",
+    "faq_kategori": 25,
+    "faq_jawaban": "Jika kamu ingin merubah/meriset sandi kamu, Caranya kamu bisa mengikuti arahan sebagai berikut : • Kamu klik button LUPA SANDI • Selanjutnya kamu bisa isikan/input kolom email pemulihan akun kamu • Dan pesan verifikasi akan dikirim ke email yang telah kamu isi tadi • Dan kata sandi kamu telah terganti",
+    "created_at": "2022-04-20 14:45:57",
+    "updated_at": "2022-04-20 14:45:57"
+  },
+  {
+    "faq_id": 66,
+    "faq_pertanyaan": "Bagaimana Cara Cek Ongkir Di Dashboard Sepaket ?",
+    "faq_kategori": 26,
+    "faq_jawaban": "Jika kamu ingin melakukan pengecekan harga ongkir didalam dashboard sepaket, kamu perlu masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik Navbar/ Garis 3 yang terdapat dikiri layar komputer/handphone kamu • Lalu kamu bisa klik dashboard • Lalu isikan/input data yang akan kamu cek ongkirnya • Setelah sudah diisikan semua • Lalu kamu bisa klik button CEK ONGKIR • Dan data ongkir akan terdisplay",
+    "created_at": "2022-04-20 14:48:48",
+    "updated_at": "2022-04-20 14:48:48"
+  },
+  {
+    "faq_id": 67,
+    "faq_pertanyaan": "Bagaimana Cara Cek Order Dan Cek Ticket Di Dashboard Sepaket ?",
+    "faq_kategori": 26,
+    "faq_jawaban": "Jika kamu ingin melakukan pengecekan harga ongkir didalam dashboard sepaket, kamu perlu masuk kedalam dashboard dari sepaket.co.id, Caranya kamu bisa mengikuti arahan sebagai berikut : • Klik Navbar/ Garis 3 yang terdapat dikiri layar komputer/handphone kamu • Lalu kamu bisa klik dashboard • Lalu kamu klik tanggal/periode data order ataupun data ticket yang akan kamu lihat",
+    "created_at": "2022-04-20 14:49:08",
+    "updated_at": "2022-04-20 14:49:08"
+  },
+  {
+    "faq_id": 68,
+    "faq_pertanyaan": "Apakah dikenakan biaya jika pengiriman di retur ?",
+    "faq_kategori": 27,
+    "faq_jawaban": "Tidak ada biaya retur yang ditagihkan jika ekspedisi SICEPAT & NINJA , ekspedisi JNE dikenakan biaya 50% dari ongkos kirim jika Jawa Barat & Bali. Seller hanya perlu bayar ongkos kirim yang sudah diptong dengan diskon.",
+    "created_at": "2022-04-21 10:23:03",
+    "updated_at": "2022-04-21 10:23:03"
+  }
+]

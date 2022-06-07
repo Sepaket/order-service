@@ -1,0 +1,77 @@
+[
+  {
+    "kategori_id": 1,
+    "kategori_nama": "None",
+    "kategori_icon": ""
+  },
+  {
+    "kategori_id": 12,
+    "kategori_nama": "CREATE ORDER",
+    "kategori_icon": "receipt-outline"
+  },
+  {
+    "kategori_id": 13,
+    "kategori_nama": "TRACKING",
+    "kategori_icon": "location-outline"
+  },
+  {
+    "kategori_id": 14,
+    "kategori_nama": "TICKETING",
+    "kategori_icon": "location-outline"
+  },
+  {
+    "kategori_id": 15,
+    "kategori_nama": "ORDER",
+    "kategori_icon": "cart-outline"
+  },
+  {
+    "kategori_id": 16,
+    "kategori_nama": "REPORT",
+    "kategori_icon": "document-text-outline"
+  },
+  {
+    "kategori_id": 17,
+    "kategori_nama": "SALDO & MUTASI",
+    "kategori_icon": "wallet-outline"
+  },
+  {
+    "kategori_id": 18,
+    "kategori_nama": "TENTANG SEPAKET",
+    "kategori_icon": "chatbubble-ellipses-outline"
+  },
+  {
+    "kategori_id": 19,
+    "kategori_nama": "KELEBIHAN SEPAKET",
+    "kategori_icon": "notifications-outline"
+  },
+  {
+    "kategori_id": 22,
+    "kategori_nama": "REGISTRASI",
+    "kategori_icon": "receipt-outline"
+  },
+  {
+    "kategori_id": 23,
+    "kategori_nama": "LOGIN",
+    "kategori_icon": "home-outline"
+  },
+  {
+    "kategori_id": 24,
+    "kategori_nama": "SETTING",
+    "kategori_icon": "settings-outline"
+  },
+  {
+    "kategori_id": 25,
+    "kategori_nama": "LUPA SANDI",
+    "kategori_icon": "clipboard-outline"
+  },
+  {
+    "kategori_id": 26,
+    "kategori_nama": "DASHBOARD",
+    "kategori_icon": "calculator-outline"
+  },
+  {
+    "kategori_id": 27,
+    "kategori_nama": "KETENTUAN PENGEMBALIAN PAKET",
+    "kategori_icon": "calendar-outline"
+  }
+]

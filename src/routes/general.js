@@ -7,6 +7,7 @@ const router = app.Router();
 // const Authorization = require('../app/middlewares/admin-authentication');
 
 const LocationController = require('../app/controllers/general/location-controller');
+const FaqConrtoller = require('../app/controllers/general/faq-controller');
 
 router.group('/location', (route) => {
   route.get('/province', LocationController.provinceList);
@@ -18,6 +19,11 @@ router.group('/location', (route) => {
   route.get('/sub-district', LocationController.subDistrictList);
   route.get('/sub-district/:id', LocationController.subDistrictDetail);
   route.get('/list', LocationController.locationList);
+});
+
+router.group('/faq', (route) => {
+  route.get('/', FaqConrtoller.index);
+  route.get('/:id', FaqConrtoller.detail);
 });
 
 // router.group('/upload', (route) => {
