@@ -52,7 +52,8 @@
     "pg": "^8.7.3",
     "pg-hstore": "^2.3.4",
     "redis": "^4.1.0",
-    "sequelize": "^6.20.1"
+    "sequelize": "^6.20.1",
+    "shortid-36": "^0.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

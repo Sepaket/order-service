@@ -9,12 +9,11 @@ const client = redis.createClient({
   legacyMode: true,
 });
 
+client.connect();
 // eslint-disable-next-line no-console
 client.on('connect', () => console.log('Connected to Redis!'));
 // eslint-disable-next-line no-console
 client.on('error', (err) => console.log('Redis Client Error', err));
-
-client.connect();
 
 const setRedisData = (payload) => {
   const {
