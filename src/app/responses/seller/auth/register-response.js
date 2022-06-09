@@ -53,7 +53,10 @@ module.exports = class {
     await sender({
       to: email,
       subject: 'Email Activation',
-      message: 'Activate your email here : https://google.co.id',
+      template: 'activation-email.ejs',
+      content: {
+        activationLink: 'https://google.com',
+      },
     });
   }
 };

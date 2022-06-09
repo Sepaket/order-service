@@ -31,7 +31,7 @@ application.listen(port);
 application.use('/api/v1/general', generalRoute);
 application.use('/api/v1/seller', sellerRoute);
 
-application.use(express.static(path.join(__dirname)));
+application.use(express.static(path.join(__dirname, 'public')));
 application.use(errorHandler);
 
 // eslint-disable-next-line no-console
