@@ -8,7 +8,8 @@ const AuthController = require('../app/controllers/seller/auth-controller');
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
   route.post('/login', AuthController.login);
-  route.post('/login/social', AuthController.social);
+  route.post('/social', AuthController.social);
+  route.get('/activate/:token', AuthController.activateEmail);
 });
 
 // method not allowed when method request http is failure

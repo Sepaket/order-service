@@ -39,8 +39,6 @@ module.exports = class {
           JSON.parse(JSON.stringify(response)),
         );
 
-        // delete result.province_id;
-
         if (response) resolve(result);
         else reject(httpErrors(404, 'No Data Found', { data: null }));
       }).catch((error) => {

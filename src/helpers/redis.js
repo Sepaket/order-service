@@ -6,7 +6,14 @@ const client = redis.createClient({
   user: process.env.REDIS_USER,
   password: process.env.REDIS_PASSWORD,
   prefix: process.env.REDIS_PREFIX,
+  legacyMode: true,
 });
+
+client.connect();
+// eslint-disable-next-line no-console
+client.on('connect', () => console.log('Connected to Redis!'));
+// eslint-disable-next-line no-console
+client.on('error', (err) => console.log('Redis Client Error', err));
 
 const setRedisData = (payload) => {
   const {

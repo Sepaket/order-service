@@ -4,6 +4,7 @@ const RegisterValidator = require('../../validators/seller/auth/register-validat
 const SocialValidator = require('../../validators/seller/auth/social-validator');
 const ForgotValidator = require('../../validators/seller/auth/forgot-validator');
 const ResetValidator = require('../../validators/seller/auth/reset-validator');
+const ActivateEmailValidator = require('../../validators/seller/auth/activate-validator');
 
 // responses
 const LoginResponse = require('../../responses/seller/auth/login-response');
@@ -11,6 +12,7 @@ const RegisterResponse = require('../../responses/seller/auth/register-response'
 const SocialResponse = require('../../responses/seller/auth/social-response');
 const ForgotResponse = require('../../responses/seller/auth/forgot-response');
 const ResetResponse = require('../../responses/seller/auth/reset-response');
+const ActivateEmailResponse = require('../../responses/seller/auth/activate-response');
 
 module.exports = {
   register: async (request, response, next) => {
@@ -34,6 +36,22 @@ module.exports = {
       await LoginValidator(request.body);
 
       const result = await new LoginResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  activateEmail: async (request, response, next) => {
+    try {
+      await ActivateEmailValidator(request.query);
+
+      const result = await new ActivateEmailResponse({ request });
 
       response.send({
         code: 200,
