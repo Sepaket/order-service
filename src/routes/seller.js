@@ -10,6 +10,7 @@ router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
   route.get('/activate/:token', AuthController.activateEmail);
   route.post('/forgot-password', AuthController.forgotPassword);
+  route.post('/reset-password', AuthController.resetPassword);
 });
 
 // method not allowed when method request http is failure

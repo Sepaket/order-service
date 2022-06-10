@@ -3,7 +3,7 @@ const LoginValidator = require('../../validators/seller/auth/login-validator');
 const RegisterValidator = require('../../validators/seller/auth/register-validator');
 const SocialValidator = require('../../validators/seller/auth/social-validator');
 const ForgotPasswordValidator = require('../../validators/seller/auth/forgot-password-validator');
-const ResetValidator = require('../../validators/seller/auth/reset-validator');
+const ResetPasswordValidator = require('../../validators/seller/auth/reset-password-validator');
 const ActivateEmailValidator = require('../../validators/seller/auth/activate-validator');
 
 // responses
@@ -11,7 +11,7 @@ const LoginResponse = require('../../responses/seller/auth/login-response');
 const RegisterResponse = require('../../responses/seller/auth/register-response');
 const SocialResponse = require('../../responses/seller/auth/social-response');
 const ForgotPasswordResponse = require('../../responses/seller/auth/forgot-password-response');
-const ResetResponse = require('../../responses/seller/auth/reset-response');
+const ResetPasswordResponse = require('../../responses/seller/auth/reset-password-response');
 const ActivateEmailResponse = require('../../responses/seller/auth/activate-response');
 
 module.exports = {
@@ -95,11 +95,11 @@ module.exports = {
     }
   },
 
-  reset: async (request, response, next) => {
+  resetPassword: async (request, response, next) => {
     try {
-      await ResetValidator(request.params);
+      await ResetPasswordValidator(request.body);
 
-      const result = await new ResetResponse({ request });
+      const result = await new ResetPasswordResponse({ request });
 
       response.send({
         code: 200,
