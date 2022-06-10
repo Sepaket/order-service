@@ -65,7 +65,7 @@ module.exports = {
 
   social: async (request, response, next) => {
     try {
-      await SocialValidator(request.params);
+      await SocialValidator(request.body);
 
       const result = await new SocialResponse({ request });
 
