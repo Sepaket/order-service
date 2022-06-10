@@ -63,6 +63,10 @@ module.exports = (sequelize, DataTypes) => {
     model.SellerDetail.belongsTo(model.Seller, {
       as: 'seller',
     });
+
+    model.SellerDetail.belongsTo(model.Bank, {
+      as: 'bank',
+    });
   };
 
   return SellerDetail;

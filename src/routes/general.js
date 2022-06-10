@@ -9,6 +9,7 @@ const SellerAuthorization = require('../app/middlewares/seller-authentication');
 const LocationController = require('../app/controllers/general/location-controller');
 const FaqConrtoller = require('../app/controllers/general/faq-controller');
 const UploadController = require('../app/controllers/general/upload-controller');
+const BankController = require('../app/controllers/general/bank-controller');
 
 router.group('/location', (route) => {
   route.get('/province', LocationController.provinceList);
@@ -25,6 +26,11 @@ router.group('/location', (route) => {
 router.group('/faq', (route) => {
   route.get('/', FaqConrtoller.index);
   route.get('/:id', FaqConrtoller.detail);
+});
+
+router.group('/bank', (route) => {
+  route.get('/', BankController.index);
+  route.get('/:id', BankController.detail);
 });
 
 router.group('/upload', (route) => {
