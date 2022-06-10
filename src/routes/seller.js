@@ -17,6 +17,7 @@ router.group('/auth', (route) => {
 
 router.group('/profile', (route) => {
   route.get('/me', Authorization, ProfileController.index);
+  route.post('/update', Authorization, ProfileController.update);
 });
 
 // method not allowed when method request http is failure
