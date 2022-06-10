@@ -2,7 +2,7 @@
 const LoginValidator = require('../../validators/seller/auth/login-validator');
 const RegisterValidator = require('../../validators/seller/auth/register-validator');
 const SocialValidator = require('../../validators/seller/auth/social-validator');
-const ForgotValidator = require('../../validators/seller/auth/forgot-validator');
+const ForgotPasswordValidator = require('../../validators/seller/auth/forgot-password-validator');
 const ResetValidator = require('../../validators/seller/auth/reset-validator');
 const ActivateEmailValidator = require('../../validators/seller/auth/activate-validator');
 
@@ -10,7 +10,7 @@ const ActivateEmailValidator = require('../../validators/seller/auth/activate-va
 const LoginResponse = require('../../responses/seller/auth/login-response');
 const RegisterResponse = require('../../responses/seller/auth/register-response');
 const SocialResponse = require('../../responses/seller/auth/social-response');
-const ForgotResponse = require('../../responses/seller/auth/forgot-response');
+const ForgotPasswordResponse = require('../../responses/seller/auth/forgot-password-response');
 const ResetResponse = require('../../responses/seller/auth/reset-response');
 const ActivateEmailResponse = require('../../responses/seller/auth/activate-response');
 
@@ -79,11 +79,11 @@ module.exports = {
     }
   },
 
-  forgot: async (request, response, next) => {
+  forgotPassword: async (request, response, next) => {
     try {
-      await ForgotValidator(request.params);
+      await ForgotPasswordValidator(request.body);
 
-      const result = await new ForgotResponse({ request });
+      const result = await new ForgotPasswordResponse({ request });
 
       response.send({
         code: 200,
