@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
-const { Seller, SellerDetail } = require('../../../models');
+const { Seller, SellerDetail, sequelize } = require('../../../models');
 const { setRedisData } = require('../../../../helpers/redis');
 
 module.exports = class {
@@ -16,48 +16,65 @@ module.exports = class {
   }
 
   process() {
-    return new Promise((resolve, reject) => {
-      const { headers, body } = this.request;
+    return new Promise(async (resolve, reject) => {
+      const dbTransaction = await sequelize.transaction();
 
-      const parameterMapper = this.parameterMapper();
-      const authorizationHeader = headers.authorization;
-      const token = authorizationHeader
-        .replace(/bearer/gi, '')
-        .replace(/ /g, '');
+      try {
+        const { headers, body } = this.request;
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-      this.userId = decoded.id;
-      this.token = token;
+        const parameterMapper = this.parameterMapper();
+        const authorizationHeader = headers.authorization;
+        const token = authorizationHeader
+          .replace(/bearer/gi, '')
+          .replace(/ /g, '');
 
-      if (body.email !== '') this.checkEmail(resolve, reject);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        this.userId = decoded.id;
+        this.token = token;
 
-      this.seller.update(
-        { ...parameterMapper },
-        { where: { id: decoded.id } },
-      ).then(() => {
+        if (await this.checkEmail()) {
+          reject(httpErrors(422, 'This email has been exist, try another email', { data: false }));
+          return;
+        }
+
+        await this.seller.update(
+          { ...parameterMapper },
+          { where: { id: decoded.id } },
+          { transaction: dbTransaction },
+        );
+
+        await this.sellerDetail.update(
+          { photo: body.photo },
+          { where: { sellerId: decoded.id } },
+          { transaction: dbTransaction },
+        );
+
+        await dbTransaction.commit();
+
         this.updateRedisToken();
         resolve(true);
-      }).catch((error) => {
+      } catch (error) {
+        await dbTransaction.rollback();
         reject(error);
-      });
+      }
     });
   }
 
-  checkEmail(resolve, reject) {
-    const { body } = this.request;
-    this.seller.findOne({
-      where: {
-        id: {
-          [this.op.not]: this.userId,
+  async checkEmail() {
+    try {
+      const { body } = this.request;
+
+      const seller = await this.seller.findOne({
+        where: {
+          id: { [this.op.not]: this.userId },
+          email: { [this.op.eq]: body.email },
         },
-        email: {
-          [this.op.eq]: body.email,
-        },
-      },
-    }).then((result) => {
-      if (!result) return resolve(true);
-      return reject(httpErrors(422, 'This email has been exist, try another email', { data: false }));
-    }).catch((error) => reject(error));
+      });
+
+      return seller;
+    } catch (error) {
+      throw new Error(httpErrors(500, error.message, { data: false }));
+    }
   }
 
   updateRedisToken() {
