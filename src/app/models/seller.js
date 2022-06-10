@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    forgot_password_token: {
+    forgotPasswordToken: {
       type: DataTypes.STRING,
       allowNull: true,
     },

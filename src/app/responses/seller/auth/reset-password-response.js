@@ -33,7 +33,7 @@ module.exports = class {
       where: { forgot_password_token: this.request.body.token },
     });
 
-    if (seller !== null) {
+    if (!seller) {
       this.seller = seller;
     }
   }
