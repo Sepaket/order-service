@@ -3,11 +3,12 @@ require('express-group-routes');
 
 const router = app.Router();
 
-// const Uploader = require('../app/middlewares/uploader');
-// const Authorization = require('../app/middlewares/admin-authentication');
+const Uploader = require('../app/middlewares/uploader');
+const SellerAuthorization = require('../app/middlewares/seller-authentication');
 
 const LocationController = require('../app/controllers/general/location-controller');
 const FaqConrtoller = require('../app/controllers/general/faq-controller');
+const UploadController = require('../app/controllers/general/upload-controller');
 
 router.group('/location', (route) => {
   route.get('/province', LocationController.provinceList);
@@ -26,9 +27,9 @@ router.group('/faq', (route) => {
   route.get('/:id', FaqConrtoller.detail);
 });
 
-// router.group('/upload', (route) => {
-//   route.post('/', [Authorization, Uploader], UploadController);
-// });
+router.group('/upload', (route) => {
+  route.post('/', [SellerAuthorization, Uploader], UploadController);
+});
 
 // method not allowed when method request http is failure
 router.all('/*', (req, res) => {
