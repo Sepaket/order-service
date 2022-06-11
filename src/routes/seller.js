@@ -13,6 +13,8 @@ router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
   route.post('/social', AuthController.social);
   route.get('/activate/:token', AuthController.activateEmail);
+  route.post('/forgot-password', AuthController.forgotPassword);
+  route.post('/reset-password', AuthController.resetPassword);
 });
 
 router.group('/profile', (route) => {
