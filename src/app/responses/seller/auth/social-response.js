@@ -75,7 +75,7 @@ module.exports = class {
 
       const created = await this.seller.create({
         name: body.name,
-        email: body.emails,
+        email: body.email,
         password: '-1',
         phone: '0',
         socialId: body.social_id,
