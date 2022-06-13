@@ -7,6 +7,8 @@ const application = express();
 const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
+const originScheduler = require('./src/scheduler/get-origin-scheduler');
+const destinationScheduler = require('./src/scheduler/get-destination-scheduler');
 
 // port load
 const port = process.env.APP_PORT || 6000;
@@ -22,6 +24,9 @@ const corsOptions = {
     'http://localhost:4200',
   ],
 };
+
+originScheduler.start();
+destinationScheduler.start();
 
 application.use(cors(corsOptions));
 application.use(bodyParser.urlencoded({ extended: true }));
