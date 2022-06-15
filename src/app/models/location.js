@@ -6,40 +6,56 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    provinceId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    provinceName: {
+    province: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    cityId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    cityName: {
+    city: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    districtId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    districtName: {
+    district: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subDistrictId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    subDistrictName: {
+    subDistrict: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     postalCode: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    jneOriginCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    jneDestinationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    sicepatOriginCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    sicepatDestinationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    ninjaOriginCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    ninjaDestinationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    idexpressOriginCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    idexpressDestinationCode: {
+      type: DataTypes.STRING,
       allowNull: true,
     },
   };
@@ -52,43 +68,5 @@ module.exports = (sequelize, DataTypes) => {
     engine: 'InnoDB',
     charset: 'utf8',
     tableName: 'locations',
-    indexes: [
-      {
-        unique: true,
-        fields: ['province_id', 'province_id_location_idx'],
-      },
-      {
-        unique: false,
-        fields: ['province_name', 'province_name_location_idx'],
-      },
-      {
-        unique: true,
-        fields: ['city_id', 'city_id_location_idx'],
-      },
-      {
-        unique: false,
-        fields: ['city_name', 'city_name_location_idx'],
-      },
-      {
-        unique: true,
-        fields: ['district_id', 'district_id_location_idx'],
-      },
-      {
-        unique: false,
-        fields: ['district_name', 'district_name_location_idx'],
-      },
-      {
-        unique: true,
-        fields: ['sub_district_id', 'sub_district_id_location_idx'],
-      },
-      {
-        unique: false,
-        fields: ['sub_district_name', 'sub_district_name_location_idx'],
-      },
-      {
-        unique: false,
-        fields: ['postal_code', 'postal_code_location_idx'],
-      },
-    ],
   });
 };

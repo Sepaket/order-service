@@ -12,15 +12,7 @@ const UploadController = require('../app/controllers/general/upload-controller')
 const BankController = require('../app/controllers/general/bank-controller');
 
 router.group('/location', (route) => {
-  route.get('/province', LocationController.provinceList);
-  route.get('/province/:id', LocationController.provinceDetail);
-  route.get('/city', LocationController.cityList);
-  route.get('/city/:id', LocationController.cityDetail);
-  route.get('/district', LocationController.districtList);
-  route.get('/district/:id', LocationController.districtDetail);
-  route.get('/sub-district', LocationController.subDistrictList);
-  route.get('/sub-district/:id', LocationController.subDistrictDetail);
-  route.get('/list', LocationController.locationList);
+  route.get('/', LocationController.index);
 });
 
 router.group('/faq', (route) => {
