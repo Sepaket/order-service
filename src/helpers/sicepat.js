@@ -43,7 +43,23 @@ const getDestination = () => new Promise((resolve, reject) => {
   });
 });
 
+const checkPrice = (payload) => new Promise((resolve) => {
+  const { origin, destination, weight } = payload;
+
+  axios.get(`${process.env.SICEPAT_BASE_URL_TRACKING}/customer/tariff`, {
+    params: { origin, destination, weight },
+    headers: {
+      'api-key': process.env.SICEPAT_APIKEY_TRACKING,
+    },
+  }).then((response) => {
+    resolve(response?.data?.sicepat?.results || []);
+  }).catch(() => {
+    resolve([]);
+  });
+});
+
 module.exports = {
   getOrigin,
   getDestination,
+  checkPrice,
 };

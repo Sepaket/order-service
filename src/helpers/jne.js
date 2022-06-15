@@ -42,7 +42,7 @@ const getDestination = () => new Promise((resolve, reject) => {
   });
 });
 
-const checkPrice = (payload) => new Promise((resolve, reject) => {
+const checkPrice = (payload) => new Promise((resolve) => {
   const {
     origin,
     destination,
@@ -60,13 +60,9 @@ const checkPrice = (payload) => new Promise((resolve, reject) => {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   }).then((response) => {
-    if (!response?.data?.price) {
-      reject(new Error(`JNE: ${response?.data?.error || 'Something Wrong'}`));
-    }
-
-    resolve(response?.data?.price);
-  }).catch((error) => {
-    reject(new Error(`JNE: ${error?.data?.error || 'Something Wrong'}`));
+    resolve(response?.data?.price || []);
+  }).catch(() => {
+    resolve([]);
   });
 });
 

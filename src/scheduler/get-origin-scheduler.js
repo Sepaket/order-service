@@ -64,7 +64,7 @@ const runner = cron.schedule('30 * * * *', async () => {
     origins = origins.concat(sicepatOrigins);
 
     setRedisData({
-      db: 3,
+      db: 2,
       key: 'origins',
       data: JSON.stringify(origins),
     });
