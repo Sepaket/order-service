@@ -1,10 +1,10 @@
 const table = 'banks';
-const provinces = require('../templates/bank.json');
+const banks = require('../templates/bank.json');
 
 module.exports = {
   up: async (queryInterface) => Promise.all([
     queryInterface.bulkDelete(table, null, { truncate: true }),
-    queryInterface.bulkInsert(table, provinces.map((item) => ({
+    queryInterface.bulkInsert(table, banks.map((item) => ({
       name: item.name,
       code: item.code,
     }))),

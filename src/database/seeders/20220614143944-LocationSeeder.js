@@ -1,10 +1,10 @@
 const table = 'locations';
-const provinces = require('../templates/location.json');
+const locations = require('../templates/location.json');
 
 module.exports = {
   up: async (queryInterface) => Promise.all([
     queryInterface.bulkDelete(table, null, { truncate: true }),
-    queryInterface.bulkInsert(table, provinces
+    queryInterface.bulkInsert(table, locations
       .filter((item) => item.ZIP_CODE !== 0)
       .map((item) => ({
         province: item.PROVINCE_NAME.toLowerCase(),
