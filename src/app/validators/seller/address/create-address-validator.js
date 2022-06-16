@@ -18,9 +18,11 @@ const isUnique = async ({ params }) => new Promise((resolve, reject) => {
 });
 
 const validator = joi.object({
-  name: joi.string()
-    .required()
-    .external((obj) => isUnique({ params: obj })),
+  name: joi.string().required().external((obj) => isUnique({ params: obj })),
+  pic_name: joi.string().required(),
+  pic_phone: joi.number().min(10).required(),
+  address: joi.string().required(),
+  address_detail: joi.string().required(),
 });
 
 module.exports = (object) => {

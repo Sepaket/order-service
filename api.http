@@ -1,0 +1,62 @@
+@base_url = http://127.0.0.1:3000/api/v1
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjU1MzU3NDk2LCJleHAiOjE2NTU0NDM4OTZ9.IA2pOijJiQ0EmKUd7r_uJHq67KL1bphtYKPnhnCj9Pc
+
+### register
+POST {{base_url}}/seller/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "ilham",
+    "email":"eagleax700@gmail.com",
+    "password":"Windows8$",
+    "password_confirmation":"Windows8$",
+    "phone":"0123456789"
+}
+
+### login
+POST {{base_url}}/seller/auth/login
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+email=eagleax700@gmail.com
+&password=Password@123
+
+### Forgot password
+POST {{base_url}}/seller/auth/forgot-password
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+email=eagleax700@gmail.com
+
+### Reset password
+POST {{base_url}}/seller/auth/reset-password
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+token=F3PPJF5MH
+&new_password=Password@123
+
+### Profile
+GET {{base_url}}/seller/profile/me
+Authorization: Bearer {{token}}
+
+### Address
+GET {{base_url}}/seller/address
+    ?page=1
+    &limit=4
+    &pagination=1
+    &q=rr
+Authorization: Bearer {{token}}
+
+### Create Address
+POST {{base_url}}/seller/address/create
+Authorization: Bearer {{token}}
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+name=sss
+&pic_name=pic name
+&pic_phone=082394888377
+&address=address 1
+&address_detail=address 2
