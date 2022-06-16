@@ -27,6 +27,7 @@ router.group('/profile', (route) => {
 router.group('/address', (route) => {
   route.get('/', Authorization, SellerAddressController.index);
   route.post('/create', Authorization, SellerAddressController.create);
+  route.get('/show', Authorization, SellerAddressController.show);
 });
 
 // method not allowed when method request http is failure

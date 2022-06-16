@@ -60,3 +60,9 @@ name=sss
 &pic_phone=082394888377
 &address=address 1
 &address_detail=address 2
+
+### Show Address
+GET {{base_url}}/seller/address/show?id=2
+Authorization: Bearer {{token}}
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
