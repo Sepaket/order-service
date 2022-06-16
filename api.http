@@ -66,3 +66,18 @@ GET {{base_url}}/seller/address/show?id=2
 Authorization: Bearer {{token}}
 Content-Type: application/x-www-form-urlencoded
 Accept: application/json
+
+### Update Address
+PUT {{base_url}}/seller/address/update
+Authorization: Bearer {{token}}
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+id=1
+&name=ssss
+&pic_name=pic name
+&pic_phone=082394888377
+&address=address 1
+&address_detail=address 2
+# 0=inactive, 1=active
+&status=0
