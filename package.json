@@ -54,8 +54,7 @@
     "pg-hstore": "^2.3.4",
     "redis": "^4.1.0",
     "sequelize": "^6.20.1",
-    "shortid-36": "^0.1.2",
-    "snakecase-keys": "^5.4.2"
+    "shortid-36": "^0.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

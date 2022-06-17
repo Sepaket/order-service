@@ -54,7 +54,6 @@ module.exports = (sequelize, DataTypes) => {
     engine: 'InnoDB',
     charset: 'utf8',
     tableName: 'seller_addresses',
-    // tableName: 'seller_addresses',
   });
 
   // SellerAddress.associate = (model) => {

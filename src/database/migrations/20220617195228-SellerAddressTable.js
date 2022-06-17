@@ -11,7 +11,7 @@ module.exports = {
       },
       seller_id: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
@@ -48,6 +48,10 @@ module.exports = {
       },
     }).then(() => [
       queryInterface.addIndex(table, { fields: ['name'], name: `name_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['pic_name'], name: `pic_name_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['pic_phone_number'], name: `pic_phone_number_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['address'], name: `address_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['address_detail'], name: `address_detail_${table}_idx` }),
     ]),
   ]),
 

@@ -1,6 +1,6 @@
 const httpErrors = require('http-errors');
 const { SellerAddress, sequelize } = require('../../../models');
-const auth = require('../../../../helpers/auth');
+const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
@@ -12,6 +12,7 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
+      this.seller = await jwtSelector({ request: this.request });
       const parameterMapper = await this.mapper();
 
       await SellerAddress.create(
@@ -28,11 +29,10 @@ module.exports = class {
   }
 
   async mapper() {
-    const sellerId = auth.sellerId(this.request);
     const { body } = this.request;
 
     return {
-      sellerId,
+      sellerId: this.seller.id,
       name: body.name,
       picName: body.pic_name,
       picPhoneNumber: body.pic_phone,
