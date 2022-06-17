@@ -4,6 +4,7 @@ const jwtSelector = require('../../../../helpers/jwt-selector');
 module.exports = class {
   constructor({ request }) {
     this.request = request;
+    this.address = SellerAddress;
     return this.process();
   }
 
@@ -14,7 +15,7 @@ module.exports = class {
         const parameter = this.parameterMapper();
         const { body } = this.request;
 
-        await SellerAddress.update(
+        await this.address.update(
           { ...parameter },
           { where: { id: body.id } },
         );
