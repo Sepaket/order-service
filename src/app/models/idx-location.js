@@ -6,27 +6,27 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    province_id: {
+    provinceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    province_name: {
+    provinceName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    city_id: {
+    cityId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    city_name: {
+    cityName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    district_id: {
+    districtId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    district_name: {
+    districtName: {
       type: DataTypes.STRING,
       allowNull: false,
     },

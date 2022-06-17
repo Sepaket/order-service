@@ -1,10 +1,12 @@
 // const httpErrors = require('http-errors');
 const jne = require('../../../helpers/jne');
+const { Location } = require('../../models');
 const ninja = require('../../../helpers/ninja');
 const sicepat = require('../../../helpers/sicepat');
+const idexpress = require('../../../helpers/idexpress');
+const { idxServiceStatus } = require('../../../constant/status');
 const snakeCaseConverter = require('../../../helpers/snakecase-converter');
 const { formatCurrency } = require('../../../helpers/currency-converter');
-const { Location } = require('../../models');
 
 module.exports = class {
   constructor({ request }) {
@@ -13,6 +15,7 @@ module.exports = class {
     this.request = request;
     this.sicepat = sicepat;
     this.location = Location;
+    this.idexpress = idexpress;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -32,7 +35,10 @@ module.exports = class {
           );
         }
 
-        resolve(result);
+        resolve({
+          data: result,
+          meta: null,
+        });
       } catch (error) {
         reject(error);
       }
@@ -56,6 +62,10 @@ module.exports = class {
         this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== ''
       );
 
+      const idxCondition = (
+        this.origin.idexpressOriginCode !== '' && this.destination.idexpressDestinationCode !== ''
+      );
+
       if (body.type === 'JNE' && jneCondition) {
         const jnePrices = await this.jneFee();
         if (jnePrices?.length > 0) fees.push(jnePrices);
@@ -71,13 +81,22 @@ module.exports = class {
         if (ninjaPrices?.length > 0) fees.push(ninjaPrices);
       }
 
+      if (body.type === 'IDEXPRESS' && idxCondition) {
+        const idxPrice = await this.idxFee();
+        if (idxPrice?.length > 0) fees.push(idxPrice);
+      }
+
       if (body.type === 'ALL') {
         let result = [];
         const jnePrices = await this.jneFee();
         const sicepatPrices = await this.sicepatFee();
+        const ninjaPrices = await this.ninjaFee();
+        const idxPrice = await this.idxFee();
 
         result = result.concat(jnePrices);
         result = result.concat(sicepatPrices);
+        result = result.concat(ninjaPrices);
+        result = result.concat(idxPrice);
 
         fees.push(result);
       }
@@ -98,7 +117,7 @@ module.exports = class {
       });
 
       const mapped = prices?.filter((item) => item.times)?.map((item) => {
-        const day = (item.times.toUpperCase() === 'D') ? 'Hari' : 'Minggu';
+        const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
 
         return {
           serviceName: item.service_display,
@@ -133,7 +152,7 @@ module.exports = class {
           serviceName: `Sicepat ${item.service}`,
           serviceCode: item.service,
           estimation: rawEstimation[0],
-          estimationFormatted: `${item.etd}`,
+          estimationFormatted: `${item.etd?.toLowerCase()}`,
           price: item.tariff,
           priceFormatted: formatCurrency(item.tariff, 'Rp.'),
           type: 'SICEPAT',
@@ -161,10 +180,50 @@ module.exports = class {
         serviceName: 'Ninja Reguler',
         serviceCode: 'Standard',
         estimation: '2 - 4',
-        estimationFormatted: '2 - 4 Hari',
+        estimationFormatted: '2 - 4 hari',
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
       }] : [];
+    } catch (error) {
+      throw new Error(error?.message || 'Something Wrong');
+    }
+  }
+
+  async idxFee() {
+    try {
+      const { body } = this.request;
+      const prices = await Promise.all(
+        idxServiceStatus.map(async (item) => {
+          const price = await this.idexpress.checkPrice({
+            weight: body.weight,
+            origin: this.origin.idexpressOriginCode,
+            destination: this.destination.idexpressDestinationCode,
+            service: item.code,
+          });
+
+          return {
+            price,
+            code: item.code,
+            name: item.name,
+            estimation: item.estimation,
+          };
+        }),
+      );
+
+      const mapped = prices?.map((item) => {
+        const rawEstimation = item.estimation.split(' hari');
+
+        return {
+          serviceName: `IDX ${item.name}`,
+          serviceCode: item.code,
+          estimation: rawEstimation[0],
+          estimationFormatted: item.estimation,
+          priceFormatted: formatCurrency(item.price, 'Rp.'),
+          type: 'IDEXPRESS',
+        };
+      }) || [];
+
+      return mapped;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
