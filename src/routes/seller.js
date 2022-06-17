@@ -26,7 +26,7 @@ router.group('/profile', (route) => {
 
 router.group('/address', (route) => {
   route.get('/', Authorization, AddressController.index);
-  route.post('/create', Authorization, AddressController.create);
+  route.post('/', Authorization, AddressController.create);
   route.get('/:id', Authorization, AddressController.detail);
   route.post('/:id', Authorization, AddressController.update);
 });
