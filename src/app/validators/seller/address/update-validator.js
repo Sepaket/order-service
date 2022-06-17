@@ -1,5 +1,4 @@
 const joi = require('joi');
-const { Op } = require('sequelize');
 const { SellerAddress } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
@@ -9,7 +8,7 @@ const isIdExists = async ({ params }) => new Promise(async (resolve, reject) => 
   const seller = await jwtSelector({ request });
 
   SellerAddress.findOne({
-    where: { id: params, seller_id: seller?.id },
+    where: { id: params, sellerId: seller?.id },
   }).then((result) => {
     if (!result) reject(new Error('The selected id is invalid'));
     else resolve(true);
@@ -24,10 +23,8 @@ const isNameUnique = async ({ params }) => new Promise(async (resolve, reject) =
   SellerAddress.findOne({
     where: {
       name: params,
-      seller_id: seller?.id,
-      id: {
-        [Op.ne]: request.body.id,
-      },
+      sellerId: seller?.id,
+      id: request.params.id,
     },
   }).then((result) => {
     if (result) reject(new Error('The name already exists.'));
