@@ -20,7 +20,7 @@ const setRedisData = (payload) => {
     db = 0,
     key = '',
     data = null,
-    timeout = 3600000,
+    timeout = 3600000, // in milisecond
   } = payload;
 
   client.select(db, () => client.setex(key, timeout, data));
