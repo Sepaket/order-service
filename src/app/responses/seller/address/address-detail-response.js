@@ -1,12 +1,13 @@
 const httpErrors = require('http-errors');
-const { SellerAddress } = require('../../../models');
+const { SellerAddress, Location } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 
 module.exports = class {
   constructor({ request }) {
-    this.address = SellerAddress;
     this.request = request;
+    this.location = Location;
+    this.address = SellerAddress;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -23,17 +24,33 @@ module.exports = class {
           'pic_name',
           'pic_phone_number',
           'address',
-          'address_detail',
           'active',
         ],
         where: {
           id: params.id,
           sellerId: seller.id,
         },
+        include: [
+          {
+            model: this.location,
+            as: 'location',
+            required: false,
+            attributes: [
+              ['id', 'location_id'],
+              'province',
+              'city',
+              'district',
+              'subDistrict',
+              'postalCode',
+            ],
+          },
+        ],
       }).then((response) => {
         const result = this.converter.objectToSnakeCase(
           JSON.parse(JSON.stringify(response)),
         );
+
+        result.location = this.converter.objectToSnakeCase(result.location);
 
         if (response) resolve(result);
         else reject(httpErrors(404, 'No Data Found', { data: null }));

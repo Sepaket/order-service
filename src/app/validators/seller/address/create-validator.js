@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { SellerAddress } = require('../../../models');
+const { SellerAddress, Location } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
 let request = null;
@@ -17,12 +17,23 @@ const isUnique = async (params) => new Promise(async (resolve, reject) => {
   });
 });
 
+const isExist = async (param) => new Promise((resolve, reject) => {
+  Location.findOne({
+    where: { id: param },
+  }).then((result) => {
+    if (!result) reject(new Error('This location does not exist'));
+    else resolve(true);
+  }).catch((error) => {
+    reject(error.message);
+  });
+});
+
 const validator = joi.object({
   name: joi.string().required().external((req) => isUnique(req)),
   pic_name: joi.string().required(),
   pic_phone: joi.number().min(10).required(),
   address: joi.string().required(),
-  address_detail: joi.string().required(),
+  location_id: joi.number().required().external((req) => isExist(req)),
 });
 
 module.exports = (object) => {
