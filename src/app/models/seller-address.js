@@ -23,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
     address: {
       type: DataTypes.STRING,
     },
-    addressDetail: {
-      type: DataTypes.STRING,
+    locationId: {
+      type: DataTypes.INTEGER,
     },
     active: {
       type: DataTypes.BOOLEAN,
@@ -59,6 +59,10 @@ module.exports = (sequelize, DataTypes) => {
   SellerAddress.associate = (model) => {
     model.SellerAddress.belongsTo(model.Seller, {
       as: 'seller',
+    });
+
+    model.SellerAddress.belongsTo(model.Location, {
+      as: 'location',
     });
   };
 

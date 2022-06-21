@@ -83,7 +83,9 @@ const validator = joi.object({
   should_pickup_with: joi.string().required().valid('MOTOR', 'MOBIL', 'TRUCK'),
   goods_content: joi.string().max(50).required(),
   goods_amount: joi.number().required(),
+  goods_qty: joi.number().min(1).required(),
   notes: joi.string().allow(null, '').max(50),
+  is_insurance: joi.boolean().required(),
   pickup_date: joi.date().min(moment().format('YYYY-MM-DD')).required(),
   pickup_time: joi.string().regex(/^([0-9]{2}):([0-9]{2})$/)
     .message({ 'string.pattern.base': 'pickup time format should HH:mm,' })
