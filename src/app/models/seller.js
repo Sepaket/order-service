@@ -70,6 +70,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'sellerDetail',
       foreignKey: 'sellerId',
     });
+
+    model.Seller.hasOne(model.SellerAddress, {
+      as: 'address',
+      foreignKey: 'sellerId',
+    });
   };
 
   return Seller;

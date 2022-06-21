@@ -56,12 +56,11 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'seller_addresses',
   });
 
-  // SellerAddress.associate = (model) => {
-  //   model.SellerAddress.hasOne(model.Seller, {
-  //     as: 'sellerAddress',
-  //     foreignKey: 'id',
-  //   });
-  // };
+  SellerAddress.associate = (model) => {
+    model.SellerAddress.belongsTo(model.Seller, {
+      as: 'seller',
+    });
+  };
 
   return SellerAddress;
 };

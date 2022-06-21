@@ -2,14 +2,16 @@
 const SingleOrderValidator = require('../../validators/expedition/order/create-order-validator');
 
 // responses
-const SingleOrderResponse = require('../../responses/expedition/order/single-order-response');
+const JneSingleOrderResponse = require('../../responses/expedition/order/single-order/jne-order-response');
 
 module.exports = {
   singleOrder: async (request, response, next) => {
     try {
-      await SingleOrderValidator(request.body);
+      let result = null;
+      const { body } = request;
+      await SingleOrderValidator(request);
 
-      const result = await new SingleOrderResponse({ request });
+      if (body.type === 'JNE') result = await new JneSingleOrderResponse({ request });
 
       response.send({
         code: 200,

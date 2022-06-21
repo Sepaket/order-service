@@ -38,6 +38,14 @@ const sicepatServiceStatus = [
   { code: 'GOKIL', name: 'Sicepat GOKIL', type: 'SICEPAT' },
   { code: 'HALU', name: 'Sicepat HALU', type: 'SICEPAT' },
   { code: 'REG', name: 'Sicepat REG', type: 'SICEPAT' },
+  { code: 'SAMEDAY', name: 'Sicepat SAMEDAY', type: 'SICEPAT' },
+  { code: 'H3LO', name: 'Sicepat H3LO', type: 'SICEPAT' },
+  { code: 'SYARIAH', name: 'Sicepat SYARIAH', type: 'SICEPAT' },
+  { code: 'GO', name: 'Sicepat GO', type: 'SICEPAT' },
+  { code: 'COD', name: 'Sicepat COD', type: 'SICEPAT' },
+  { code: 'KLIK', name: 'Sicepat KLIK', type: 'SICEPAT' },
+  { code: 'SIUNTUNG', name: 'Sicepat SIUNTUNG', type: 'SICEPAT' },
+  { code: 'BEST', name: 'Sicepat BEST', type: 'SICEPAT' },
 ];
 
 const serviceCode = {
