@@ -88,15 +88,20 @@ module.exports = class {
 
       if (body.type === 'ALL') {
         let result = [];
-        const jnePrices = await this.jneFee();
-        const sicepatPrices = await this.sicepatFee();
-        const ninjaPrices = await this.ninjaFee();
-        const idxPrice = await this.idxFee();
+        let jnePrices = [];
+        let sicepatPrices = [];
+        let ninjaPrices = [];
+        let idxPrices = [];
+
+        if (jneCondition) jnePrices = await this.jneFee();
+        if (sicepatCondition) sicepatPrices = await this.sicepatFee();
+        if (ninjaCondition) ninjaPrices = await this.ninjaFee();
+        if (idxCondition) idxPrices = await this.idxFee();
 
         result = result.concat(jnePrices);
         result = result.concat(sicepatPrices);
         result = result.concat(ninjaPrices);
-        result = result.concat(idxPrice);
+        result = result.concat(idxPrices);
 
         fees.push(result);
       }
@@ -116,7 +121,7 @@ module.exports = class {
         weight: body.weight,
       });
 
-      const mapped = prices?.filter((item) => item.times)?.map((item) => {
+      const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
 
         return {
@@ -210,10 +215,11 @@ module.exports = class {
         }),
       );
 
-      const mapped = prices?.map((item) => {
+      const mapped = prices?.filter((item) => item.price)?.map((item) => {
         const rawEstimation = item.estimation.split(' hari');
 
         return {
+          price: item.price,
           serviceName: `IDX ${item.name}`,
           serviceCode: item.code,
           estimation: rawEstimation[0],
