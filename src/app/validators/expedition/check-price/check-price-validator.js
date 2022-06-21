@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { Location } = require('../../models');
+const { Location } = require('../../../models');
 
 const isExist = async ({ params, identifier }) => new Promise((resolve, reject) => {
   Location.findOne({

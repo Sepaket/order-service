@@ -1,12 +1,12 @@
 // const httpErrors = require('http-errors');
-const jne = require('../../../helpers/jne');
-const { Location } = require('../../models');
-const ninja = require('../../../helpers/ninja');
-const sicepat = require('../../../helpers/sicepat');
-const idexpress = require('../../../helpers/idexpress');
-const { idxServiceStatus } = require('../../../constant/status');
-const snakeCaseConverter = require('../../../helpers/snakecase-converter');
-const { formatCurrency } = require('../../../helpers/currency-converter');
+const jne = require('../../../../helpers/jne');
+const { Location } = require('../../../models');
+const ninja = require('../../../../helpers/ninja');
+const sicepat = require('../../../../helpers/sicepat');
+const idexpress = require('../../../../helpers/idexpress');
+const { idxServiceStatus } = require('../../../../constant/status');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const { formatCurrency } = require('../../../../helpers/currency-converter');
 
 module.exports = class {
   constructor({ request }) {
