@@ -69,7 +69,6 @@ module.exports = class {
       pickup_name: this.sellerData?.name || '',
       pickup_date: body.pickup_date,
       pickup_time: body.pickup_time,
-      pickup_pic: this.seller
     };
   }
 };
