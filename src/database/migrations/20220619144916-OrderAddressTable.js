@@ -9,6 +9,10 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      order_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       sender_name: {
         type: Sequelize.STRING,
         allowNull: false,

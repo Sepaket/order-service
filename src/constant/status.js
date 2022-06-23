@@ -61,10 +61,15 @@ const serviceCode = {
   ],
 };
 
+const orderStatus = {
+  WAITING_PICKUP: 'WAITING_PICKUP',
+};
+
 module.exports = {
   idxServiceStatus,
   ninjaServiceStatus,
   jneServiceStatus,
   sicepatServiceStatus,
   serviceCode,
+  orderStatus,
 };
