@@ -1,6 +1,5 @@
-const moment = require('moment');
-const shortid = require('shortid-36');
-const jne = require('../../../../../helpers/jne');
+const randomNumber = require('random-number');
+const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const { orderStatus } = require('../../../../../constant/status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
@@ -9,6 +8,7 @@ const {
   Seller,
   Order,
   OrderLog,
+  OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -17,13 +17,14 @@ const {
 
 module.exports = class {
   constructor({ request }) {
-    this.jne = jne;
+    this.sicepat = sicepat;
     this.order = Order;
     this.seller = Seller;
     this.request = request;
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
+    this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
     this.converter = snakeCaseConverter;
@@ -61,22 +62,23 @@ module.exports = class {
 
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
 
+      this.resi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 1 })}`;
       this.origin = this.sellerAddress.location;
       this.destination = await this.location.findOne({ where: { id: body.receiver_location_id } });
       this.shippingFee = await this.shippingFee();
-      this.parameter = await this.paramsMapper();
 
-      const jneCondition = (this.origin.jneOriginCode !== '' && this.destination.jneDestinationCode !== '');
+      const parameter = await this.paramsMapper();
+      const jneCondition = (this.origin.sicepatOriginCode !== '' && this.destination.sicepatDestinationCode !== '');
+
       if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
       if (!this.shippingFee) throw new Error('Service for this destination not found!');
 
-      const paramFormatted = await this.caseConverter();
-      const order = await this.jne.createOrder(paramFormatted);
+      const order = await this.sicepat.createOrder(parameter);
       const orderId = await this.insertLog(order);
 
       return {
         order_id: orderId,
-        resi: order?.length > 0 ? order[0].cnote_no : '',
+        resi: order?.length > 0 ? order[0].receipt_number : '',
       };
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -86,15 +88,15 @@ module.exports = class {
   async shippingFee() {
     try {
       const { body } = this.request;
-      const prices = await this.jne.checkPrice({
-        origin: this.origin.jneOriginCode,
-        destination: this.destination.jneDestinationCode,
+      const prices = await this.sicepat.checkPrice({
+        origin: this.origin.sicepatOriginCode,
+        destination: this.destination.sicepatDestinationCode,
         weight: body.weight,
       });
 
-      const service = await prices?.find((item) => item.service_code === body.service_code);
+      const service = await prices?.find((item) => item.service === body.service_code);
 
-      return service?.price;
+      return service?.tariff;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
@@ -136,18 +138,11 @@ module.exports = class {
     }
   }
 
-  async caseConverter() {
-    return Object.keys(this.parameter).reduce((accumulator, key) => {
-      accumulator[key.toUpperCase()] = this.parameter[key];
-      return accumulator;
-    }, {});
-  }
-
   async orderQuery(order) {
     const { body } = this.request;
 
     return {
-      resi: order?.length > 0 ? order[0].cnote_no : '',
+      resi: order?.length > 0 ? order[0].receipt_number : '',
       expedition: body.type,
       serviceCode: body.service_code,
       isCod: body.is_cod,
@@ -190,53 +185,79 @@ module.exports = class {
     };
   }
 
+  async pickupAddress() {
+    const address = this.sellerAddress;
+
+    return `
+      ${address?.address || ''},
+      Kec. ${address?.location?.subDistrict || ''},
+      Kota ${address?.location?.city || ''},
+      ${address?.location?.province || ''},
+      ${address?.location?.postalCode || ''}
+    `;
+  }
+
+  async receiverAddress() {
+    const { body } = this.request;
+    const address = this.destination;
+
+    return `
+      ${body?.address || ''},
+      Kec. ${address?.subDistrict || ''},
+      Kota ${address?.city || ''},
+      ${address?.province || ''},
+      ${address?.postalCode || ''}
+    `;
+  }
+
   async paramsMapper() {
     const { body } = this.request;
+    const pickupAddress = await this.pickupAddress();
+    const receiverAddress = await this.receiverAddress();
 
     return {
-      pickup_name: this.sellerData?.name || '',
-      pickup_date: body.pickup_date.split('-').reverse().join('-'),
-      pickup_time: body.pickup_time,
-      pickup_pic: this.sellerAddress?.picName || '',
-      pickup_pic_phone: this.sellerAddress?.picPhoneNumber || '',
-      pickup_address: this.sellerAddress?.address || '',
-      pickup_district: this.origin?.district || '',
-      pickup_city: this.origin?.city || '',
-      pickup_service: 'Domestic',
-      pickup_vechile: body.should_pickup_with,
-      branch: this.origin?.jneOriginCode || '',
-      cust_id: body.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
-      order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
-      shipper_name: body.sender_name || '',
-      shipper_addr1: this.sellerAddress?.address?.slice(0, 80) || '',
-      shipper_city: this.origin?.city || '',
-      shipper_zip: this.origin?.postalCode || '',
-      shipper_region: this.origin?.province || '',
-      shipper_country: 'Indonesia',
-      shipper_contact: body.sender_name,
-      shipper_phone: this.sellerAddress?.picPhoneNumber || '',
-      receiver_name: body.receiver_name,
-      receiver_addr1: body.receiver_address,
-      receiver_city: this.destination?.city || '',
-      receiver_zip: this.destination?.postalCode || '',
-      receiver_region: this.destination?.province || '',
-      receiver_country: 'Indonesia',
-      receiver_contact: body.receiver_name,
-      receiver_phone: body.receiver_phone,
-      origin_code: this.origin?.jneOriginCode || '',
-      destination_code: this.destination?.jneDestinationCode || '',
-      service_code: body.service_code,
-      weight: body.weight,
-      qty: body.goods_qty,
-      goods_desc: body.notes,
-      goods_amount: body.goods_amount,
-      insurance_flag: body.is_insurance ? 'Y' : 'N',
-      special_ins: '',
-      merchant_id: this.sellerData.id,
-      type: 'PICKUP',
-      cod_flag: body.is_cod ? 'YES' : 'NO',
-      cod_amount: body?.goods_amount,
-      awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
+      reference_number: `${process.env.SICEPAT_ORDER_PREFIX}${this.resi}`,
+      pickup_request_date: `${body.pickup_date} ${body.pickup_time}`,
+      pickup_method: 'PICKUP',
+      pickup_merchant_code: `Sepaket-${this.sellerData.id}`,
+      pickup_merchant_name: this.sellerAddress.picName,
+      pickup_address: pickupAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+      pickup_city: this.sellerAddress?.location?.city?.toUpperCase() || '',
+      pickup_merchant_phone: this.sellerAddress?.picPhoneNumber || '',
+      pickup_merchant_email: this.sellerData?.email || '',
+      PackageList: [
+        {
+          receipt_number: this.resi,
+          origin_code: this.origin.sicepatOriginCode,
+          delivery_type: body.service_code,
+          parcel_category: body.goods_category,
+          parcel_content: body.goods_content,
+          parcel_qty: body.goods_qty,
+          parcel_uom: 'Pcs',
+          parcel_value: body.goods_amount,
+          total_weight: body.weight,
+          shipper_name: body.sender_name,
+          shipper_address: pickupAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+          shipper_province: this.sellerAddress?.location?.province || '',
+          shipper_city: this.sellerAddress?.location?.city || '',
+          shipper_district: this.sellerAddress?.location?.district || '',
+          shipper_zip: this.sellerAddress?.location?.postalCode || '',
+          shipper_phone: body.sender_phone,
+          shipper_longitude: '',
+          shipper_latitude: '',
+          recipient_title: 'Mr',
+          recipient_name: body.receiver_name,
+          recipient_address: receiverAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+          recipient_province: this.destination.province,
+          recipient_city: this.destination.city,
+          recipient_district: this.destination.district,
+          recipient_zip: this.destination.postalCode,
+          recipient_phone: body.receiver_phone,
+          recipient_longitude: '',
+          recipient_latitude: '',
+          destination_code: this.destination.sicepatDestinationCode,
+        },
+      ],
     };
   }
 };

@@ -6,15 +6,15 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    order_id: {
+    orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    previous_status: {
+    previousStatus: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    current_status: {
+    currentStatus: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -22,16 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },

@@ -35,17 +35,12 @@ const jneServiceStatus = [
 ];
 
 const sicepatServiceStatus = [
-  { code: 'GOKIL', name: 'Sicepat GOKIL', type: 'SICEPAT' },
-  { code: 'HALU', name: 'Sicepat HALU', type: 'SICEPAT' },
   { code: 'REG', name: 'Sicepat REG', type: 'SICEPAT' },
-  { code: 'SAMEDAY', name: 'Sicepat SAMEDAY', type: 'SICEPAT' },
-  { code: 'H3LO', name: 'Sicepat H3LO', type: 'SICEPAT' },
-  { code: 'SYARIAH', name: 'Sicepat SYARIAH', type: 'SICEPAT' },
-  { code: 'GO', name: 'Sicepat GO', type: 'SICEPAT' },
-  { code: 'COD', name: 'Sicepat COD', type: 'SICEPAT' },
-  { code: 'KLIK', name: 'Sicepat KLIK', type: 'SICEPAT' },
-  { code: 'SIUNTUNG', name: 'Sicepat SIUNTUNG', type: 'SICEPAT' },
   { code: 'BEST', name: 'Sicepat BEST', type: 'SICEPAT' },
+  { code: 'SIUNT', name: 'Sicepat SIUNTUNG', type: 'SICEPAT' },
+  { code: 'GOKIL', name: 'Sicepat GOKIL', type: 'SICEPAT' },
+  { code: 'SDS', name: 'Sicepat SAMEDAY', type: 'SICEPAT' },
+  { code: 'KEPO', name: 'Sicepat KEPO', type: 'SICEPAT' },
 ];
 
 const serviceCode = {
@@ -65,6 +60,21 @@ const orderStatus = {
   WAITING_PICKUP: 'WAITING_PICKUP',
 };
 
+const sicepatParcelCategories = {
+  ORGANIC: {
+    code: 'Organic',
+    text: 'Organik',
+  },
+  NORMAL: {
+    code: 'Normal',
+    text: 'Normal',
+  },
+  ELECTRONIC: {
+    code: 'FragileElectronic',
+    name: 'Electronic',
+  },
+};
+
 module.exports = {
   idxServiceStatus,
   ninjaServiceStatus,
@@ -72,4 +82,5 @@ module.exports = {
   sicepatServiceStatus,
   serviceCode,
   orderStatus,
+  sicepatParcelCategories,
 };

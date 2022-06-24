@@ -1,7 +1,7 @@
 const joi = require('joi');
 const moment = require('moment');
 const { Location, SellerAddress } = require('../../../models');
-const { serviceCode } = require('../../../../constant/status');
+const { serviceCode, sicepatParcelCategories } = require('../../../../constant/status');
 
 let request = null;
 const isExist = async ({ params, identifier, model }) => new Promise((resolve, reject) => {
@@ -27,7 +27,7 @@ const codValidator = async () => new Promise((resolve, reject) => {
   const { body } = request;
   const sicepatCondition = (
     body.type === 'SICEPAT'
-    && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNTUNG')
+    && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
     && parseFloat(body.goods_amount) <= parseFloat(15000000)
   );
 
@@ -82,6 +82,14 @@ const validator = joi.object({
   receiver_address_note: joi.string().max(20),
   should_pickup_with: joi.string().required().valid('MOTOR', 'MOBIL', 'TRUCK'),
   goods_content: joi.string().max(50).required(),
+  goods_category: joi
+    .string()
+    .required()
+    .allow(
+      sicepatParcelCategories.ORGANIC,
+      sicepatParcelCategories.NORMAL,
+      sicepatParcelCategories.ELECTRONIC,
+    ),
   goods_amount: joi.number().required(),
   goods_qty: joi.number().min(1).required(),
   notes: joi.string().allow(null, '').max(50),
