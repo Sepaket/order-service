@@ -62,7 +62,7 @@ module.exports = class {
 
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
 
-      this.resi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 1 })}`;
+      this.resi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 10000 })}`;
       this.origin = this.sellerAddress.location;
       this.destination = await this.location.findOne({ where: { id: body.receiver_location_id } });
       this.shippingFee = await this.shippingFee();
@@ -81,6 +81,10 @@ module.exports = class {
         resi: order?.length > 0 ? order[0].receipt_number : '',
       };
     } catch (error) {
+      if (error?.message?.includes('SICEPAT:')) {
+        throw new Error(`${error?.message}, Please try again later`);
+      }
+
       throw new Error(error?.message || 'Something Wrong');
     }
   }

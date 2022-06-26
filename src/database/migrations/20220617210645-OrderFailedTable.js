@@ -29,10 +29,6 @@ module.exports = {
         type: Sequelize.JSON,
         allowNull: false,
       },
-      response: {
-        type: Sequelize.JSON,
-        allowNull: false,
-      },
     }).then(() => [
       queryInterface.addIndex(table, { fields: ['resi'], name: 'resi_order_failed_idx' }),
       queryInterface.addIndex(table, { fields: ['provider'], name: 'provider_order_failed_idx' }),

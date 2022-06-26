@@ -26,15 +26,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: false,
     },
-    response: {
-      type: DataTypes.JSON,
-      allowNull: false,
-    },
   };
 
   const OrderFailed = sequelize.define('OrderFailed', schema, {
-    timestamps: true,
-    paranoid: true,
+    timestamps: false,
+    paranoid: false,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
