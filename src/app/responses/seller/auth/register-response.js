@@ -1,7 +1,9 @@
 const httpErrors = require('http-errors');
+const shortid = require('shortid-36');
 const { Seller, SellerDetail, sequelize } = require('../../../models');
 const hash = require('../../../../helpers/hash');
 const sender = require('../../../../helpers/email-sender');
+const { setRedisData } = require('../../../../helpers/redis');
 
 module.exports = class {
   constructor({ request }) {
@@ -50,10 +52,28 @@ module.exports = class {
 
   async send() {
     const { email } = this.request.body;
+    this.token = shortid.generate();
+    this.email = email;
+    this.storeToRedis();
+
     await sender({
       to: email,
       subject: 'Email Activation',
-      message: 'Activate your email here : https://google.co.id',
+      template: 'activation-email.ejs',
+      content: {
+        activationLink: `${process.env.WEB_URL}/verify/${this.token}?email=${email}`,
+      },
     });
+  }
+
+  storeToRedis() {
+    setRedisData(
+      {
+        db: 1,
+        key: `email-token-${this.email}`,
+        timeout: 300000,
+        data: this.token,
+      },
+    );
   }
 };
