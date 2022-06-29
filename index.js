@@ -14,11 +14,13 @@ const port = process.env.APP_PORT || 6000;
 // routes load
 const sellerRoute = require('./src/routes/seller');
 const generalRoute = require('./src/routes/general');
+const expeditionRoute = require('./src/routes/expedition');
 // const bloggerRoute = require('./src/routes/blogger');
 
 const corsOptions = {
   optionsSuccessStatus: 200,
   origin: [
+    'http://http://13.213.8.51/',
     'http://localhost:4200',
   ],
 };
@@ -30,8 +32,9 @@ application.listen(port);
 
 application.use('/api/v1/general', generalRoute);
 application.use('/api/v1/seller', sellerRoute);
+application.use('/api/v1/expedition', expeditionRoute);
 
-application.use(express.static(path.join(__dirname, 'public')));
+application.use(express.static(path.join(__dirname)));
 application.use(errorHandler);
 
 // eslint-disable-next-line no-console

@@ -3,22 +3,16 @@ require('express-group-routes');
 
 const router = app.Router();
 
-// const Uploader = require('../app/middlewares/uploader');
-// const Authorization = require('../app/middlewares/admin-authentication');
+const Uploader = require('../app/middlewares/uploader');
+const SellerAuthorization = require('../app/middlewares/seller-authentication');
 
 const LocationController = require('../app/controllers/general/location-controller');
 const FaqConrtoller = require('../app/controllers/general/faq-controller');
+const UploadController = require('../app/controllers/general/upload-controller');
+const BankController = require('../app/controllers/general/bank-controller');
 
 router.group('/location', (route) => {
-  route.get('/province', LocationController.provinceList);
-  route.get('/province/:id', LocationController.provinceDetail);
-  route.get('/city', LocationController.cityList);
-  route.get('/city/:id', LocationController.cityDetail);
-  route.get('/district', LocationController.districtList);
-  route.get('/district/:id', LocationController.districtDetail);
-  route.get('/sub-district', LocationController.subDistrictList);
-  route.get('/sub-district/:id', LocationController.subDistrictDetail);
-  route.get('/list', LocationController.locationList);
+  route.get('/', LocationController.index);
 });
 
 router.group('/faq', (route) => {
@@ -26,9 +20,14 @@ router.group('/faq', (route) => {
   route.get('/:id', FaqConrtoller.detail);
 });
 
-// router.group('/upload', (route) => {
-//   route.post('/', [Authorization, Uploader], UploadController);
-// });
+router.group('/bank', (route) => {
+  route.get('/', BankController.index);
+  route.get('/:id', BankController.detail);
+});
+
+router.group('/upload', (route) => {
+  route.post('/', [SellerAuthorization, Uploader], UploadController);
+});
 
 // method not allowed when method request http is failure
 router.all('/*', (req, res) => {
