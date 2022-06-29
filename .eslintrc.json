@@ -1,10 +1,14 @@
 {
-    "extends": "airbnb-base",
+    "extends": [
+      "airbnb-base"
+    ],
     "env": {
-        "node": true
+        "node": true,
+        "commonjs": true,
+        "es2021": true
     },
     "parserOptions": {
-        "ecmaVersion": 2020
+        "ecmaVersion": 12
     },
     "rules": {
       "no-async-promise-executor": 0,
