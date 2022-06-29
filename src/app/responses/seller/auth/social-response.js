@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
+const { OAuth2Client } = require('google-auth-library');
 const { setRedisData } = require('../../../../helpers/redis');
 const { Seller, SellerDetail, sequelize } = require('../../../models');
 
@@ -10,19 +11,33 @@ module.exports = class {
     this.sellerDetail = SellerDetail;
     this.op = Sequelize.Op;
     this.request = request;
+    this.googleClient = new OAuth2Client(
+      {
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        redirectUri: process.env.GOOGLE_REDIRECT_URI,
+      },
+    );
+
     return this.process();
   }
 
   async process() {
     return new Promise(async (resolve, reject) => {
       try {
+        let userInfo = null;
+
+        if (this.request.body.service === 'google') {
+          userInfo = await this.getGoogleUserInfo();
+        }
+
         let sellerFound = null;
-        const { body } = this.request;
+
         const seller = await this.seller.findOne({
           where: {
             [this.op.or]: {
-              email: body.email,
-              socialId: body.social_id,
+              email: userInfo.email,
+              socialId: userInfo.socialId,
             },
           },
           include: [
@@ -35,8 +50,8 @@ module.exports = class {
         });
 
         const condition = (
-          (seller && seller.socialId !== body.social_id)
-          || (seller && seller.email !== body.email)
+          (seller && seller.socialId !== userInfo.socialId)
+          || (seller && seller.email !== userInfo.email)
         );
 
         if (condition) {
@@ -44,7 +59,7 @@ module.exports = class {
           return;
         }
 
-        if (!seller) sellerFound = await this.createNewUser();
+        if (!seller) sellerFound = await this.createNewUser(userInfo);
         else sellerFound = seller;
 
         this.user = sellerFound;
@@ -57,7 +72,7 @@ module.exports = class {
             seller_id: this.user.id,
             email: this.user.email,
             name: this.user.name,
-            photo: this.user.sellerDetail.photo,
+            photo: this.user.sellerDetail.photo || '',
             credit: this.user.sellerDetail.credit || 0,
           },
         });
@@ -67,18 +82,30 @@ module.exports = class {
     });
   }
 
-  async createNewUser() {
+  async getGoogleUserInfo() {
+    const { tokens } = await this.googleClient.getToken(this.request.body.code);
+    this.googleClient.setCredentials({ access_token: tokens.access_token });
+    const userInfo = await this.googleClient.request({
+      url: 'https://www.googleapis.com/oauth2/v3/userinfo',
+    });
+
+    return {
+      email: userInfo.data.email,
+      socialId: userInfo.data.sub,
+      name: `${userInfo.data.given_name} ${userInfo.data.family_name}`,
+    };
+  }
+
+  async createNewUser(userInfo) {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const { body } = this.request;
-
       const created = await this.seller.create({
-        name: body.name,
-        email: body.email,
+        name: userInfo.name,
+        email: userInfo.email,
         password: '-1',
         phone: '0',
-        socialId: body.social_id,
+        socialId: userInfo.socialId,
       }, { transaction: dbTransaction });
 
       await this.sellerDetail.create(
