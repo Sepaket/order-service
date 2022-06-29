@@ -1,0 +1,22 @@
+version: "3.7"
+
+networks:
+  default:
+    external:
+      name:
+        local
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: sepaket_postgres
+    ports:
+      - 5432:3111
+    environment:
+      POSTGRES_PASSWORD: "aDmin123~"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379"
