@@ -33,7 +33,7 @@ module.exports = class {
       subject: 'Sepaket - Reset password',
       template: 'seller/forgot-password.ejs',
       content: {
-        resetPasswordLink: `${process.env.APP_HOST}/api/v1/seller/auth/reset-password/${this.token}?email=${email}`,
+        resetPasswordLink: `${process.env.WEB_URL}/reset-password?token=${this.token}&email=${email}`,
       },
     });
   }
