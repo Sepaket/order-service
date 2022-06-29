@@ -1,11 +1,23 @@
 const joi = require('joi');
 
 const validator = joi.object({
-  code: joi.string().required(),
-  service: joi.string().required(),
-  // name: joi.string().required(),
-  // email: joi.string().email().required(),
-  // social_id: joi.string().required(),
+  service: joi.string().valid('facebook', 'google').required(),
+  code: joi.when('service', {
+    is: joi.string().valid('google'),
+    then: joi.required(),
+  }),
+  name: joi.when('service', {
+    is: joi.string().valid('facebook'),
+    then: joi.required(),
+  }),
+  email: joi.when('service', {
+    is: joi.string().valid('facebook'),
+    then: joi.required(),
+  }),
+  social_id: joi.when('service', {
+    is: joi.string().valid('facebook'),
+    then: joi.required(),
+  }),
 });
 
 module.exports = (object) => validator.validateAsync(object, {

@@ -31,6 +31,10 @@ module.exports = class {
           userInfo = await this.getGoogleUserInfo();
         }
 
+        if (this.request.body.service === 'facebook') {
+          userInfo = this.getFacebookUserInfo();
+        }
+
         let sellerFound = null;
 
         const seller = await this.seller.findOne({
@@ -93,6 +97,14 @@ module.exports = class {
       email: userInfo.data.email,
       socialId: userInfo.data.sub,
       name: `${userInfo.data.given_name} ${userInfo.data.family_name}`,
+    };
+  }
+
+  getFacebookUserInfo() {
+    return {
+      email: this.request.body.email,
+      socialId: this.request.body.social_id,
+      name: this.request.body.name,
     };
   }
 
