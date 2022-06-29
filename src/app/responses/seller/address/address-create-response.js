@@ -38,7 +38,7 @@ module.exports = class {
       picName: body.pic_name,
       picPhoneNumber: body.pic_phone,
       address: body.address,
-      addressDetail: body.address_detail,
+      locationId: body.location_id,
       active: true,
     };
   }

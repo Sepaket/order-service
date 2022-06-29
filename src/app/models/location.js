@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  return sequelize.define('Location', schema, {
+  const Location = sequelize.define('Location', schema, {
     timestamps: false,
     paranoid: false,
     underscored: true,
@@ -69,4 +69,13 @@ module.exports = (sequelize, DataTypes) => {
     charset: 'utf8',
     tableName: 'locations',
   });
+
+  Location.associate = (model) => {
+    model.SellerAddress.hasOne(model.SellerAddress, {
+      as: 'sellerAddress',
+      foreignKey: 'locationId',
+    });
+  };
+
+  return Location;
 };

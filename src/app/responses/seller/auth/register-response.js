@@ -61,7 +61,7 @@ module.exports = class {
       subject: 'Email Activation',
       template: 'activation-email.ejs',
       content: {
-        activationLink: `${process.env.APP_HOST}/api/v1/seller/auth/activate/${this.token}?email=${email}`,
+        activationLink: `${process.env.WEB_URL}/verify/${this.token}?email=${email}`,
       },
     });
   }

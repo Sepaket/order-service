@@ -1,13 +1,14 @@
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { SellerAddress } = require('../../../models');
+const { SellerAddress, Location } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 
 module.exports = class {
   constructor({ request }) {
-    this.address = SellerAddress;
     this.op = Sequelize.Op;
     this.request = request;
+    this.location = Location;
+    this.address = SellerAddress;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -31,8 +32,22 @@ module.exports = class {
             'pic_name',
             'pic_phone_number',
             'address',
-            'address_detail',
             'active',
+          ],
+          include: [
+            {
+              model: this.location,
+              as: 'location',
+              required: false,
+              attributes: [
+                ['id', 'location_id'],
+                'province',
+                'city',
+                'district',
+                'subDistrict',
+                'postalCode',
+              ],
+            },
           ],
           where: search,
           order: [['id', 'DESC']],
@@ -43,12 +58,17 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
 
-          if (result.length > 0) {
+          const mapped = result?.map((item) => ({
+            ...item,
+            location: this.converter.objectToSnakeCase(item?.location) || null,
+          }));
+
+          if (mapped.length > 0) {
             resolve({
-              data: result,
+              data: mapped,
               meta: {
                 total,
-                total_result: result.length,
+                total_result: mapped.length,
                 limit: parseInt(query.limit, 10) || limit,
                 page: parseInt(query.page, 10) || (offset + 1),
               },
@@ -59,7 +79,7 @@ module.exports = class {
                 data: [],
                 meta: {
                   total,
-                  total_result: result.length,
+                  total_result: mapped.length,
                   limit: parseInt(query.limit, 10) || limit,
                   page: parseInt(query.page, 10) || (offset + 1),
                 },

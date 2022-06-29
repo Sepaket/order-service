@@ -15,21 +15,26 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       pic_name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       pic_phone_number: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       address: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
-      address_detail: {
-        type: Sequelize.STRING,
+      location_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       active: {
-        type: Sequelize.DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: true,
         allowNull: false,
       },
@@ -51,7 +56,7 @@ module.exports = {
       queryInterface.addIndex(table, { fields: ['pic_name'], name: `pic_name_${table}_idx` }),
       queryInterface.addIndex(table, { fields: ['pic_phone_number'], name: `pic_phone_number_${table}_idx` }),
       queryInterface.addIndex(table, { fields: ['address'], name: `address_${table}_idx` }),
-      queryInterface.addIndex(table, { fields: ['address_detail'], name: `address_detail_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['location_id'], name: `location_id_${table}_idx` }),
     ]),
   ]),
 
