@@ -14,16 +14,15 @@ const tokenization = () => new Promise((resolve, reject) => {
       data: response?.data?.access_token,
       timeout: 300000, // 5 min
     });
-
     resolve(response?.data?.access_token);
   }).catch((error) => {
     reject(new Error(error?.response?.data?.message || error?.message || 'Something Wrong'));
   });
 });
 
-const localToken = () => {
+const localToken = async () => {
   try {
-    const token = getRedisData({ key: 'ninja-token', db: 3 });
+    const token = await getRedisData({ key: 'ninja-token', db: 3 });
     return token;
   } catch (error) {
     throw new Error(error?.message || 'Somethin Wrong');
@@ -64,7 +63,6 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
     const originSplitted = origin.split(',');
     const destinationSplitted = destination.split(',');
     const token = await localToken() || await tokenization();
-
     const price = await axios.post(`${process.env.NINJA_BASE_URL}/1.0/public/price`, {
       weight,
       service_level: service,
@@ -88,8 +86,24 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
   }
 });
 
+const createOrder = (payload) => new Promise(async (resolve, reject) => {
+  const token = await localToken() || await tokenization();
+  axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
+    ...payload,
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((response) => {
+    resolve(response?.data?.data);
+  }).catch((error) => {
+    reject(new Error(`NINJA: ${error?.message}`));
+  });
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
+  createOrder,
 };

@@ -25,6 +25,7 @@ const serviceCodeValidator = async () => new Promise((resolve, reject) => {
 
 const codValidator = async () => new Promise((resolve, reject) => {
   const { body } = request;
+  const ninjaCondition = (body.type === 'NINJA');
   const sicepatCondition = (
     body.type === 'SICEPAT'
     && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
@@ -39,6 +40,7 @@ const codValidator = async () => new Promise((resolve, reject) => {
 
   if (sicepatCondition) resolve(true);
   if (jneCondition) resolve(true);
+  if (ninjaCondition) resolve(true);
   reject(new Error('This service code does not exist when you choose COD'));
 });
 
