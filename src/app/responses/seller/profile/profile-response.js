@@ -29,6 +29,7 @@ module.exports = class {
           'name',
           'email',
           'phone',
+          'socialId',
         ],
         where: { id: decoded.id },
         include: [
@@ -54,6 +55,10 @@ module.exports = class {
         result.seller_detail = this.converter.objectToSnakeCase(
           JSON.parse(JSON.stringify(result.seller_detail)),
         );
+
+        result.seller_detail.is_login_socmed = !!(result.social_id !== 'NULL' && result.social_id);
+
+        delete result.social_id;
 
         if (response) resolve(result);
         else reject(httpErrors(404, 'No Data Found', { data: null }));
