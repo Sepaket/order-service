@@ -22,6 +22,7 @@ const corsOptions = {
   origin: [
     'http://http://13.213.8.51/',
     'http://localhost:4200',
+    'http://frontend.sepaket.co.id',
   ],
 };
 
