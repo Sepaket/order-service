@@ -6,16 +6,21 @@ const router = app.Router();
 const Authorization = require('../app/middlewares/seller-authentication');
 
 const OrderController = require('../app/controllers/expedition/order-controller');
+const ServiceController = require('../app/controllers/expedition/service-controller');
 const CheckPriceController = require('../app/controllers/expedition/check-price-controller');
 const ServiceCodeController = require('../app/controllers/expedition/service-code-controller');
 
+router.group('/service', (route) => {
+  route.get('/', ServiceController.index);
+});
+
 router.group('/service-code', (route) => {
-  route.get('/:type', Authorization, ServiceCodeController.index);
-  route.get('/:type/:code', Authorization, ServiceCodeController.detail);
+  route.get('/:type', ServiceCodeController.index);
+  route.get('/:type/:code', ServiceCodeController.detail);
 });
 
 router.group('/', (route) => {
-  route.post('/check-service-fee', Authorization, CheckPriceController);
+  route.post('/check-service-fee', CheckPriceController);
 });
 
 router.group('/order', (route) => {

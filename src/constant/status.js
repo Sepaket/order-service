@@ -75,6 +75,25 @@ const sicepatParcelCategories = {
   },
 };
 
+const expeditionService = [
+  {
+    name: 'JNE',
+    code: 'JNE',
+  },
+  {
+    name: 'Sicepat',
+    code: 'SICEPAT',
+  },
+  {
+    name: 'Ninja',
+    code: 'NINJA',
+  },
+  {
+    name: 'IDexpress',
+    code: 'IDEXPRESS',
+  },
+];
+
 module.exports = {
   idxServiceStatus,
   ninjaServiceStatus,
@@ -82,5 +101,6 @@ module.exports = {
   sicepatServiceStatus,
   serviceCode,
   orderStatus,
+  expeditionService,
   sicepatParcelCategories,
 };
