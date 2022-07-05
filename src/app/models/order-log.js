@@ -10,33 +10,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    senderName: {
+    previousStatus: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    senderPhone: {
+    currentStatus: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    receiverName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    receiverPhone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    receiverAddress: {
+    note: {
       type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    receiverAddressNote: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    receiverLocationId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -53,21 +37,15 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  const OrderAddress = sequelize.define('OrderAddress', schema, {
+  const OrderLog = sequelize.define('OrderLog', schema, {
     timestamps: true,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'order_addresses',
+    tableName: 'order_logs',
   });
 
-  OrderAddress.associate = (model) => {
-    model.OrderAddress.belongsTo(model.Order, {
-      as: 'order',
-    });
-  };
-
-  return OrderAddress;
+  return OrderLog;
 };

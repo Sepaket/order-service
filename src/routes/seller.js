@@ -8,6 +8,7 @@ const Authorization = require('../app/middlewares/seller-authentication');
 const AuthController = require('../app/controllers/seller/auth-controller');
 const ProfileController = require('../app/controllers/seller/profile-controller');
 const AddressController = require('../app/controllers/seller/address-controller');
+const OrderController = require('../app/controllers/seller/order-controller');
 
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
@@ -29,6 +30,11 @@ router.group('/address', (route) => {
   route.post('/', Authorization, AddressController.create);
   route.get('/:id', Authorization, AddressController.detail);
   route.post('/:id', Authorization, AddressController.update);
+});
+
+router.group('/order', (route) => {
+  route.get('/', Authorization, OrderController.index);
+  route.get('/:id', Authorization, OrderController.detail);
 });
 
 // method not allowed when method request http is failure

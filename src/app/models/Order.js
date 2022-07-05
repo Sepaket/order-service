@@ -70,6 +70,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'detail',
       foreignKey: 'orderId',
     });
+
+    model.Order.hasMany(model.OrderLog, {
+      as: 'statuses',
+      foreignKey: 'orderId',
+    });
   };
 
   return Order;

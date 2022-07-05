@@ -92,6 +92,16 @@ module.exports = (sequelize, DataTypes) => {
     model.OrderDetail.belongsTo(model.Order, {
       as: 'order',
     });
+
+    model.OrderDetail.belongsTo(model.SellerAddress, {
+      as: 'sellerAddress',
+    });
+
+    model.OrderDetail.belongsTo(model.OrderAddress, {
+      as: 'receiverAddress',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
   };
 
   return OrderDetail;

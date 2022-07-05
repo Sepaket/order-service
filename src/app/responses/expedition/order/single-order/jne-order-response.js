@@ -46,7 +46,6 @@ module.exports = class {
     try {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
-
       this.sellerData = await this.seller.findOne({ where: { id: sellerId.id } });
       this.sellerAddress = await this.address.findOne({
         where: { id: body.seller_location_id, sellerId: sellerId.id },
