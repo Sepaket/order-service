@@ -16,9 +16,9 @@ module.exports = class {
       Seller.update(
         {
           password,
-          forgot_password_token: null,
+          forgotPasswordToken: null,
         },
-        { where: { forgot_password_token: this.request.body.token } },
+        { where: { forgotPasswordToken: this.request.body.token } },
       )
         .then(() => {
           this.sendEmail();
@@ -30,7 +30,7 @@ module.exports = class {
 
   async getSeller() {
     const seller = await Seller.findOne({
-      where: { forgot_password_token: this.request.body.token },
+      where: { forgotPasswordToken: this.request.body.token },
     });
 
     if (!seller) {
