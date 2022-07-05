@@ -59,7 +59,7 @@ module.exports = class {
     await sender({
       to: email,
       subject: 'Email Activation',
-      template: 'activation-email.ejs',
+      template: 'seller/activation-email.ejs',
       content: {
         activationLink: `${process.env.WEB_URL}/verify/${this.token}?email=${email}`,
       },

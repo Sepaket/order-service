@@ -71,9 +71,19 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Location.associate = (model) => {
-    model.SellerAddress.hasOne(model.SellerAddress, {
+    model.Location.hasOne(model.SellerAddress, {
       as: 'sellerAddress',
       foreignKey: 'locationId',
+    });
+
+    model.Location.hasOne(model.OrderDetail, {
+      as: 'sellerOrderAddress',
+      foreignKey: 'sellerAddressId',
+    });
+
+    model.Location.hasOne(model.OrderAddress, {
+      as: 'receiverOrderAddress',
+      foreignKey: 'receiverLocationId',
     });
   };
 

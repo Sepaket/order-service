@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   SellerAddress.associate = (model) => {
+    model.SellerAddress.belongsTo(model.Seller, {
+      as: 'seller',
+    });
+
     model.SellerAddress.belongsTo(model.Location, {
       as: 'location',
     });

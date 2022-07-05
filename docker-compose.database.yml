@@ -13,9 +13,15 @@ services:
     ports:
       - 5432:3111
     environment:
+      POSTGRES_DB: sepaket
+      POSTGRES_USER: admin
       POSTGRES_PASSWORD: "aDmin123~"
     volumes:
       - ./db-data:/var/lib/postgresql/data
+  adminer:
+    image:  "adminer"
+    ports:
+      - "8080:8080"
   redis:
     image: redis:alpine
     ports:
