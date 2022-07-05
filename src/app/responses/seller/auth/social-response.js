@@ -118,6 +118,7 @@ module.exports = class {
         password: '-1',
         phone: '0',
         socialId: userInfo.socialId,
+        isVerified: true,
       }, { transaction: dbTransaction });
 
       await this.sellerDetail.create(

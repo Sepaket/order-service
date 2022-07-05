@@ -16,6 +16,7 @@ module.exports = class {
         {
           password,
           forgotPasswordToken: null,
+          isNew: true,
         },
         { where: { forgotPasswordToken: this.request.body.token } },
       )
