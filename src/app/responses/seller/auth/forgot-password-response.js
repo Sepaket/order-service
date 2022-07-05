@@ -14,7 +14,7 @@ module.exports = class {
   async process() {
     return new Promise((resolve, reject) => {
       this.seller.update(
-        { forgot_password_token: this.token },
+        { forgotPasswordToken: this.token },
         { where: { email: this.request.body.email } },
       )
         .then(() => {
