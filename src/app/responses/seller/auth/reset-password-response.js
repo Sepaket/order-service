@@ -5,7 +5,6 @@ const sender = require('../../../../helpers/email-sender');
 module.exports = class {
   constructor({ request }) {
     this.request = request;
-    this.seller = null;
     this.getSeller();
     return this.process();
   }
@@ -33,14 +32,12 @@ module.exports = class {
       where: { forgotPasswordToken: this.request.body.token },
     });
 
-    if (!seller) {
-      this.seller = seller;
-    }
+    if (seller) this.seller = seller;
   }
 
   async sendEmail() {
     await sender({
-      to: this.seller.email,
+      to: this.seller?.email || null,
       subject: 'Sepaket - Reset password sukses',
       template: 'seller/reset-password.ejs',
       content: {},
