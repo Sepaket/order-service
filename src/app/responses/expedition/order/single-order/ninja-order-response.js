@@ -1,3 +1,4 @@
+const shortid = require('shortid-36');
 const ninja = require('../../../../../helpers/ninja');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const { orderStatus } = require('../../../../../constant/status');
@@ -63,20 +64,21 @@ module.exports = class {
 
       this.origin = this.sellerAddress.location;
       this.destination = await this.location.findOne({ where: { id: body.receiver_location_id } });
-      this.shippingFee = await this.shippingFee();
+      this.shippingFee = await this.shippingFee() || 1;
+      this.resi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
 
       const parameter = await this.paramsMapper();
-      const jneCondition = (this.origin.sicepatOriginCode !== '' && this.destination.sicepatDestinationCode !== '');
+      const jneCondition = (this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== '');
 
       if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
       if (!this.shippingFee) throw new Error('Service for this destination not found!');
 
-      const order = await this.ninja.createOrder(parameter);
-      const orderId = await this.insertLog(order);
+      await this.ninja.createOrder(parameter);
+      const orderId = await this.insertLog();
 
       return {
         order_id: orderId,
-        resi: order?.length > 0 ? order[0].receipt_number : '',
+        resi: this.resi,
       };
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -87,8 +89,8 @@ module.exports = class {
     try {
       const { body } = this.request;
       const price = await this.ninja.checkPrice({
-        origin: this.origin.sicepatOriginCode,
-        destination: this.destination.sicepatDestinationCode,
+        origin: this.origin.ninjaOriginCode,
+        destination: this.destination.ninjaDestinationCode,
         weight: body.weight,
         service: body.service_code,
       });
@@ -135,11 +137,11 @@ module.exports = class {
     }
   }
 
-  async orderQuery(order) {
+  async orderQuery() {
     const { body } = this.request;
 
     return {
-      resi: order?.length > 0 ? order[0].receipt_number : '',
+      resi: this.resi,
       expedition: body.type,
       serviceCode: body.service_code,
       isCod: body.is_cod,
@@ -182,103 +184,70 @@ module.exports = class {
     };
   }
 
-  async pickupAddress() {
-    const address = this.sellerAddress;
-
-    return `
-      ${address?.address || ''},
-      Kec. ${address?.location?.subDistrict || ''},
-      Kota ${address?.location?.city || ''},
-      ${address?.location?.province || ''},
-      ${address?.location?.postalCode || ''}
-    `;
-  }
-
-  async receiverAddress() {
-    const { body } = this.request;
-    const address = this.destination;
-
-    return `
-      ${body?.address || ''},
-      Kec. ${address?.subDistrict || ''},
-      Kota ${address?.city || ''},
-      ${address?.province || ''},
-      ${address?.postalCode || ''}
-    `;
-  }
-
   async paramsMapper() {
     const { body } = this.request;
-    // const pickupAddress = await this.pickupAddress();
-    // const receiverAddress = await this.receiverAddress();
 
     return {
-      requested_tracking_number: '1234-56789',
-      tracking_number: 'PREFIX1234-56789',
+      requested_tracking_number: this.resi,
       service_type: 'Parcel',
       service_level: body.service_code,
-      reference: {
-        merchant_order_number: 'SHIP-1234-56789',
-      },
       from: {
-        name: 'John Doe',
-        phone_number: '+60138201527',
-        email: 'john.doe@gmail.com',
+        name: body.sender_name,
+        phone_number: body.sender_phone,
+        email: this.sellerData.email,
         address: {
-          address1: '17 Lorong Jambu 3',
+          address1: this.sellerAddress?.address || '',
           address2: '',
-          area: 'Taman Sri Delima',
-          city: 'Simpang Ampat',
-          state: 'Pulau Pinang',
+          area: this.origin?.subDistrict || '',
+          city: this.origin?.city || '',
+          state: this.origin?.province || '',
           address_type: 'office',
-          country: 'MY',
-          postcode: '51200',
+          country: 'Indonesia',
+          postcode: this.origin?.postalCode || '',
         },
       },
       to: {
-        name: 'Jane Doe',
-        phone_number: '+60103067174',
-        email: 'jane.doe@gmail.com',
+        name: body.receiver_name,
+        phone_number: body.receiver_phone,
+        email: '',
         address: {
-          address1: 'Jalan PJU 8/8',
+          address1: `${body.receiver_address}, Note: ${body.receiver_address_note}`,
           address2: '',
-          area: 'Damansara Perdana',
-          city: 'Petaling Jaya',
-          state: 'Selangor',
+          area: this.destination?.subDistrict || '',
+          city: this.destination?.city || '',
+          state: this.destination?.province || '',
           address_type: 'home',
-          country: 'MY',
-          postcode: '47820',
+          country: 'Indonesia',
+          postcode: this.destination?.postalCode || '',
         },
       },
       parcel_job: {
         is_pickup_required: true,
         pickup_service_type: 'Scheduled',
-        pickup_service_level: 'Standard',
-        pickup_address_id: '98989012',
-        pickup_date: '2021-12-15',
+        pickup_service_level: body.service_code,
+        pickup_date: body.pickup_date,
         pickup_timeslot: {
           start_time: '09:00',
-          end_time: '12:00',
-          timezone: 'Asia/Kuala_Lumpur',
+          end_time: '18:00',
+          timezone: 'Asia/Jakarta',
         },
-        pickup_approximate_volume: 'Less than 3 Parcels',
-        pickup_instructions: 'Pickup with care!',
-        delivery_start_date: '2021-12-16',
+        pickup_instructions: body.note,
+        delivery_start_date: body.pickup_date,
         delivery_timeslot: {
           start_time: '09:00',
-          end_time: '12:00',
-          timezone: 'Asia/Kuala_Lumpur',
+          end_time: '18:00',
+          timezone: 'Asia/Jakarta',
         },
-        delivery_instructions: 'If recipient is not around, leave parcel in power riser.',
+        delivery_instructions: body.note,
         'allow-weekend_delivery': true,
         dimensions: {
-          weight: 1.5,
+          weight: body.weight,
         },
         items: [
           {
-            item_description: 'Sample description',
-            quantity: 1,
-            is_dangerous_good: false,
+            item_description: body.goods_content,
+            quantity: body.goods_qty,
+            is_dangerous_good: body.goods_category === 'ORGANIC',
           },
         ],
       },
