@@ -63,9 +63,10 @@ module.exports = class {
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
 
       this.origin = this.sellerAddress.location;
-      this.destination = await this.location.findOne({ where: { id: body.receiver_location_id } });
-      this.shippingFee = await this.shippingFee() || 1;
       this.resi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
+      this.destination = await this.location.findOne({ where: { id: body.receiver_location_id } });
+      this.shippingFee = !process.env.NINJA_BASE_URL?.includes('sandbox') ? await this.shippingFee() : 1;
+      // make shipping fee conditional bcs ninja has no sandbox for check price
 
       const parameter = await this.paramsMapper();
       const jneCondition = (this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== '');
