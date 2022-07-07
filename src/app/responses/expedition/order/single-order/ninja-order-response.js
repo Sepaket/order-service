@@ -69,9 +69,9 @@ module.exports = class {
       // make shipping fee conditional bcs ninja has no sandbox for check price
 
       const parameter = await this.paramsMapper();
-      const jneCondition = (this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== '');
+      const ninjaCondition = (this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== '');
 
-      if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
+      if (!ninjaCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
       if (!this.shippingFee) throw new Error('Service for this destination not found!');
 
       await this.ninja.createOrder(parameter);

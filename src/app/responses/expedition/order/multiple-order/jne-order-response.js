@@ -48,7 +48,6 @@ module.exports = class {
     try {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
-      const destinationId = body.order_items.map((item) => item.receiver_location_id);
 
       this.sellerData = await this.seller.findOne({ where: { id: sellerId.id } });
       this.sellerAddress = await this.address.findOne({
@@ -63,37 +62,64 @@ module.exports = class {
       });
 
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
-      this.origin = this.sellerAddress.location;
-      this.destination = await this.location.findAll({
-        where: {
-          id: { [this.op.in]: destinationId },
-        },
-      });
 
-      const jneCondition = (this.origin.jneOriginCode !== '' && this.destination.jneDestinationCode !== '');
-      if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-      if (!this.shippingFee) throw new Error('Service for this destination not found!');
+      const response = await Promise.all(
+        body.order_items.map(async (item) => {
+          let result = [];
+          const origin = this.sellerAddress.location;
+          const destination = await this.location.findOne({
+            where: { id: item.receiver_location_id },
+          });
 
-      const paramFormatted = await this.caseConverter();
-      const order = await this.jne.createOrder(paramFormatted);
-      const orderId = await this.insertLog(order);
+          const jneCondition = (origin.jneOriginCode !== '' && destination.jneDestinationCode !== '');
+          const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
 
-      return {
-        order_id: orderId,
-        resi: order?.length > 0 ? order[0].cnote_no : '',
-      };
+          const payload = {
+            origin,
+            shippingFee,
+            destination,
+            ...body,
+            ...item,
+          };
+
+          const parameter = await this.paramsMapper({ payload });
+          if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
+
+          if (shippingFee) {
+            const paramFormatted = await this.caseConverter({ parameter });
+            const order = await this.jne.createOrder(paramFormatted);
+            const resi = order?.length > 0 ? order[0].cnote_no : '';
+
+            const orderId = await this.insertLog({ ...payload, resi });
+
+            result = [{ order_id: orderId, resi }];
+          } else {
+            result = [
+              {
+                resi: '',
+                order_id: null,
+                error: 'Service for this destination not found',
+              },
+            ];
+          }
+
+          return result?.shift();
+        }),
+      );
+
+      return response;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
 
-  async shippingFee() {
+  async shippingFee({ origin, destination, weight }) {
     try {
       const { body } = this.request;
       const prices = await this.jne.checkPrice({
-        origin: this.origin.jneOriginCode,
-        destination: this.destination.jneDestinationCode,
-        weight: body.weight,
+        origin: origin.jneOriginCode,
+        destination: destination.jneDestinationCode,
+        weight,
       });
 
       const service = await prices?.find((item) => item.service_code === body.service_code);
@@ -104,13 +130,13 @@ module.exports = class {
     }
   }
 
-  async insertLog(orderResponse) {
+  async insertLog(payload) {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const orderQuery = await this.orderQuery(orderResponse);
-      const orderDetailQuery = await this.orderQueryDetail();
-      const orderAddressQuery = await this.orderQueryAddress();
+      const orderQuery = await this.orderQuery(payload);
+      const orderDetailQuery = await this.orderQueryDetail(payload);
+      const orderAddressQuery = await this.orderQueryAddress(payload);
 
       const order = await this.order.create(
         { ...orderQuery },
@@ -140,106 +166,110 @@ module.exports = class {
     }
   }
 
-  async caseConverter() {
-    return Object.keys(this.parameter).reduce((accumulator, key) => {
-      accumulator[key.toUpperCase()] = this.parameter[key];
+  async caseConverter({ parameter }) {
+    // eslint-disable-next-line no-unused-vars
+    const { body } = this.request;
+
+    return Object.keys(parameter).reduce((accumulator, key) => {
+      accumulator[key.toUpperCase()] = parameter[key];
       return accumulator;
     }, {});
   }
 
-  async orderQuery(order) {
+  async orderQuery(payload) {
+    // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
 
     return {
-      resi: order?.length > 0 ? order[0].cnote_no : '',
-      expedition: body.type,
-      serviceCode: body.service_code,
-      isCod: body.is_cod,
-      orderDate: body.pickup_date,
-      orderTime: body.pickup_time,
-      totalAmount: parseFloat(body.goods_amount) + parseFloat(this.shippingFee),
+      resi: payload.resi,
+      expedition: payload.type,
+      serviceCode: payload.service_code,
+      isCod: payload.is_cod,
+      orderDate: payload.pickup_date,
+      orderTime: payload.pickup_time,
+      totalAmount: parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee),
       status: orderStatus.WAITING_PICKUP,
     };
   }
 
-  async orderQueryDetail() {
+  async orderQueryDetail(payload) {
+    // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
 
     return {
       sellerId: this.sellerData?.id,
       sellerAddressId: this.sellerAddress?.id,
-      weight: body.weight,
-      totalItem: body.goods_qty,
-      notes: body.notes,
-      goodsContent: body.goods_content,
-      goodsPrice: body.goods_amount,
-      shippingCharge: this.shippingFee,
-      useInsurance: body.is_insurance,
+      weight: payload.weight,
+      totalItem: payload.goods_qty,
+      notes: payload.notes,
+      goodsContent: payload.goods_content,
+      goodsPrice: payload.goods_amount,
+      shippingCharge: payload.shippingFee,
+      useInsurance: payload.is_insurance,
       insuranceAmount: 0,
       isTrouble: false,
     };
   }
 
-  async orderQueryAddress() {
+  async orderQueryAddress(payload) {
+    // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
 
     return {
-      senderName: body.sender_name,
-      senderPhone: body.sender_phone,
-      receiverName: body.receiver_name,
-      receiverPhone: body.receiver_phone,
-      receiverAddress: body.receiver_address,
-      receiverAddressNote: body.receiver_address_note,
-      receiverLocationId: body.receiver_location_id,
+      senderName: payload.sender_name,
+      senderPhone: payload.sender_phone,
+      receiverName: payload.receiver_name,
+      receiverPhone: payload.receiver_phone,
+      receiverAddress: payload.receiver_address,
+      receiverAddressNote: payload.receiver_address_note,
+      receiverLocationId: payload.receiver_location_id,
     };
   }
 
-  async paramsMapper() {
-    const { body } = this.request;
-
+  async paramsMapper({ payload }) {
     return {
       pickup_name: this.sellerData?.name || '',
-      pickup_date: body.pickup_date.split('-').reverse().join('-'),
-      pickup_time: body.pickup_time,
+      pickup_date: payload.pickup_date.split('-').reverse().join('-'),
+      pickup_time: payload.pickup_time,
       pickup_pic: this.sellerAddress?.picName || '',
       pickup_pic_phone: this.sellerAddress?.picPhoneNumber || '',
       pickup_address: this.sellerAddress?.address || '',
-      pickup_district: this.origin?.district || '',
-      pickup_city: this.origin?.city || '',
+      pickup_district: payload.origin?.district || '',
+      pickup_city: payload.origin?.city || '',
       pickup_service: 'Domestic',
-      pickup_vechile: body.should_pickup_with,
-      branch: this.origin?.jneOriginCode || '',
-      cust_id: body.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
+      pickup_vechile: payload.should_pickup_with,
+      branch: payload.origin?.jneOriginCode || '',
+      cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
       order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
-      shipper_name: body.sender_name || '',
+      shipper_name: payload.sender_name || '',
       shipper_addr1: this.sellerAddress?.address?.slice(0, 80) || '',
-      shipper_city: this.origin?.city || '',
-      shipper_zip: this.origin?.postalCode || '',
-      shipper_region: this.origin?.province || '',
+      shipper_city: payload.origin?.city || '',
+      shipper_zip: payload.origin?.postalCode || '',
+      shipper_region: payload.origin?.province || '',
       shipper_country: 'Indonesia',
-      shipper_contact: body.sender_name,
+      shipper_contact: payload.sender_name,
       shipper_phone: this.sellerAddress?.picPhoneNumber || '',
-      receiver_name: body.receiver_name,
-      receiver_addr1: body.receiver_address,
-      receiver_city: this.destination?.city || '',
-      receiver_zip: this.destination?.postalCode || '',
-      receiver_region: this.destination?.province || '',
+      receiver_name: payload.receiver_name,
+      receiver_addr1: payload.receiver_address,
+      receiver_city: payload.destination?.city || '',
+      receiver_zip: payload.destination?.postalCode || '',
+      receiver_region: payload.destination?.province || '',
       receiver_country: 'Indonesia',
-      receiver_contact: body.receiver_name,
-      receiver_phone: body.receiver_phone,
-      origin_code: this.origin?.jneOriginCode || '',
-      destination_code: this.destination?.jneDestinationCode || '',
-      service_code: body.service_code,
-      weight: body.weight,
-      qty: body.goods_qty,
-      goods_desc: body.notes,
-      goods_amount: body.goods_amount,
-      insurance_flag: body.is_insurance ? 'Y' : 'N',
+      receiver_contact: payload.receiver_name,
+      receiver_phone: payload.receiver_phone,
+      origin_code: payload.origin?.jneOriginCode || '',
+      destination_code: payload.destination?.jneDestinationCode || '',
+      service_code: payload.service_code,
+      weight: payload.weight,
+      qty: payload.goods_qty,
+      goods_desc: payload.notes,
+      goods_amount: payload.goods_amount,
+      insurance_flag: payload.is_insurance ? 'Y' : 'N',
       special_ins: '',
       merchant_id: this.sellerData.id,
       type: 'PICKUP',
-      cod_flag: body.is_cod ? 'YES' : 'NO',
-      cod_amount: body?.goods_amount,
+      cod_flag: payload.is_cod ? 'YES' : 'NO',
+      cod_amount: payload?.goods_amount,
       awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
     };
   }

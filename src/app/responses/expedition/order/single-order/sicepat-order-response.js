@@ -68,9 +68,9 @@ module.exports = class {
       this.shippingFee = await this.shippingFee();
 
       const parameter = await this.paramsMapper();
-      const jneCondition = (this.origin.sicepatOriginCode !== '' && this.destination.sicepatDestinationCode !== '');
+      const sicepatCondition = (this.origin.sicepatOriginCode !== '' && this.destination.sicepatDestinationCode !== '');
 
-      if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
+      if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
       if (!this.shippingFee) throw new Error('Service for this destination not found!');
 
       const order = await this.sicepat.createOrder(parameter);
