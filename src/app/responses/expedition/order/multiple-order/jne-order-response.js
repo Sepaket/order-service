@@ -99,6 +99,7 @@ module.exports = class {
                 resi: '',
                 order_id: null,
                 error: 'Service for this destination not found',
+                payload: item,
               },
             ];
           }
