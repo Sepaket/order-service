@@ -19,9 +19,9 @@ const {
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
-    this.op = Sequelize.Op;
     this.order = Order;
     this.seller = Seller;
+    this.op = Sequelize.Op;
     this.request = request;
     this.location = Location;
     this.orderLog = OrderLog;
