@@ -21,7 +21,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
   origin: [
     'http://localhost:4200',
-    'http://frontend.sepaket.co.id',
+    'https://frontend.sepaket.co.id',
   ],
 };
 
