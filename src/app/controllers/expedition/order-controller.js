@@ -8,6 +8,7 @@ const JneMultipleOrderResponse = require('../../responses/expedition/order/multi
 const SicepatSingleOrderResponse = require('../../responses/expedition/order/single-order/sicepat-order-response');
 const SicepatMultipleOrderResponse = require('../../responses/expedition/order/multiple-order/sicepat-order-response');
 const NinjaSingleOrderResponse = require('../../responses/expedition/order/single-order/ninja-order-response');
+const NinjaMultipleOrderResponse = require('../../responses/expedition/order/multiple-order/ninja-order-response');
 
 module.exports = {
   singleOrder: async (request, response, next) => {
@@ -38,7 +39,7 @@ module.exports = {
 
       if (body.type === 'JNE') result = await new JneMultipleOrderResponse({ request });
       if (body.type === 'SICEPAT') result = await new SicepatMultipleOrderResponse({ request });
-      // if (body.type === 'NINJA') result = await new NinjaSingleOrderResponse({ request });
+      if (body.type === 'NINJA') result = await new NinjaMultipleOrderResponse({ request });
 
       response.send({
         code: 200,
