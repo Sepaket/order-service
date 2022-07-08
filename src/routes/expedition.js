@@ -24,7 +24,7 @@ router.group('/', (route) => {
 });
 
 router.group('/order', (route) => {
-  route.post('/single', Authorization, OrderController.singleOrder);
+  route.post('/', Authorization, OrderController.commonOrder);
 });
 
 // method not allowed when method request http is failure
