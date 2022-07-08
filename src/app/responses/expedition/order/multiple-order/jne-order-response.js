@@ -65,7 +65,14 @@ module.exports = class {
 
       const response = await Promise.all(
         body.order_items.map(async (item) => {
-          let result = [];
+          let result = [
+            {
+              resi: '',
+              order_id: null,
+              error: 'Service for this destination not found',
+              payload: item,
+            },
+          ];
           const origin = this.sellerAddress.location;
           const destination = await this.location.findOne({
             where: { id: item.receiver_location_id },
@@ -93,15 +100,6 @@ module.exports = class {
             const orderId = await this.insertLog({ ...payload, resi });
 
             result = [{ order_id: orderId, resi }];
-          } else {
-            result = [
-              {
-                resi: '',
-                order_id: null,
-                error: 'Service for this destination not found',
-                payload: item,
-              },
-            ];
           }
 
           return result?.shift();

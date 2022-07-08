@@ -23,27 +23,6 @@ const serviceCodeValidator = async () => new Promise((resolve, reject) => {
   else reject(new Error('This service code does not exist'));
 });
 
-const codValidator = async () => new Promise((resolve, reject) => {
-  const { body } = request;
-  const ninjaCondition = (body.type === 'NINJA');
-  const sicepatCondition = (
-    body.type === 'SICEPAT'
-    && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-    && parseFloat(body.goods_amount) <= parseFloat(15000000)
-  );
-
-  const jneCondition = (
-    body.type === 'JNE'
-    && body.weight <= 70
-    && parseFloat(body.goods_amount) <= parseFloat(5000000)
-  );
-
-  if (sicepatCondition) resolve(true);
-  if (jneCondition) resolve(true);
-  if (ninjaCondition) resolve(true);
-  reject(new Error('This service code does not exist when you choose COD'));
-});
-
 /*
   NOTE
 
@@ -56,14 +35,10 @@ const codValidator = async () => new Promise((resolve, reject) => {
 
 const validator = joi.object({
   type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS'),
-  service_code: joi.string().required().when('is_cod', {
-    is: true,
-    then: joi
-      .string()
-      .required()
-      .external(() => serviceCodeValidator())
-      .external(() => codValidator()),
-  }),
+  service_code: joi
+    .string()
+    .required()
+    .external(() => serviceCodeValidator()),
   should_pickup_with: joi.string().required().valid('MOTOR', 'MOBIL', 'TRUCK'),
   pickup_date: joi.date().min(moment().format('YYYY-MM-DD')).required(),
   pickup_time: joi.string().regex(/^([0-9]{2}):([0-9]{2})$/)

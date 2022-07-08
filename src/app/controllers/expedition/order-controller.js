@@ -6,6 +6,7 @@ const MultipleOrderValidator = require('../../validators/expedition/order/multip
 const JneSingleOrderResponse = require('../../responses/expedition/order/single-order/jne-order-response');
 const JneMultipleOrderResponse = require('../../responses/expedition/order/multiple-order/jne-order-response');
 const SicepatSingleOrderResponse = require('../../responses/expedition/order/single-order/sicepat-order-response');
+const SicepatMultipleOrderResponse = require('../../responses/expedition/order/multiple-order/sicepat-order-response');
 const NinjaSingleOrderResponse = require('../../responses/expedition/order/single-order/ninja-order-response');
 
 module.exports = {
@@ -36,7 +37,7 @@ module.exports = {
       await MultipleOrderValidator(request);
 
       if (body.type === 'JNE') result = await new JneMultipleOrderResponse({ request });
-      // if (body.type === 'SICEPAT') result = await new SicepatSingleOrderResponse({ request });
+      if (body.type === 'SICEPAT') result = await new SicepatMultipleOrderResponse({ request });
       // if (body.type === 'NINJA') result = await new NinjaSingleOrderResponse({ request });
 
       response.send({
