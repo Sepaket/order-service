@@ -68,7 +68,7 @@ module.exports = class {
             {
               resi: '',
               order_id: null,
-              error: 'Service for this destination not found',
+              error: 'Service for this destination not found or service code does not exist when you choose COD',
               payload: item,
             },
           ];
@@ -92,10 +92,12 @@ module.exports = class {
           };
 
           const parameter = await this.paramsMapper({ payload });
+          const codCondition = (item.is_cod)
+            ? (this.codValidator({ payload }))
+            : true;
 
-          if (!this.codValidator({ payload })) throw new Error('This service code does not exist when you choose COD');
           if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-          if (shippingFee) {
+          if (shippingFee && codCondition) {
             const order = await this.sicepat.createOrder(parameter);
             const responseResi = order?.length > 0 ? order[0].receipt_number : '';
             const orderId = await this.insertLog({ ...payload, resi: responseResi });
@@ -117,7 +119,7 @@ module.exports = class {
     }
   }
 
-  async codValidator({ payload }) {
+  codValidator({ payload }) {
     const { body } = this.request;
     const ninjaCondition = (body.type === 'NINJA');
     const sicepatCondition = (

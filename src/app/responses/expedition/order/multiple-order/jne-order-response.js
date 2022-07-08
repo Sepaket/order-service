@@ -69,7 +69,7 @@ module.exports = class {
             {
               resi: '',
               order_id: null,
-              error: 'Service for this destination not found',
+              error: 'Service for this destination not found or service code does not exist when you choose COD',
               payload: item,
             },
           ];
@@ -90,9 +90,13 @@ module.exports = class {
           };
 
           const parameter = await this.paramsMapper({ payload });
+          const codCondition = (item.is_cod)
+            ? (this.codValidator({ payload }))
+            : true;
+
           if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
 
-          if (shippingFee) {
+          if (shippingFee && codCondition) {
             const paramFormatted = await this.caseConverter({ parameter });
             const order = await this.jne.createOrder(paramFormatted);
             const resi = order?.length > 0 ? order[0].cnote_no : '';
@@ -110,6 +114,27 @@ module.exports = class {
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
+  }
+
+  codValidator({ payload }) {
+    const { body } = this.request;
+    const ninjaCondition = (body.type === 'NINJA');
+    const sicepatCondition = (
+      body.type === 'SICEPAT'
+      && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
+      && parseFloat(payload.goods_amount) <= parseFloat(15000000)
+    );
+
+    const jneCondition = (
+      body.type === 'JNE'
+      && payload.weight <= 70
+      && parseFloat(payload.goods_amount) <= parseFloat(5000000)
+    );
+
+    if (sicepatCondition) return true;
+    if (jneCondition) return true;
+    if (ninjaCondition) return true;
+    return false;
   }
 
   async shippingFee({ origin, destination, weight }) {
