@@ -53,7 +53,7 @@ module.exports = class {
           ],
         });
 
-        if ((seller.socialId !== '' && seller.socialId !== null)) {
+        if (seller && (seller.socialId !== '' && seller.socialId !== null)) {
           const condition = (
             (seller && seller.socialId !== userInfo.socialId)
             || (seller && seller.email !== userInfo.email)
