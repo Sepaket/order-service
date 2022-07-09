@@ -14,7 +14,6 @@ module.exports = {
       phone: item.user_telp,
       is_verified: !!item.user_verfikasi,
       is_new: false,
-      social_id: item.outside_id,
     }))),
 
     queryInterface.bulkInsert(sellerDetailTable, sellers.map((item, index) => ({
