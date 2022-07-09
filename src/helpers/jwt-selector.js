@@ -7,7 +7,7 @@ const jwtSelector = ({ request }) => new Promise((resolve, reject) => {
       .replace(/bearer/gi, '')
       .replace(/ /g, '');
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-1');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     resolve(decoded);
   } catch (error) {
     reject(error);
