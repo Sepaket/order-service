@@ -2,6 +2,7 @@ const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
 const { SellerAddress, Location } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
@@ -22,6 +23,7 @@ module.exports = class {
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
+    const seller = await jwtSelector({ request: this.request });
 
     return new Promise((resolve, reject) => {
       try {
@@ -49,7 +51,7 @@ module.exports = class {
               ],
             },
           ],
-          where: search,
+          where: { ...search, seller_id: seller.id },
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
