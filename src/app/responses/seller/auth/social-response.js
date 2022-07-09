@@ -53,18 +53,24 @@ module.exports = class {
           ],
         });
 
-        const condition = (
-          (seller && seller.socialId !== userInfo.socialId)
-          || (seller && seller.email !== userInfo.email)
-        );
+        if ((seller.socialId !== '' && seller.socialId !== null)) {
+          const condition = (
+            (seller && seller.socialId !== userInfo.socialId)
+            || (seller && seller.email !== userInfo.email)
+          );
 
-        if (condition) {
-          reject(httpErrors(400, 'Email and social_id not match'));
-          return;
+          if (condition) {
+            reject(httpErrors(400, 'Email and social_id not match'));
+            return;
+          }
         }
 
-        if (!seller) sellerFound = await this.createNewUser(userInfo);
-        else sellerFound = seller;
+        if (!seller) {
+          sellerFound = await this.createNewUser(userInfo);
+        } else {
+          this.updateUserSocialId(seller, userInfo);
+          sellerFound = seller;
+        }
 
         this.user = sellerFound;
         this.generateToken();
@@ -140,6 +146,20 @@ module.exports = class {
       });
 
       return seller;
+    } catch (error) {
+      await dbTransaction.rollback();
+      throw new Error(httpErrors(500, error.message, { data: false }));
+    }
+  }
+
+  async updateUserSocialId(seller, userInfo) {
+    const dbTransaction = await sequelize.transaction();
+
+    try {
+      await this.seller.update({
+        socialId: userInfo.socialId,
+      }, { where: { id: seller.id }, transaction: dbTransaction });
+      await dbTransaction.commit();
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
