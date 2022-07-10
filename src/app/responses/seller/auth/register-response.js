@@ -47,6 +47,7 @@ module.exports = class {
       email: body.email,
       password: await hash({ payload: body.password }),
       phone: body.phone,
+      isNew: true,
     };
   }
 

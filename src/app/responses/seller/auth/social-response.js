@@ -125,6 +125,7 @@ module.exports = class {
         phone: '0',
         socialId: userInfo.socialId,
         isVerified: true,
+        isNew: true,
       }, { transaction: dbTransaction });
 
       await this.sellerDetail.create(
