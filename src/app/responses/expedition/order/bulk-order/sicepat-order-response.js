@@ -1,8 +1,7 @@
-const moment = require('moment');
-const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
+const randomNumber = require('random-number');
 const excelReader = require('read-excel-file/node');
-const jne = require('../../../../../helpers/jne');
+const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const { orderStatus } = require('../../../../../constant/status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
@@ -11,6 +10,7 @@ const {
   Seller,
   Order,
   OrderLog,
+  OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -19,7 +19,7 @@ const {
 
 module.exports = class {
   constructor({ request }) {
-    this.jne = jne;
+    this.sicepat = sicepat;
     this.order = Order;
     this.seller = Seller;
     this.op = Sequelize.Op;
@@ -27,6 +27,7 @@ module.exports = class {
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
+    this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
     this.converter = snakeCaseConverter;
@@ -109,8 +110,9 @@ module.exports = class {
             });
 
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
-            const jneCondition = (origin?.jneOriginCode !== '' && destination?.jneDestinationCode !== '');
-            if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
+            const sicepatCondition = (origin?.sicepatOriginCode !== '' && destination?.sicepatDestinationCode !== '');
+            const resi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 10000 })}`;
+            if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
 
             const shippingFee = await this.shippingFee({
               origin,
@@ -119,6 +121,7 @@ module.exports = class {
             });
 
             const payload = {
+              resi,
               origin,
               shippingFee,
               destination,
@@ -127,7 +130,6 @@ module.exports = class {
             };
 
             const parameter = await this.paramsMapper({ payload });
-            const paramFormatted = await this.caseConverter({ parameter });
             const codCondition = (excelData.isCod)
               ? (this.codValidator({ payload }))
               : true;
@@ -140,10 +142,9 @@ module.exports = class {
                 payload: excelData,
               });
             } else {
-              const order = await this.jne.createOrder(paramFormatted);
-              const resi = order?.length > 0 ? order[0].cnote_no : '';
-              const orderId = await this.insertLog({ ...payload, resi });
-
+              const order = await this.sicepat.createOrder(parameter);
+              const responseResi = order?.length > 0 ? order[0].receipt_number : '';
+              const orderId = await this.insertLog({ ...payload, resi: responseResi });
               result.push({ order_id: orderId, resi });
             }
           }
@@ -154,6 +155,10 @@ module.exports = class {
 
       return result;
     } catch (error) {
+      if (error?.message?.includes('SICEPAT:')) {
+        throw new Error(`${error?.message}, Please try again later`);
+      }
+
       throw new Error(error?.message || 'Something Wrong');
     }
   }
@@ -179,18 +184,18 @@ module.exports = class {
     return false;
   }
 
-  async shippingFee({ origin, destination, weight }) {
+  async shippingFee({ origin, weight, destination }) {
     try {
       const { body } = this.request;
-      const prices = await this.jne.checkPrice({
-        origin: origin?.jneOriginCode || '',
-        destination: destination?.jneDestinationCode || '',
+      const prices = await this.sicepat.checkPrice({
+        origin: origin?.sicepatOriginCode || '',
+        destination: destination?.sicepatDestinationCode || '',
         weight,
       });
 
-      const service = await prices?.find((item) => item.service_code === body.service_code);
+      const service = await prices?.find((item) => item.service === body.service_code);
 
-      return service?.price;
+      return service?.tariff;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
@@ -232,16 +237,6 @@ module.exports = class {
     }
   }
 
-  async caseConverter({ parameter }) {
-    // eslint-disable-next-line no-unused-vars
-    const { body } = this.request;
-
-    return Object.keys(parameter).reduce((accumulator, key) => {
-      accumulator[key.toUpperCase()] = parameter[key];
-      return accumulator;
-    }, {});
-  }
-
   async orderQuery(payload) {
     // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
@@ -259,17 +254,14 @@ module.exports = class {
   }
 
   async orderQueryDetail(payload) {
-    // eslint-disable-next-line no-unused-vars
-    const { body } = this.request;
-
     return {
       sellerId: this.sellerData?.id,
       sellerAddressId: this.sellerAddress?.id,
       weight: payload.weight,
-      totalItem: payload.goods_qty,
+      totalItem: payload.goodsQty,
       notes: payload.notes,
-      goodsContent: payload.goods_content,
-      goodsPrice: payload.goods_amount,
+      goodsContent: payload.goodsContent,
+      goodsPrice: payload.goodsAmount,
       shippingCharge: payload.shippingFee,
       useInsurance: payload.isInsurance,
       insuranceAmount: 0,
@@ -288,55 +280,83 @@ module.exports = class {
       receiverPhone: payload.receiverPhone,
       receiverAddress: payload.receiverAddress,
       receiverAddressNote: payload.receiverAddressNote,
-      receiverLocationId: payload?.destination?.id,
+      receiverLocationId: payload.destination?.id,
     };
   }
 
+  async pickupAddress() {
+    const address = this.sellerAddress;
+
+    return `
+      ${address?.address || ''},
+      Kec. ${address?.location?.subDistrict || ''},
+      Kota ${address?.location?.city || ''},
+      ${address?.location?.province || ''},
+      ${address?.location?.postalCode || ''}
+    `;
+  }
+
+  async receiverAddress({ payload }) {
+    // eslint-disable-next-line no-unused-vars
+    const { body } = this.request;
+    const address = payload.destination;
+
+    return `
+      ${payload?.receiverAddress || ''},
+      Kec. ${address?.subDistrict || ''},
+      Kota ${address?.city || ''},
+      ${address?.province || ''},
+      ${address?.postalCode || ''}
+    `;
+  }
+
   async paramsMapper({ payload }) {
+    const pickupAddress = await this.pickupAddress({ payload });
+    const receiverAddress = await this.receiverAddress({ payload });
+
     return {
-      pickup_name: this.sellerData?.name || '',
-      pickup_date: payload.pickup_date.split('-').reverse().join('-'),
-      pickup_time: payload.pickup_time,
-      pickup_pic: this.sellerAddress?.picName || '',
-      pickup_pic_phone: this.sellerAddress?.picPhoneNumber || '',
-      pickup_address: this.sellerAddress?.address || '',
-      pickup_district: payload.origin?.district || '',
-      pickup_city: payload.origin?.city || '',
-      pickup_service: 'Domestic',
-      pickup_vechile: payload.should_pickup_with,
-      branch: payload.origin?.jneOriginCode || '',
-      cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
-      order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
-      shipper_name: payload.sender_name || this.sellerData?.name,
-      shipper_addr1: this.sellerAddress?.address?.slice(0, 80) || '',
-      shipper_city: payload.origin?.city || '',
-      shipper_zip: payload.origin?.postalCode || '',
-      shipper_region: payload.origin?.province || '',
-      shipper_country: 'Indonesia',
-      shipper_contact: payload.sender_name || this.sellerData?.name,
-      shipper_phone: this.sellerAddress?.picPhoneNumber || '',
-      receiver_name: payload.receiverName || '',
-      receiver_addr1: payload.receiverAddress || '',
-      receiver_city: payload.destination?.city || '',
-      receiver_zip: payload.destination?.postalCode || '',
-      receiver_region: payload.destination?.province || '',
-      receiver_country: 'Indonesia',
-      receiver_contact: payload.receiverName || '',
-      receiver_phone: `${payload.receiverPhone}` || '',
-      origin_code: payload.origin?.jneOriginCode || '',
-      destination_code: payload.destination?.jneDestinationCode || '',
-      service_code: payload.service_code,
-      weight: payload.weight || '1',
-      qty: payload.goodsQty || '1',
-      goods_desc: payload.goodsContent || '',
-      goods_amount: payload.goodsAmount || '',
-      insurance_flag: payload.isInsurance ? 'Y' : 'N',
-      special_ins: '',
-      merchant_id: this.sellerData.id,
-      type: 'PICKUP',
-      cod_flag: (payload.isCod) ? 'YES' : 'NO',
-      cod_amount: payload.goodsAmount || '',
-      awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
+      reference_number: `${process.env.SICEPAT_ORDER_PREFIX}${payload.resi}`,
+      pickup_request_date: `${payload.pickup_date} ${payload.pickup_time}`,
+      pickup_method: 'PICKUP',
+      pickup_merchant_code: `Sepaket-${this.sellerData.id}`,
+      pickup_merchant_name: this.sellerAddress.picName,
+      pickup_address: pickupAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+      pickup_city: this.sellerAddress?.location?.city?.toUpperCase() || '',
+      pickup_merchant_phone: this.sellerAddress?.picPhoneNumber || '',
+      pickup_merchant_email: this.sellerData?.email || '',
+      PackageList: [
+        {
+          receipt_number: payload.resi,
+          origin_code: payload.origin.sicepatOriginCode,
+          delivery_type: payload.service_code,
+          parcel_category: 'Normal',
+          parcel_content: payload.goodsContent,
+          parcel_qty: payload.goodsQty,
+          parcel_uom: 'Pcs',
+          parcel_value: payload.goodsAmount,
+          total_weight: payload.weight,
+          shipper_name: payload.sender_name || this.sellerAddress.picName,
+          shipper_address: pickupAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+          shipper_province: this.sellerAddress?.location?.province || '',
+          shipper_city: this.sellerAddress?.location?.city || '',
+          shipper_district: this.sellerAddress?.location?.district || '',
+          shipper_zip: this.sellerAddress?.location?.postalCode || '',
+          shipper_phone: payload.sender_phone || this.sellerAddress?.picPhoneNumber,
+          shipper_longitude: '',
+          shipper_latitude: '',
+          recipient_title: 'Mr',
+          recipient_name: payload.receiverName,
+          recipient_address: receiverAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
+          recipient_province: payload.destination.province,
+          recipient_city: payload.destination.city,
+          recipient_district: payload.destination.district,
+          recipient_zip: payload.destination.postalCode,
+          recipient_phone: payload.receiverPhone,
+          recipient_longitude: '',
+          recipient_latitude: '',
+          destination_code: payload.destination.sicepatDestinationCode,
+        },
+      ],
     };
   }
 };

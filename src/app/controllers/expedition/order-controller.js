@@ -7,6 +7,7 @@ const JneCommonOrderResponse = require('../../responses/expedition/order/common-
 const SicepatCommonOrderResponse = require('../../responses/expedition/order/common-order/sicepat-order-response');
 const NinjaCommonOrderResponse = require('../../responses/expedition/order/common-order/ninja-order-response');
 const JneBulkOrderResponse = require('../../responses/expedition/order/bulk-order/jne-order-response');
+const SicepatBulkOrderResponse = require('../../responses/expedition/order/bulk-order/sicepat-order-response');
 
 module.exports = {
   commonOrder: async (request, response, next) => {
@@ -36,6 +37,7 @@ module.exports = {
       await BulkOrderValidator(request);
 
       if (body.type === 'JNE') result = await new JneBulkOrderResponse({ request });
+      if (body.type === 'SICEPAT') result = await new SicepatBulkOrderResponse({ request });
 
       response.send({
         code: 200,
