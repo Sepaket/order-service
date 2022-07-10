@@ -1,6 +1,7 @@
 const moment = require('moment');
 const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
+const excelReader = require('read-excel-file/node');
 const jne = require('../../../../../helpers/jne');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const { orderStatus } = require('../../../../../constant/status');
@@ -62,55 +63,96 @@ module.exports = class {
       });
 
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
+      const fileName = body.file.split('/public/');
+      if (!fileName[1]) throw new Error('File not found!');
 
-      const response = await Promise.all(
-        body.order_items.map(async (item) => {
-          let result = [
-            {
-              resi: '',
-              order_id: null,
-              error: 'Service for this destination not found or service code does not exist when you choose COD',
-              payload: item,
-            },
-          ];
-          const origin = this.sellerAddress.location;
-          const destination = await this.location.findOne({
-            where: { id: item.receiver_location_id },
-          });
+      const result = [];
+      const dataOrders = await excelReader(`public/${fileName[1]}`);
+      await Promise.all(
+        dataOrders?.map(async (item, index) => {
+          const dataOrderCondition = (
+            (item[0]
+            && item[0] !== ''
+            && item[0] !== null)
+          );
 
-          const jneCondition = (origin.jneOriginCode !== '' && destination.jneDestinationCode !== '');
-          const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
+          if (index !== 0 && dataOrderCondition) {
+            const excelData = {
+              receiverName: item[0],
+              receiverPhone: item[1],
+              receiverAddress: item[2],
+              receiverAddressNote: item[3],
+              receiverAddressSubDistrict: item[4],
+              receiverAddressPostalCode: item[5],
+              weight: item[6],
+              volume: item[7],
+              goodsAmount: item[9],
+              goodsContent: item[10],
+              goodsQty: item[11],
+              isInsurance: item[12],
+              note: item[13],
+              isCod: !!((item[9] || item[9] !== '' || item[9] !== 0)),
+            };
 
-          const payload = {
-            origin,
-            shippingFee,
-            destination,
-            ...body,
-            ...item,
-          };
+            const origin = this.sellerAddress.location;
+            const locations = await this.location.findAll({
+              where: {
+                [this.op.or]: {
+                  subDistrict: {
+                    [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
+                  },
+                  district: {
+                    [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
+                  },
+                },
+              },
+            });
 
-          const parameter = await this.paramsMapper({ payload });
-          const codCondition = (item.is_cod)
-            ? (this.codValidator({ payload }))
-            : true;
+            const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
+            const jneCondition = (origin?.jneOriginCode !== '' && destination?.jneDestinationCode !== '');
+            if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
 
-          if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
+            const shippingFee = await this.shippingFee({
+              origin,
+              destination,
+              weight: excelData.weight,
+            });
 
-          if (shippingFee && codCondition) {
+            const payload = {
+              origin,
+              shippingFee,
+              destination,
+              ...body,
+              ...excelData,
+            };
+
+            const parameter = await this.paramsMapper({ payload });
             const paramFormatted = await this.caseConverter({ parameter });
-            const order = await this.jne.createOrder(paramFormatted);
-            const resi = order?.length > 0 ? order[0].cnote_no : '';
+            const codCondition = (excelData.isCod)
+              ? (this.codValidator({ payload }))
+              : true;
 
-            const orderId = await this.insertLog({ ...payload, resi });
+            if (!shippingFee || !codCondition) {
+              result.push({
+                resi: '',
+                order_id: null,
+                error: 'Service for this destination not found or service code does not exist when you choose COD',
+                payload: excelData,
+              });
+            } else {
+              const order = await this.jne.createOrder(paramFormatted);
+              const resi = order?.length > 0 ? order[0].cnote_no : '';
+              const orderId = await this.insertLog({ ...payload, resi });
 
-            result = [{ order_id: orderId, resi }];
+              result.push({ order_id: orderId, resi });
+            }
           }
 
-          return result?.shift();
-        }),
+          return item;
+        }) || [],
       );
 
-      return response;
+      return result;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
@@ -122,13 +164,13 @@ module.exports = class {
     const sicepatCondition = (
       body.type === 'SICEPAT'
       && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goods_amount) <= parseFloat(15000000)
+      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
     );
 
     const jneCondition = (
       body.type === 'JNE'
       && payload.weight <= 70
-      && parseFloat(payload.goods_amount) <= parseFloat(5000000)
+      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
     );
 
     if (sicepatCondition) return true;
@@ -141,8 +183,8 @@ module.exports = class {
     try {
       const { body } = this.request;
       const prices = await this.jne.checkPrice({
-        origin: origin.jneOriginCode,
-        destination: destination.jneDestinationCode,
+        origin: origin?.jneOriginCode || '',
+        destination: destination?.jneDestinationCode || '',
         weight,
       });
 
@@ -208,10 +250,10 @@ module.exports = class {
       resi: payload.resi,
       expedition: payload.type,
       serviceCode: payload.service_code,
-      isCod: payload.is_cod,
+      isCod: payload.isCod,
       orderDate: payload.pickup_date,
       orderTime: payload.pickup_time,
-      totalAmount: parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee),
+      totalAmount: parseFloat(payload.goodsAmount) + parseFloat(payload.shippingFee),
       status: orderStatus.WAITING_PICKUP,
     };
   }
@@ -229,7 +271,7 @@ module.exports = class {
       goodsContent: payload.goods_content,
       goodsPrice: payload.goods_amount,
       shippingCharge: payload.shippingFee,
-      useInsurance: payload.is_insurance,
+      useInsurance: payload.isInsurance,
       insuranceAmount: 0,
       isTrouble: false,
     };
@@ -240,13 +282,13 @@ module.exports = class {
     const { body } = this.request;
 
     return {
-      senderName: payload.sender_name,
-      senderPhone: payload.sender_phone,
-      receiverName: payload.receiver_name,
-      receiverPhone: payload.receiver_phone,
-      receiverAddress: payload.receiver_address,
-      receiverAddressNote: payload.receiver_address_note,
-      receiverLocationId: payload.receiver_location_id,
+      senderName: payload.sender_name || '',
+      senderPhone: payload.sender_phone || '',
+      receiverName: payload.receiverName,
+      receiverPhone: payload.receiverPhone,
+      receiverAddress: payload.receiverAddress,
+      receiverAddressNote: payload.receiverAddressNote,
+      receiverLocationId: payload?.destination?.id,
     };
   }
 
@@ -265,35 +307,35 @@ module.exports = class {
       branch: payload.origin?.jneOriginCode || '',
       cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
       order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
-      shipper_name: payload.sender_name || '',
+      shipper_name: payload.sender_name || this.sellerData?.name,
       shipper_addr1: this.sellerAddress?.address?.slice(0, 80) || '',
       shipper_city: payload.origin?.city || '',
       shipper_zip: payload.origin?.postalCode || '',
       shipper_region: payload.origin?.province || '',
       shipper_country: 'Indonesia',
-      shipper_contact: payload.sender_name,
+      shipper_contact: payload.sender_name || this.sellerData?.name,
       shipper_phone: this.sellerAddress?.picPhoneNumber || '',
-      receiver_name: payload.receiver_name,
-      receiver_addr1: payload.receiver_address,
+      receiver_name: payload.receiverName || '',
+      receiver_addr1: payload.receiverAddress || '',
       receiver_city: payload.destination?.city || '',
       receiver_zip: payload.destination?.postalCode || '',
       receiver_region: payload.destination?.province || '',
       receiver_country: 'Indonesia',
-      receiver_contact: payload.receiver_name,
-      receiver_phone: payload.receiver_phone,
+      receiver_contact: payload.receiverName || '',
+      receiver_phone: `${payload.receiverPhone}` || '',
       origin_code: payload.origin?.jneOriginCode || '',
       destination_code: payload.destination?.jneDestinationCode || '',
       service_code: payload.service_code,
-      weight: payload.weight,
-      qty: payload.goods_qty,
-      goods_desc: payload.goods_content,
-      goods_amount: payload.goods_amount,
-      insurance_flag: payload.is_insurance ? 'Y' : 'N',
+      weight: payload.weight || '1',
+      qty: payload.goodsQty || '1',
+      goods_desc: payload.goodsContent || '',
+      goods_amount: payload.goodsAmount || '',
+      insurance_flag: payload.isInsurance ? 'Y' : 'N',
       special_ins: '',
       merchant_id: this.sellerData.id,
       type: 'PICKUP',
-      cod_flag: payload.is_cod ? 'YES' : 'NO',
-      cod_amount: payload?.goods_amount,
+      cod_flag: (payload.isCod) ? 'YES' : 'NO',
+      cod_amount: payload.goodsAmount || '',
       awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
     };
   }

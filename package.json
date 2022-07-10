@@ -59,6 +59,7 @@
     "pg-hstore": "^2.3.4",
     "querystring": "^0.2.1",
     "random-number": "0.0.9",
+    "read-excel-file": "^5.4.2",
     "redis": "^4.1.0",
     "sequelize": "^6.20.1",
     "shortid-36": "^0.1.2"

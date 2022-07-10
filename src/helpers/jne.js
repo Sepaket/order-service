@@ -54,7 +54,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
     api_key: process.env.JNE_APIKEY,
     from: origin,
     thru: destination,
-    weight,
+    weight: weight || 1,
   }), {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',

@@ -25,6 +25,7 @@ router.group('/', (route) => {
 
 router.group('/order', (route) => {
   route.post('/', Authorization, OrderController.commonOrder);
+  route.post('/bulk', Authorization, OrderController.bulkOrder);
 });
 
 // method not allowed when method request http is failure
