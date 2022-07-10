@@ -79,6 +79,9 @@ module.exports = class {
         subDistrict: {
           [this.op.substring]: query.keyword?.toLowerCase(),
         },
+        postalCode: {
+          [this.op.substring]: `${query.keyword?.toLowerCase()}`,
+        },
       },
     };
 
