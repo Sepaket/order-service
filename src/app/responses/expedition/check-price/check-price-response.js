@@ -123,10 +123,15 @@ module.exports = class {
 
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
+        const codCondition = (
+          body.weight <= 70
+          && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
+        );
 
         return {
           serviceName: item.service_display,
           serviceCode: item.service_code,
+          availableCod: codCondition,
           estimation: `${item.etd_from} - ${item.etd_thru}`,
           estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
           price: item.price,
@@ -152,10 +157,15 @@ module.exports = class {
 
       const mapped = prices?.map((item) => {
         const rawEstimation = item.etd.split(' hari');
+        const codCondition = (
+          (item.service === 'GOKIL' || item.service === 'BEST' || item.service === 'SIUNT')
+          && parseFloat(body.goods_amount || 0) <= parseFloat(15000000)
+        );
 
         return {
           serviceName: `Sicepat ${item.service}`,
           serviceCode: item.service,
+          availableCod: codCondition,
           estimation: rawEstimation[0],
           estimationFormatted: `${item.etd?.toLowerCase()}`,
           price: item.tariff,
@@ -185,6 +195,7 @@ module.exports = class {
         serviceName: 'Ninja Reguler',
         serviceCode: 'Standard',
         estimation: '2 - 4',
+        availableCod: true,
         estimationFormatted: '2 - 4 hari',
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
