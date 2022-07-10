@@ -17,6 +17,7 @@ const validator = joi.object({
   origin: joi.number().min(1).required().external((request) => isExist({ params: request, identifier: 'id' })),
   destination: joi.number().min(1).required().external((request) => isExist({ params: request, identifier: 'id' })),
   weight: joi.number().min(1).required(),
+  goods_amount: joi.number(),
 });
 
 module.exports = (object) => validator.validateAsync(object, {
