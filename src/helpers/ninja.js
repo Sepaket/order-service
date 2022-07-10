@@ -87,8 +87,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 });
 
 const createOrder = (payload) => new Promise(async (resolve, reject) => {
-  const token = await localToken() || await tokenization();
-
+  const token = await localToken();
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
@@ -97,8 +96,13 @@ const createOrder = (payload) => new Promise(async (resolve, reject) => {
     },
   }).then((response) => {
     resolve(response?.data);
-  }).catch((error) => {
-    reject(new Error(`NINJA: ${error?.response?.data?.error?.message || error?.message}`));
+  }).catch(async (error) => {
+    if (error?.response?.data?.error?.message?.includes('token')) {
+      await tokenization();
+      createOrder(payload);
+    } else {
+      reject(new Error(`NINJA: ${error?.response?.data?.error?.message || error?.message}`));
+    }
   });
 });
 
