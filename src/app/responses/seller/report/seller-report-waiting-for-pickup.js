@@ -1,3 +1,5 @@
+const moment = require('moment');
+const { Op } = require('sequelize');
 const { Order, OrderDetail } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
@@ -18,6 +20,7 @@ module.exports = class {
           where: {
             '$detail.seller_id$': seller.id,
             status: 'WAITING_PICKUP',
+            ...this.querySearch(),
           },
           include: [{
             model: OrderDetail,
@@ -30,5 +33,23 @@ module.exports = class {
         reject(error);
       }
     });
+  }
+
+  querySearch() {
+    const { query } = this.request;
+    if (query.start_date && query.end_date) {
+      const condition = {
+        createdAt: {
+          [Op.between]: [
+            moment(query.start_date).startOf('day').format(),
+            moment(query.end_date).endOf('day').format(),
+          ],
+        },
+      };
+
+      return condition;
+    }
+
+    return {};
   }
 };
