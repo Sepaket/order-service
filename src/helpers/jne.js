@@ -91,9 +91,30 @@ const createOrder = (payload) => new Promise((resolve, reject) => {
   }
 });
 
+const tracking = (payload) => new Promise((resolve, reject) => {
+  try {
+    const { resi } = payload;
+    axios.post(`${process.env.JNE_BASE_URL}/tracing/api/v1/cnote/${resi}`, qs.stringify({
+      username: process.env.JNE_USERNAME,
+      api_key: process.env.JNE_APIKEY,
+    }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    }).then((response) => {
+      resolve(response?.data);
+    }).catch((error) => {
+      resolve({ error: error?.message || 'Something Wrong' });
+    });
+  } catch (error) {
+    reject(error);
+  }
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
   createOrder,
+  tracking,
 };
