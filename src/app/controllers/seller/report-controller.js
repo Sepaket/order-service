@@ -1,8 +1,23 @@
+const TotalOrderReponse = require('../../responses/seller/report/seller-report-total-order');
 const WaitingFormPickupReponse = require('../../responses/seller/report/seller-report-waiting-for-pickup');
 const CodProcessingReponse = require('../../responses/seller/report/seller-report-cod-processing');
 const NonCodProcessingReponse = require('../../responses/seller/report/seller-report-non-cod-processing');
 
 module.exports = {
+  totalOrder: async (request, response, next) => {
+    try {
+      const result = await new TotalOrderReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   waitingForPickup: async (request, response, next) => {
     try {
       const result = await new WaitingFormPickupReponse({ request });

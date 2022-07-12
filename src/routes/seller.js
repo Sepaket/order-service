@@ -39,6 +39,7 @@ router.group('/order', (route) => {
 });
 
 router.group('/reports', (route) => {
+  route.get('/total-order', Authorization, ReportController.totalOrder);
   route.get('/waiting-for-pickup', Authorization, ReportController.waitingForPickup);
   route.get('/cod-processing', Authorization, ReportController.codProcessing);
   route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);
