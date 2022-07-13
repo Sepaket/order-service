@@ -43,6 +43,7 @@ router.group('/reports', (route) => {
   route.get('/waiting-for-pickup', Authorization, ReportController.waitingForPickup);
   route.get('/cod-processing', Authorization, ReportController.codProcessing);
   route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);
+  route.get('/percentage-processing', Authorization, ReportController.percentageProcessing);
 });
 
 // method not allowed when method request http is failure
