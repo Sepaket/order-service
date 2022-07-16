@@ -5,6 +5,7 @@ const jwtSelector = require('../../../../helpers/jwt-selector');
 const {
   Order,
   OrderDetail,
+  OrderAddress,
   SellerAddress,
   Location,
   OrderLog,
@@ -18,6 +19,7 @@ module.exports = class {
     this.location = Location;
     this.orderLog = OrderLog;
     this.orderDetail = OrderDetail;
+    this.orderAddress = OrderAddress;
     this.sellerAddress = SellerAddress;
     this.converter = snakeCaseConverter;
     return this.process();
@@ -43,6 +45,15 @@ module.exports = class {
           ],
           include: [
             {
+              model: this.orderAddress,
+              as: 'receiverAddress',
+              required: true,
+              attributes: [
+                ['id', 'receiver_id'],
+                'senderName',
+              ],
+            },
+            {
               model: this.order,
               as: 'order',
               required: true,
@@ -55,6 +66,7 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
                 'status',
+                'updatedAt',
               ],
             },
             {
@@ -96,6 +108,7 @@ module.exports = class {
           const mapped = result?.map((item) => ({
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
+            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
