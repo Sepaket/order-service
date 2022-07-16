@@ -106,9 +106,30 @@ const createOrder = (payload) => new Promise(async (resolve, reject) => {
   });
 });
 
+const tracking = (payload) => new Promise(async (resolve) => {
+  const { resi } = payload;
+  const token = await localToken();
+
+  axios.get(`${process.env.NINJA_BASE_URL}/1.0/orders/tracking-events/${resi}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((response) => {
+    resolve(response?.data);
+  }).catch(async (error) => {
+    if (error?.response?.data?.error?.message?.includes('token')) {
+      await tokenization();
+      tracking(payload);
+    } else {
+      resolve({ error: error?.response?.data?.error?.message || error?.message });
+    }
+  });
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
   createOrder,
+  tracking,
 };

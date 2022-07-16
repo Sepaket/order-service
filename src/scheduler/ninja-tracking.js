@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const sicepat = require('../helpers/sicepat');
+const ninja = require('../helpers/ninja');
 const { Order, OrderLog } = require('../app/models');
 const orderStatus = require('../constant/order-status');
 
@@ -33,7 +33,7 @@ const tracking = async () => {
     const trackHistories = [];
     const order = await Order.findAll({
       where: {
-        expedition: 'SICEPAT',
+        expedition: 'NINJA',
         status: {
           [Sequelize.Op.ne]: 'DELIVERED',
         },
@@ -42,7 +42,7 @@ const tracking = async () => {
 
     await Promise.all(
       order?.map(async (item) => {
-        const track = await sicepat.tracking({ resi: item.resi });
+        const track = await ninja.tracking({ resi: item.resi });
 
         if (track?.sicepat?.status?.code === 200) {
           const trackingStatus = track?.sicepat?.result?.last_status;
