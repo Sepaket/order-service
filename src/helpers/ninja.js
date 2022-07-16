@@ -87,7 +87,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 });
 
 const createOrder = (payload) => new Promise(async (resolve, reject) => {
-  const token = await localToken();
+  const token = await localToken() || await tokenization();
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
@@ -97,18 +97,13 @@ const createOrder = (payload) => new Promise(async (resolve, reject) => {
   }).then((response) => {
     resolve(response?.data);
   }).catch(async (error) => {
-    if (error?.response?.data?.error?.message?.includes('token')) {
-      await tokenization();
-      createOrder(payload);
-    } else {
-      reject(new Error(`NINJA: ${error?.response?.data?.error?.message || error?.message}`));
-    }
+    reject(new Error(`NINJA: ${error?.response?.data?.error?.message || error?.message}`));
   });
 });
 
 const tracking = (payload) => new Promise(async (resolve) => {
   const { resi } = payload;
-  const token = await localToken();
+  const token = await localToken() || await tokenization();
 
   axios.get(`${process.env.NINJA_BASE_URL}/1.0/orders/tracking-events/${resi}`, {
     headers: {
@@ -117,12 +112,22 @@ const tracking = (payload) => new Promise(async (resolve) => {
   }).then((response) => {
     resolve(response?.data);
   }).catch(async (error) => {
-    if (error?.response?.data?.error?.message?.includes('token')) {
-      await tokenization();
-      tracking(payload);
-    } else {
-      resolve({ error: error?.response?.data?.error?.message || error?.message });
-    }
+    resolve({ error: error?.response?.data?.error?.message || error?.message });
+  });
+});
+
+const cancel = (payload) => new Promise(async (resolve, reject) => {
+  const { resi } = payload;
+  const token = await localToken() || await tokenization();
+
+  axios.delete(`${process.env.NINJA_BASE_URL}/2.2/orders/${resi}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((response) => {
+    resolve(response?.data);
+  }).catch(async (error) => {
+    reject(new Error(`NINJA: ${error?.response?.data?.data?.message || error?.message}`));
   });
 });
 
@@ -132,4 +137,5 @@ module.exports = {
   checkPrice,
   createOrder,
   tracking,
+  cancel,
 };
