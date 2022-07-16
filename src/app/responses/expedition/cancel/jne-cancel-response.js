@@ -92,7 +92,7 @@ module.exports = class {
       const paramFormatted = await this.caseConverter({ parameter });
       const canceled = await this.jne.cancel(paramFormatted);
 
-      if (canceled[0]?.status) this.insertLog();
+      if (canceled[0]?.status) await this.insertLog();
 
       return true;
     } catch (error) {

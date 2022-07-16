@@ -101,10 +101,27 @@ const tracking = (payload) => new Promise(async (resolve) => {
   });
 });
 
+const cancel = (payload) => new Promise(async (resolve, reject) => {
+  axios.post(`${process.env.SICEPAT_BASE_URL_PICKUP}/partner/cancelpickup`, {
+    auth_key: process.env.SICEPAT_APIKEY_PICKUP,
+    receipt_number: payload.resi,
+  }).then((response) => {
+    if (response?.data?.status !== '200') {
+      reject(new Error(`SICEPAT: ${response?.data?.error_message}`));
+      return;
+    }
+
+    resolve(response?.data);
+  }).catch((error) => {
+    reject(new Error(`SICEPAT: ${error?.message}`));
+  });
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
   createOrder,
   tracking,
+  cancel,
 };
