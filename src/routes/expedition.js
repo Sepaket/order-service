@@ -9,6 +9,7 @@ const OrderController = require('../app/controllers/expedition/order-controller'
 const ServiceController = require('../app/controllers/expedition/service-controller');
 const CheckPriceController = require('../app/controllers/expedition/check-price-controller');
 const ServiceCodeController = require('../app/controllers/expedition/service-code-controller');
+const TrackingController = require('../app/controllers/expedition/order-tracking-controller');
 
 router.group('/service', (route) => {
   route.get('/', ServiceController.index);
@@ -26,6 +27,10 @@ router.group('/', (route) => {
 router.group('/order', (route) => {
   route.post('/', Authorization, OrderController.commonOrder);
   route.post('/bulk', Authorization, OrderController.bulkOrder);
+});
+
+router.group('/tracking', (route) => {
+  route.post('/', Authorization, TrackingController);
 });
 
 // method not allowed when method request http is failure

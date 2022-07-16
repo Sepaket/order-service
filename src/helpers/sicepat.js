@@ -78,9 +78,33 @@ const createOrder = (payload) => new Promise(async (resolve, reject) => {
   });
 });
 
+const tracking = (payload) => new Promise(async (resolve) => {
+  const { resi } = payload;
+  axios.get(`${process.env.SICEPAT_BASE_URL_TRACKING}/customer/waybill`, {
+    params: {
+      waybill: resi,
+    },
+    headers: {
+      'api-key': process.env.SICEPAT_APIKEY_TRACKING,
+    },
+  }).then((response) => {
+    resolve(response?.data);
+  }).catch((error) => {
+    resolve({
+      sicepat: {
+        status: {
+          code: 500,
+          description: error?.message || 'Something Wrong',
+        },
+      },
+    });
+  });
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
   createOrder,
+  tracking,
 };
