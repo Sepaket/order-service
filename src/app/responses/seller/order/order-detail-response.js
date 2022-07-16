@@ -120,25 +120,36 @@ module.exports = class {
             sellerId: seller.id,
             orderId: params.id,
           },
-        }).then((response) => {
-          const result = this.converter.objectToSnakeCase(
+        }).then(async (response) => {
+          const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
 
-          result.order = this.converter.objectToSnakeCase(result?.order) || null;
-          result.seller_address = this.converter.objectToSnakeCase(result?.seller_address) || null;
+          const orderLogs = await this.orderLog.findAll({
+            where: { orderId: result.order_id },
+          });
 
-          result.receiver_address = this.converter.objectToSnakeCase(
+          result.order = await this.converter.objectToSnakeCase(result?.order) || null;
+
+          result.seller_address = await this.converter.objectToSnakeCase(
+            result?.seller_address,
+          ) || null;
+
+          result.receiver_address = await this.converter.objectToSnakeCase(
             result?.receiver_address,
           ) || null;
 
-          result.receiver_address.location = this.converter.objectToSnakeCase(
+          result.receiver_address.location = await this.converter.objectToSnakeCase(
             result?.receiver_address?.location,
           ) || null;
 
-          result.seller_address.location = this.converter.objectToSnakeCase(
+          result.seller_address.location = await this.converter.objectToSnakeCase(
             result?.seller_address?.location,
           ) || null;
+
+          result.order_log = await this.converter.arrayToSnakeCase(
+            JSON.parse(JSON.stringify(orderLogs)),
+          );
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
