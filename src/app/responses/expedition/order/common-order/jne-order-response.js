@@ -5,6 +5,7 @@ const jne = require('../../../../../helpers/jne');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
+const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const {
   Location,
   Seller,
@@ -102,8 +103,42 @@ module.exports = class {
             const resi = order?.length > 0 ? order[0].cnote_no : '';
 
             const orderId = await this.insertLog({ ...payload, resi });
+            const totalAmount = parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee);
 
-            result = [{ order_id: orderId, resi }];
+            result = [{
+              resi,
+              order_id: orderId,
+              order: {
+                order_id: orderId,
+                service: payload.type,
+                service_code: payload.service_code,
+                weight: payload.weight,
+                goods_content: payload.goods_content,
+                goods_amount: payload.gppds_amount,
+                goods_qty: payload.goods_qty,
+                goods_notes: payload.notes,
+                insurance_amount: 0,
+                is_cod: payload.is_cod,
+                total_amount: {
+                  raw: totalAmount,
+                  formatted: formatCurrency(totalAmount, 'Rp.'),
+                },
+              },
+              receiver: {
+                name: payload.receiver_name,
+                phone: payload.receiver_phone,
+                address: payload.receiver_address,
+                address_note: payload.receiver_address_note,
+                location: payload.destination || null,
+              },
+              sender: {
+                name: payload.receiver_name,
+                phone: payload.receiver_phone,
+                address: this.sellerAddress?.address || '',
+                address_note: '',
+                location: payload.origin || null,
+              },
+            }];
           }
 
           return result?.shift();

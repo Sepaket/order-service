@@ -76,7 +76,7 @@ const validator = joi.object({
     goods_qty: joi.number().min(1).required(),
     notes: joi.string().allow(null, '').max(50),
     is_insurance: joi.boolean().required(),
-  })).max(5).required(),
+  })).required(),
 });
 
 module.exports = (object) => {
