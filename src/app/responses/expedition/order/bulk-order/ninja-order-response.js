@@ -1,8 +1,8 @@
-const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
 const excelReader = require('read-excel-file/node');
 const ninja = require('../../../../../helpers/ninja');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
+const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const orderStatus = require('../../../../../constant/order-status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const {
@@ -10,7 +10,6 @@ const {
   Seller,
   Order,
   OrderLog,
-  OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -27,7 +26,6 @@ module.exports = class {
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
-    this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
     this.converter = snakeCaseConverter;
@@ -95,7 +93,6 @@ module.exports = class {
               isCod: !!((item[9] || item[9] !== '' || item[9] !== 0)),
             };
 
-            const origin = this.sellerAddress.location;
             const locations = await this.location.findAll({
               where: {
                 [this.op.or]: {
@@ -109,72 +106,50 @@ module.exports = class {
               },
             });
 
+            const origin = this.sellerAddress.location;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
-            const ninjaCondition = (origin?.ninjaOriginCode !== '' && destination?.ninjaDestinationCode !== '');
-            const resi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
-            if (!ninjaCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-
-            const shippingFee = !process.env.NINJA_BASE_URL?.includes('sandbox')
-              ? await this.shippingFee({ origin, destination, weight: excelData.weight })
-              : 1;
-
-            const payload = {
-              resi,
+            const shippingFee = await this.shippingFee({
               origin,
-              shippingFee,
               destination,
-              ...body,
-              ...excelData,
-            };
+              weight: excelData.weight,
+            });
 
-            const parameter = await this.paramsMapper({ payload });
-            const codCondition = (excelData.isCod)
-              ? (this.codValidator({ payload }))
-              : true;
-
-            if (!shippingFee || !codCondition) {
-              result.push({
-                resi: '',
-                order_id: null,
-                error: 'Service for this destination not found or service code does not exist when you choose COD',
-                payload: excelData,
-              });
-            } else {
-              await this.ninja.createOrder(parameter);
-              const orderId = await this.insertLog({ ...payload, resi });
-              result.push({ order_id: orderId, resi });
-            }
+            result.push({
+              error: !shippingFee ? 'Service for this destination not found' : '',
+              receiver_name: excelData?.receiverName || '',
+              receiver_phone: excelData?.receiverPhone || '',
+              receiver_location: {
+                id: destination?.id || 0,
+                province: destination?.province || '',
+                city: destination?.city || '',
+                district: destination?.district || '',
+                sub_district: destination?.subDistrict || '',
+                postal_code: destination?.postalCode || '',
+              },
+              receiver_address: excelData?.receiverAddress || '',
+              receiver_address_note: excelData?.receiverAddressNote || '',
+              is_cod: excelData?.isCod,
+              weight: excelData?.weight || 1,
+              goods_amount: excelData?.goodsAmount || 0,
+              goods_content: excelData?.goodsContent || '',
+              goods_qty: excelData?.goodsQty || 1,
+              note: excelData?.note || '',
+              is_insurance: excelData?.isInsurance,
+              shipping_fee: {
+                raw: shippingFee || 0,
+                formatted: formatCurrency(shippingFee || 0, 'Rp.'),
+              },
+            });
           }
 
           return item;
-        }),
+        }) || [],
       );
-      // make shipping fee conditional bcs ninja has no sandbox for check price
+
       return result;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
-  }
-
-  codValidator({ payload }) {
-    const { body } = this.request;
-    const ninjaCondition = (body.type === 'NINJA');
-    const sicepatCondition = (
-      body.type === 'SICEPAT'
-      && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
-    );
-
-    const jneCondition = (
-      body.type === 'JNE'
-      && payload.weight <= 70
-      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
-    );
-
-    if (sicepatCondition) return true;
-    if (jneCondition) return true;
-    if (ninjaCondition) return true;
-    return false;
   }
 
   async shippingFee({ origin, destination, weight }) {

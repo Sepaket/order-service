@@ -5,6 +5,7 @@ const excelReader = require('read-excel-file/node');
 const jne = require('../../../../../helpers/jne');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
+const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const {
   Location,
@@ -94,7 +95,6 @@ module.exports = class {
               isCod: !!((item[9] || item[9] !== '' || item[9] !== 0)),
             };
 
-            const origin = this.sellerAddress.location;
             const locations = await this.location.findAll({
               where: {
                 [this.op.or]: {
@@ -108,44 +108,40 @@ module.exports = class {
               },
             });
 
+            const origin = this.sellerAddress.location;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
-            const jneCondition = (origin?.jneOriginCode !== '' && destination?.jneDestinationCode !== '');
-            if (!jneCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-
             const shippingFee = await this.shippingFee({
               origin,
               destination,
               weight: excelData.weight,
             });
 
-            const payload = {
-              origin,
-              shippingFee,
-              destination,
-              ...body,
-              ...excelData,
-            };
-
-            const parameter = await this.paramsMapper({ payload });
-            const paramFormatted = await this.caseConverter({ parameter });
-            const codCondition = (excelData.isCod)
-              ? (this.codValidator({ payload }))
-              : true;
-
-            if (!shippingFee || !codCondition) {
-              result.push({
-                resi: '',
-                order_id: null,
-                error: 'Service for this destination not found or service code does not exist when you choose COD',
-                payload: excelData,
-              });
-            } else {
-              const order = await this.jne.createOrder(paramFormatted);
-              const resi = order?.length > 0 ? order[0].cnote_no : '';
-              const orderId = await this.insertLog({ ...payload, resi });
-
-              result.push({ order_id: orderId, resi });
-            }
+            result.push({
+              error: !shippingFee ? 'Service for this destination not found' : '',
+              receiver_name: excelData?.receiverName || '',
+              receiver_phone: excelData?.receiverPhone || '',
+              receiver_location: {
+                id: destination?.id || 0,
+                province: destination?.province || '',
+                city: destination?.city || '',
+                district: destination?.district || '',
+                sub_district: destination?.subDistrict || '',
+                postal_code: destination?.postalCode || '',
+              },
+              receiver_address: excelData?.receiverAddress || '',
+              receiver_address_note: excelData?.receiverAddressNote || '',
+              is_cod: excelData?.isCod,
+              weight: excelData?.weight || 1,
+              goods_amount: excelData?.goodsAmount || 0,
+              goods_content: excelData?.goodsContent || '',
+              goods_qty: excelData?.goodsQty || 1,
+              note: excelData?.note || '',
+              is_insurance: excelData?.isInsurance,
+              shipping_fee: {
+                raw: shippingFee || 0,
+                formatted: formatCurrency(shippingFee || 0, 'Rp.'),
+              },
+            });
           }
 
           return item;
@@ -156,27 +152,6 @@ module.exports = class {
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
-  }
-
-  codValidator({ payload }) {
-    const { body } = this.request;
-    const ninjaCondition = (body.type === 'NINJA');
-    const sicepatCondition = (
-      body.type === 'SICEPAT'
-      && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
-    );
-
-    const jneCondition = (
-      body.type === 'JNE'
-      && payload.weight <= 70
-      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
-    );
-
-    if (sicepatCondition) return true;
-    if (jneCondition) return true;
-    if (ninjaCondition) return true;
-    return false;
   }
 
   async shippingFee({ origin, destination, weight }) {

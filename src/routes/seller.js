@@ -9,6 +9,7 @@ const AuthController = require('../app/controllers/seller/auth-controller');
 const ProfileController = require('../app/controllers/seller/profile-controller');
 const AddressController = require('../app/controllers/seller/address-controller');
 const OrderController = require('../app/controllers/seller/order-controller');
+const ReportController = require('../app/controllers/seller/report-controller');
 
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
@@ -35,6 +36,14 @@ router.group('/address', (route) => {
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
   route.get('/:id', Authorization, OrderController.detail);
+});
+
+router.group('/reports', (route) => {
+  route.get('/total-order', Authorization, ReportController.totalOrder);
+  route.get('/waiting-for-pickup', Authorization, ReportController.waitingForPickup);
+  route.get('/cod-processing', Authorization, ReportController.codProcessing);
+  route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);
+  route.get('/percentage-processing', Authorization, ReportController.percentageProcessing);
 });
 
 // method not allowed when method request http is failure

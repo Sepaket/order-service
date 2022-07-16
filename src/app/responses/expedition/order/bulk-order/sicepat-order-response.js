@@ -1,16 +1,15 @@
 const { Sequelize } = require('sequelize');
-const randomNumber = require('random-number');
 const excelReader = require('read-excel-file/node');
 const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
+const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const {
   Location,
   Seller,
   Order,
   OrderLog,
-  OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -27,7 +26,6 @@ module.exports = class {
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
-    this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
     this.converter = snakeCaseConverter;
@@ -95,7 +93,6 @@ module.exports = class {
               isCod: !!((item[9] || item[9] !== '' || item[9] !== 0)),
             };
 
-            const origin = this.sellerAddress.location;
             const locations = await this.location.findAll({
               where: {
                 [this.op.or]: {
@@ -109,44 +106,44 @@ module.exports = class {
               },
             });
 
+            let errorMessage = '';
+            const origin = this.sellerAddress.location;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
-            const sicepatCondition = (origin?.sicepatOriginCode !== '' && destination?.sicepatDestinationCode !== '');
-            const resi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 10000 })}`;
-            if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-
             const shippingFee = await this.shippingFee({
               origin,
               destination,
               weight: excelData.weight,
             });
 
-            const payload = {
-              resi,
-              origin,
-              shippingFee,
-              destination,
-              ...body,
-              ...excelData,
-            };
+            if (!shippingFee) errorMessage = 'Service for this destination not found';
+            if (!destination) errorMessage = 'Sorry! Your district or postal code may wrong';
 
-            const parameter = await this.paramsMapper({ payload });
-            const codCondition = (excelData.isCod)
-              ? (this.codValidator({ payload }))
-              : true;
-
-            if (!shippingFee || !codCondition) {
-              result.push({
-                resi: '',
-                order_id: null,
-                error: 'Service for this destination not found or service code does not exist when you choose COD',
-                payload: excelData,
-              });
-            } else {
-              const order = await this.sicepat.createOrder(parameter);
-              const responseResi = order?.length > 0 ? order[0].receipt_number : '';
-              const orderId = await this.insertLog({ ...payload, resi: responseResi });
-              result.push({ order_id: orderId, resi });
-            }
+            result.push({
+              error: errorMessage,
+              receiver_name: excelData?.receiverName || '',
+              receiver_phone: excelData?.receiverPhone || '',
+              receiver_location: {
+                id: destination?.id || 0,
+                province: destination?.province || '',
+                city: destination?.city || '',
+                district: destination?.district || '',
+                sub_district: destination?.subDistrict || '',
+                postal_code: destination?.postalCode || '',
+              },
+              receiver_address: excelData?.receiverAddress || '',
+              receiver_address_note: excelData?.receiverAddressNote || '',
+              is_cod: excelData?.isCod,
+              weight: excelData?.weight || 1,
+              goods_amount: excelData?.goodsAmount || 0,
+              goods_content: excelData?.goodsContent || '',
+              goods_qty: excelData?.goodsQty || 1,
+              note: excelData?.note || '',
+              is_insurance: excelData?.isInsurance,
+              shipping_fee: {
+                raw: shippingFee || 0,
+                formatted: formatCurrency(shippingFee || 0, 'Rp.'),
+              },
+            });
           }
 
           return item;
@@ -155,41 +152,16 @@ module.exports = class {
 
       return result;
     } catch (error) {
-      if (error?.message?.includes('SICEPAT:')) {
-        throw new Error(`${error?.message}, Please try again later`);
-      }
-
       throw new Error(error?.message || 'Something Wrong');
     }
-  }
-
-  codValidator({ payload }) {
-    const { body } = this.request;
-    const ninjaCondition = (body.type === 'NINJA');
-    const sicepatCondition = (
-      body.type === 'SICEPAT'
-      && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
-    );
-
-    const jneCondition = (
-      body.type === 'JNE'
-      && payload.weight <= 70
-      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
-    );
-
-    if (sicepatCondition) return true;
-    if (jneCondition) return true;
-    if (ninjaCondition) return true;
-    return false;
   }
 
   async shippingFee({ origin, weight, destination }) {
     try {
       const { body } = this.request;
       const prices = await this.sicepat.checkPrice({
-        origin: origin?.sicepatOriginCode || '',
-        destination: destination?.sicepatDestinationCode || '',
+        origin: origin.sicepatOriginCode,
+        destination: destination.sicepatDestinationCode,
         weight,
       });
 
