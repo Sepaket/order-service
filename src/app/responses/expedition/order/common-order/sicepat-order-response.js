@@ -1,7 +1,7 @@
 const randomNumber = require('random-number');
 const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
-const { orderStatus } = require('../../../../../constant/status');
+const orderStatus = require('../../../../../constant/order-status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const {
   Location,
@@ -181,7 +181,7 @@ module.exports = class {
       );
 
       await this.orderLog.create(
-        { previousStatus: orderStatus.WAITING_PICKUP, orderId: order.id },
+        { previousStatus: orderStatus.WAITING_PICKUP.text, orderId: order.id },
         { transaction: dbTransaction },
       );
 
@@ -205,7 +205,7 @@ module.exports = class {
       orderDate: payload.pickup_date,
       orderTime: payload.pickup_time,
       totalAmount: parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee),
-      status: orderStatus.WAITING_PICKUP,
+      status: orderStatus.WAITING_PICKUP.text,
     };
   }
 

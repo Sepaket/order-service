@@ -94,7 +94,7 @@ const createOrder = (payload) => new Promise((resolve, reject) => {
 const tracking = (payload) => new Promise((resolve, reject) => {
   try {
     const { resi } = payload;
-    axios.post(`${process.env.JNE_BASE_URL}/tracing/api/v1/cnote/${resi}`, qs.stringify({
+    axios.post(`${process.env.JNE_BASE_URL}/tracing/api/list/v1/cnote/${resi}`, qs.stringify({
       username: process.env.JNE_USERNAME,
       api_key: process.env.JNE_APIKEY,
     }), {

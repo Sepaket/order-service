@@ -56,10 +56,6 @@ const serviceCode = {
   ],
 };
 
-const orderStatus = {
-  WAITING_PICKUP: 'WAITING_PICKUP',
-};
-
 const sicepatParcelCategories = {
   ORGANIC: {
     code: 'Organic',
@@ -100,7 +96,6 @@ module.exports = {
   jneServiceStatus,
   sicepatServiceStatus,
   serviceCode,
-  orderStatus,
   expeditionService,
   sicepatParcelCategories,
 };

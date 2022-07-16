@@ -7,7 +7,7 @@ const application = express();
 const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
-// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 // port load
 const port = process.env.APP_PORT || 6000;
@@ -26,7 +26,7 @@ const corsOptions = {
   ],
 };
 
-// trackingScheduler.start();
+trackingScheduler.start();
 
 application.use(cors(corsOptions));
 application.use(bodyParser.urlencoded({ extended: true }));
