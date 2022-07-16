@@ -111,10 +111,36 @@ const tracking = (payload) => new Promise((resolve, reject) => {
   }
 });
 
+const cancel = (payload) => new Promise((resolve, reject) => {
+  try {
+    axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, qs.stringify({
+      username: process.env.JNE_USERNAME,
+      api_key: process.env.JNE_APIKEY,
+      ...payload,
+    }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    }).then((response) => {
+      if (!response?.data?.detail) {
+        reject(new Error(`JNE: ${response?.data?.error || 'Something Wrong'}`));
+        return;
+      }
+
+      resolve(response?.data?.detail);
+    }).catch((error) => {
+      reject(new Error(`JNE: ${error?.data?.reason || error?.message || 'Something Wrong'}`));
+    });
+  } catch (error) {
+    reject(error);
+  }
+});
+
 module.exports = {
   getOrigin,
   getDestination,
   checkPrice,
   createOrder,
   tracking,
+  cancel,
 };

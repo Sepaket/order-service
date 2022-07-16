@@ -93,6 +93,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'order',
     });
 
+    model.OrderDetail.belongsTo(model.Seller, {
+      as: 'seller',
+    });
+
     model.OrderDetail.belongsTo(model.SellerAddress, {
       as: 'sellerAddress',
     });

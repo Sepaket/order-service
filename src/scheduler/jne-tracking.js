@@ -34,9 +34,18 @@ const tracking = async () => {
     const order = await Order.findAll({
       where: {
         expedition: 'JNE',
-        status: {
-          [Sequelize.Op.ne]: 'DELIVERED',
-        },
+        [Sequelize.Op.or]: [
+          {
+            status: {
+              [Sequelize.Op.ne]: 'DELIVERED',
+            },
+          },
+          {
+            status: {
+              [Sequelize.Op.ne]: 'CANCELED',
+            },
+          },
+        ],
       },
     });
 
