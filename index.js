@@ -14,10 +14,10 @@ const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-schedule
 const port = process.env.APP_PORT || 6000;
 
 // routes load
+const adminRoute = require('./src/routes/admin');
 const sellerRoute = require('./src/routes/seller');
 const generalRoute = require('./src/routes/general');
 const expeditionRoute = require('./src/routes/expedition');
-// const bloggerRoute = require('./src/routes/blogger');
 
 const corsOptions = {
   optionsSuccessStatus: 200,
@@ -35,8 +35,9 @@ application.use(bodyParser.urlencoded({ extended: true }));
 application.use(bodyParser.json({ limit: 1024102420, type: 'application/json' }));
 application.listen(port);
 
-application.use('/api/v1/general', generalRoute);
+application.use('/api/v1/admin', adminRoute);
 application.use('/api/v1/seller', sellerRoute);
+application.use('/api/v1/general', generalRoute);
 application.use('/api/v1/expedition', expeditionRoute);
 
 application.use(express.static(path.join(__dirname)));

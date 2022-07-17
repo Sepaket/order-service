@@ -1,10 +1,10 @@
 const roles = {
-  SUPERADMIN: {
+  SUPER_ADMIN: {
     text: 'SUPERADMIN',
     description: '',
   },
-  ADMIN: {
-    text: 'ADMIN',
+  STAFF: {
+    text: 'STAFF',
     description: '',
   },
   SELLER: {
@@ -13,6 +13,14 @@ const roles = {
   },
   FINANCE: {
     text: 'FINANCE',
+    description: '',
+  },
+  LAST_MILE: {
+    text: 'LAST_MILE',
+    description: '',
+  },
+  CONTROL_TOWER: {
+    text: 'CONTROL_TOWER',
     description: '',
   },
 };
