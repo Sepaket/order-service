@@ -16,11 +16,7 @@ const seed = (queryInterface) => {
           ? item.SICEPAT_DESTINATION_CODE?.replace('n.a', '')
           : item.SICEPAT_DESTINATION_CODE;
 
-        const ninjaCode = `
-          ${item.NINJA_LOCATION_1}
-          ${item.NINJA_LOCATION_1 !== '' ? ',' : ''}
-          ${item.NINJA_LOCATION_2}
-        `;
+        const ninjaCode = `${item.NINJA_LOCATION_1}${item.NINJA_LOCATION_1 !== '' ? ',' : ''}${item.NINJA_LOCATION_2}`;
 
         return {
           province: item.PROVINCE_NAME.toLowerCase(),

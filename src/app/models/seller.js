@@ -76,6 +76,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'sellerId',
     });
 
+    model.Seller.hasOne(model.OrderBatch, {
+      as: 'batch',
+      foreignKey: 'sellerId',
+    });
+
     model.Seller.hasOne(model.OrderDetail, {
       as: 'orderDetail',
       foreignKey: 'sellerId',

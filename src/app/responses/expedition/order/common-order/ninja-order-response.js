@@ -9,6 +9,7 @@ const {
   Seller,
   Order,
   OrderLog,
+  OrderBatch,
   OrderFailed,
   OrderDetail,
   OrderAddress,
@@ -22,6 +23,7 @@ module.exports = class {
     this.order = Order;
     this.seller = Seller;
     this.request = request;
+    this.batch = OrderBatch;
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
@@ -45,6 +47,8 @@ module.exports = class {
   }
 
   async createOrder() {
+    const dbTransaction = await sequelize.transaction();
+
     try {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
@@ -60,6 +64,19 @@ module.exports = class {
           },
         ],
       });
+
+      this.createBatch = await this.batch.create(
+        {
+          expedition: body.type,
+          sellerId: this.sellerData?.id,
+          batchCode: `B${body?.order_items?.length}${shortid.generate()}`,
+          totalOrder: body?.order_items?.length || 0,
+          totalOrderProcessed: 0,
+          totalOrderSent: 0,
+          totalOrderProblem: 0,
+        },
+        { transaction: dbTransaction },
+      );
 
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
 
@@ -146,8 +163,10 @@ module.exports = class {
       );
 
       // make shipping fee conditional bcs ninja has no sandbox for check price
+      await dbTransaction.commit();
       return response;
     } catch (error) {
+      await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
     }
   }
@@ -230,6 +249,7 @@ module.exports = class {
     const { body } = this.request;
 
     return {
+      batchId: this.createBatch.id,
       orderCode: shortid.generate(),
       resi: payload.resi,
       expedition: payload.type,
@@ -244,6 +264,7 @@ module.exports = class {
 
   async orderQueryDetail(payload) {
     return {
+      batchId: this.createBatch.id,
       sellerId: this.sellerData?.id,
       sellerAddressId: this.sellerAddress?.id,
       weight: payload.weight,

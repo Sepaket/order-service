@@ -35,6 +35,7 @@ router.group('/address', (route) => {
 
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
+  route.get('/batch', Authorization, OrderController.batch);
   route.get('/:id', Authorization, OrderController.detail);
 });
 

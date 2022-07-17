@@ -11,6 +11,7 @@ const {
   Seller,
   Order,
   OrderLog,
+  OrderBatch,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -24,6 +25,7 @@ module.exports = class {
     this.seller = Seller;
     this.op = Sequelize.Op;
     this.request = request;
+    this.batch = OrderBatch;
     this.location = Location;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
@@ -46,6 +48,8 @@ module.exports = class {
   }
 
   async createOrder() {
+    const dbTransaction = await sequelize.transaction();
+
     try {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
@@ -62,6 +66,19 @@ module.exports = class {
         ],
       });
 
+      this.createBatch = await this.batch.create(
+        {
+          expedition: body.type,
+          sellerId: this.sellerData?.id,
+          batchCode: `B${body?.order_items?.length}${shortid.generate()}`,
+          totalOrder: body?.order_items?.length || 0,
+          totalOrderProcessed: 0,
+          totalOrderSent: 0,
+          totalOrderProblem: 0,
+        },
+        { transaction: dbTransaction },
+      );
+
       if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
 
       const response = await Promise.all(
@@ -74,6 +91,8 @@ module.exports = class {
               payload: item,
             },
           ];
+
+          const resi = `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`;
           const origin = this.sellerAddress.location;
           const destination = await this.location.findOne({
             where: { id: item.receiver_location_id },
@@ -83,6 +102,7 @@ module.exports = class {
           const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
 
           const payload = {
+            resi,
             origin,
             shippingFee,
             destination,
@@ -99,9 +119,8 @@ module.exports = class {
 
           if (shippingFee && codCondition) {
             const paramFormatted = await this.caseConverter({ parameter });
-            const order = await this.jne.createOrder(paramFormatted);
-            const resi = order?.length > 0 ? order[0].cnote_no : '';
 
+            await this.jne.createOrder(paramFormatted);
             const orderId = await this.insertLog({ ...payload, resi });
             const totalAmount = parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee);
 
@@ -145,8 +164,10 @@ module.exports = class {
         }),
       );
 
+      await dbTransaction.commit();
       return response;
     } catch (error) {
+      await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
     }
   }
@@ -240,6 +261,7 @@ module.exports = class {
     const { body } = this.request;
 
     return {
+      batchId: this.createBatch.id,
       orderCode: shortid.generate(),
       resi: payload.resi,
       expedition: payload.type,
@@ -257,6 +279,7 @@ module.exports = class {
     const { body } = this.request;
 
     return {
+      batchId: this.createBatch.id,
       sellerId: this.sellerData?.id,
       sellerAddressId: this.sellerAddress?.id,
       weight: payload.weight,
@@ -330,7 +353,7 @@ module.exports = class {
       type: 'PICKUP',
       cod_flag: payload.is_cod ? 'YES' : 'NO',
       cod_amount: payload?.goods_amount,
-      awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
+      awb: payload.resi,
     };
   }
 };

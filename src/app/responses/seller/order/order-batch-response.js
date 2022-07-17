@@ -1,15 +1,15 @@
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { SellerAddress, Location } = require('../../../models');
+const { OrderBatch, Seller } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
+    this.seller = Seller;
     this.op = Sequelize.Op;
     this.request = request;
-    this.location = Location;
-    this.address = SellerAddress;
+    this.batch = OrderBatch;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -19,35 +19,33 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.address.count();
+    const seller = await jwtSelector({ request: this.request });
+    const total = await this.batch.count({ where: { sellerId: seller.id } });
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
-    const seller = await jwtSelector({ request: this.request });
 
     return new Promise((resolve, reject) => {
       try {
-        this.address.findAll({
+        this.batch.findAll({
           attributes: [
-            ['id', 'address_id'],
-            'name',
-            'pic_name',
-            'pic_phone_number',
-            'address',
-            'active',
+            ['id', 'batch_id'],
+            'expedition',
+            'batchCode',
+            'totalOrder',
+            'totalOrderProcessed',
+            'totalOrderSent',
+            'totalOrderProblem',
+            'createdAt',
           ],
           include: [
             {
-              model: this.location,
-              as: 'location',
-              required: false,
+              model: this.seller,
+              as: 'seller',
+              required: true,
               attributes: [
-                ['id', 'location_id'],
-                'province',
-                'city',
-                'district',
-                'subDistrict',
-                'postalCode',
+                ['id', 'seller_id'],
+                'name',
               ],
             },
           ],
@@ -60,17 +58,12 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
 
-          const mapped = result?.map((item) => ({
-            ...item,
-            location: this.converter.objectToSnakeCase(item?.location) || null,
-          }));
-
-          if (mapped.length > 0) {
+          if (result.length > 0) {
             resolve({
-              data: mapped,
+              data: result,
               meta: {
                 total,
-                total_result: mapped.length,
+                total_result: result.length,
                 limit: parseInt(query.limit, 10) || limit,
                 page: parseInt(query.page, 10) || (offset + 1),
               },
@@ -81,7 +74,7 @@ module.exports = class {
                 data: [],
                 meta: {
                   total,
-                  total_result: mapped.length,
+                  total_result: result.length,
                   limit: parseInt(query.limit, 10) || limit,
                   page: parseInt(query.page, 10) || (offset + 1),
                 },
@@ -99,11 +92,7 @@ module.exports = class {
     const { query } = this.request;
     const condition = {
       [this.op.or]: {
-        name: { [this.op.substring]: query.keyword },
-        picName: { [this.op.substring]: query.keyword },
-        picPhoneNumber: { [this.op.substring]: query.keyword },
-        address: { [this.op.substring]: query.keyword },
-        addressDetail: { [this.op.substring]: query.keyword },
+        batchCode: { [this.op.substring]: query.keyword },
       },
     };
 
