@@ -5,6 +5,7 @@ const NonCodProcessingReponse = require('../../responses/seller/report/seller-re
 const PercentageProcessingReponse = require('../../responses/seller/report/seller-report-percentage-processing');
 const CodSentReponse = require('../../responses/seller/report/seller-report-cod-sent');
 const NonCodSentReponse = require('../../responses/seller/report/seller-report-non-cod-sent');
+const ReturnToSellerReponse = require('../../responses/seller/report/seller-report-return-to-seller');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -94,6 +95,20 @@ module.exports = {
   nonCodSent: async (request, response, next) => {
     try {
       const result = await new NonCodSentReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  returnToSeller: async (request, response, next) => {
+    try {
+      const result = await new ReturnToSellerReponse({ request });
 
       response.send({
         code: 200,
