@@ -11,41 +11,29 @@ module.exports = class {
   }
 
   async process() {
-    try {
-      await this.getOrders();
-      return this.calculatePercentage();
-    } catch (error) {
-      return error;
-    }
-  }
+    const seller = await jwtSelector({ request: this.request });
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.seller = await jwtSelector({ request: this.request });
 
-  calculatePercentage() {
-    let processingOrders = 0;
-    this.orderList.forEach((orderList) => {
-      if (orderList.status === 'PROCESSED') {
-        // eslint-disable-next-line no-plusplus
-        processingOrders++;
+        this.order.count({
+          where: {
+            '$detail.seller_id$': seller.id,
+            status: 'DELIVERED',
+            isCod: true,
+            ...this.querySearch(),
+          },
+          include: [{
+            model: OrderDetail,
+            as: 'detail',
+          }],
+        }).then((response) => {
+          resolve(response);
+        });
+      } catch (error) {
+        reject(error);
       }
     });
-
-    return (processingOrders / this.orderList.length) * 100;
-  }
-
-  async getOrders() {
-    const seller = await jwtSelector({ request: this.request });
-    const orderList = await this.order.findAll({
-      attributes: ['id', 'status'],
-      where: {
-        '$detail.seller_id$': seller.id,
-        ...this.querySearch(),
-      },
-      include: [{
-        model: OrderDetail,
-        as: 'detail',
-      }],
-    });
-
-    if (orderList) this.orderList = orderList;
   }
 
   querySearch() {
