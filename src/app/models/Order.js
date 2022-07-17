@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
+    orderCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     resi: {
       type: DataTypes.STRING,
       allowNull: false,

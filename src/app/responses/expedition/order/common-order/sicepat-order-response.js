@@ -1,3 +1,4 @@
+const shortid = require('shortid-36');
 const randomNumber = require('random-number');
 const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
@@ -233,6 +234,7 @@ module.exports = class {
     const { body } = this.request;
 
     return {
+      orderCode: shortid.generate(),
       resi: payload.resi,
       expedition: payload.type,
       serviceCode: payload.service_code,
