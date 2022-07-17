@@ -59,6 +59,7 @@ module.exports = class {
               required: true,
               where: search,
               attributes: [
+                'orderCode',
                 'resi',
                 'orderDate',
                 'orderTime',

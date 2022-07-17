@@ -240,6 +240,7 @@ module.exports = class {
     const { body } = this.request;
 
     return {
+      orderCode: shortid.generate(),
       resi: payload.resi,
       expedition: payload.type,
       serviceCode: payload.service_code,

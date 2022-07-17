@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const httpErrors = require('http-errors');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const { Seller, SellerDetail } = require('../../../models');
+const role = require('../../../../constant/role');
 
 module.exports = class {
   constructor({ request }) {
@@ -56,6 +57,7 @@ module.exports = class {
           JSON.parse(JSON.stringify(result.seller_detail)),
         );
 
+        result.seller_detail.role = role.SELLER.text;
         result.seller_detail.is_login_socmed = !!(result.social_id !== 'NULL' && result.social_id);
 
         delete result.social_id;
