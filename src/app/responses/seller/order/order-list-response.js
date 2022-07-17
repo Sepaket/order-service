@@ -30,8 +30,11 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.order.count();
     const seller = await jwtSelector({ request: this.request });
+    const total = await this.orderDetail.count({
+      where: { sellerId: seller.id, batchId: query.batch_id },
+    });
+
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
@@ -97,7 +100,7 @@ module.exports = class {
               ],
             },
           ],
-          where: { sellerId: seller.id },
+          where: { sellerId: seller.id, batchId: query.batch_id },
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,

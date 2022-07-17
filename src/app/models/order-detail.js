@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
+    batchId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,

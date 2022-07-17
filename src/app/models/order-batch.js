@@ -6,47 +6,37 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    batchId: {
+    sellerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    orderCode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    resi: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
     },
     expedition: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    serviceCode: {
+    batchCode: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    isCod: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    orderDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    orderTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
-    totalAmount: {
-      type: DataTypes.DECIMAL(10, 2),
+    totalOrder: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    status: {
-      type: DataTypes.STRING,
+    totalOrderSent: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 0,
+    },
+    totalOrderProcessed: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    totalOrderProblem: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -63,27 +53,21 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  const Order = sequelize.define('Order', schema, {
+  const Batch = sequelize.define('OrderBatch', schema, {
     timestamps: true,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'orders',
+    tableName: 'order_batch',
   });
 
-  Order.associate = (model) => {
-    model.Order.hasOne(model.OrderDetail, {
-      as: 'detail',
-      foreignKey: 'orderId',
-    });
-
-    model.Order.hasMany(model.OrderLog, {
-      as: 'statuses',
-      foreignKey: 'orderId',
+  Batch.associate = (model) => {
+    model.OrderBatch.belongsTo(model.Seller, {
+      as: 'seller',
     });
   };
 
-  return Order;
+  return Batch;
 };
