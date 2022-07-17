@@ -3,6 +3,8 @@ const WaitingFormPickupReponse = require('../../responses/seller/report/seller-r
 const CodProcessingReponse = require('../../responses/seller/report/seller-report-cod-processing');
 const NonCodProcessingReponse = require('../../responses/seller/report/seller-report-non-cod-processing');
 const PercentageProcessingReponse = require('../../responses/seller/report/seller-report-percentage-processing');
+const CodSentReponse = require('../../responses/seller/report/seller-report-cod-sent');
+const NonCodSentReponse = require('../../responses/seller/report/seller-report-non-cod-sent');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -64,6 +66,34 @@ module.exports = {
   percentageProcessing: async (request, response, next) => {
     try {
       const result = await new PercentageProcessingReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  codSent: async (request, response, next) => {
+    try {
+      const result = await new CodSentReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  nonCodSent: async (request, response, next) => {
+    try {
+      const result = await new NonCodSentReponse({ request });
 
       response.send({
         code: 200,

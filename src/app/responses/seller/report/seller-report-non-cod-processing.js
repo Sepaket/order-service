@@ -19,7 +19,7 @@ module.exports = class {
         this.order.count({
           where: {
             '$detail.seller_id$': seller.id,
-            status: 'PICKUP',
+            status: 'PROCESSED',
             isCod: false,
             ...this.querySearch(),
           },
