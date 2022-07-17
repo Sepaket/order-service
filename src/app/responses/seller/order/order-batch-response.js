@@ -1,3 +1,4 @@
+const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
 const { OrderBatch, Seller } = require('../../../models');
@@ -92,10 +93,19 @@ module.exports = class {
     const { query } = this.request;
     const condition = {
       [this.op.or]: {
-        batchCode: { [this.op.substring]: query.keyword },
+        batchCode: { [this.op.substring]: query?.keyword || '' },
       },
     };
 
-    return query.keyword ? condition : {};
+    if (query?.date_start && query?.date_end) {
+      condition.createdAt = {
+        [this.op.between]: [
+          moment(`${query?.date_start} 23:59:59`).toISOString(),
+          moment(`${query?.date_end} 23:59:59`).toISOString(),
+        ],
+      };
+    }
+
+    return (query?.date_start || query?.keyword) ? condition : {};
   }
 };
