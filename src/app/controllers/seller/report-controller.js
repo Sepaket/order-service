@@ -1,3 +1,5 @@
+const OrderTotalChartValidator = require('../../validators/seller/report/order-total-chart-validator');
+
 const TotalOrderReponse = require('../../responses/seller/report/seller-report-total-order');
 const WaitingFormPickupReponse = require('../../responses/seller/report/seller-report-waiting-for-pickup');
 const CodProcessingReponse = require('../../responses/seller/report/seller-report-cod-processing');
@@ -168,6 +170,8 @@ module.exports = {
 
   orderTotalChart: async (request, response, next) => {
     try {
+      await OrderTotalChartValidator(request.query);
+
       const result = await new OrderTotalChartReponse({ request });
 
       response.send({
