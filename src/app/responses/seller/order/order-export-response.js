@@ -1,3 +1,4 @@
+const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
@@ -26,18 +27,8 @@ module.exports = class {
   }
 
   async process() {
-    const limit = 10;
-    const offset = 0;
-    const { query } = this.request;
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
-    const total = await this.orderDetail.count({
-      where: { sellerId: seller.id, batchId: query.batch_id },
-    });
-
-    const nextPage = (
-      (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
-    ) || parseInt(offset, 10);
 
     return new Promise((resolve, reject) => {
       try {
@@ -45,43 +36,43 @@ module.exports = class {
           attributes: [
             'orderId',
             'totalItem',
+            'batchId',
+            'weight',
+            'volume',
+            'goodsPrice',
+            'useInsurance',
+            'insuranceAmount',
+            'shippingCharge',
           ],
           include: [
+            {
+              model: this.order,
+              as: 'order',
+              required: true,
+              attributes: [
+                'orderCode',
+                'resi',
+                'expedition',
+                'serviceCode',
+                'isCod',
+                'status',
+                'orderDate',
+                'orderTime',
+                'updatedAt',
+              ],
+            },
             {
               model: this.orderAddress,
               as: 'receiverAddress',
               required: true,
               attributes: [
                 ['id', 'receiver_id'],
+                'senderName',
+                'senderPhone',
                 'receiverName',
-              ],
-            },
-            {
-              model: this.order,
-              as: 'order',
-              required: true,
-              where: search,
-              attributes: [
-                'orderCode',
-                'resi',
-                'orderDate',
-                'orderTime',
-                'expedition',
-                'serviceCode',
-                'isCod',
-                'status',
-                'updatedAt',
-              ],
-            },
-            {
-              model: this.sellerAddress,
-              as: 'sellerAddress',
-              required: false,
-              attributes: [
-                ['id', 'seller_address_id'],
-                'address',
-                'picName',
-                'picPhoneNumber',
+                'receiverPhone',
+                'receiverAddress',
+                'receiverAddressNote',
               ],
               include: [
                 {
@@ -100,45 +91,23 @@ module.exports = class {
               ],
             },
           ],
-          where: { sellerId: seller.id, batchId: query.batch_id },
+          where: { ...search, sellerId: seller.id },
           order: [['id', 'DESC']],
-          limit: parseInt(query.limit, 10) || parseInt(limit, 10),
-          offset: nextPage,
         }).then((response) => {
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
 
-          const mapped = result?.map((item) => ({
-            ...item,
-            order: this.converter.objectToSnakeCase(item?.order) || null,
-            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
-            seller_address: {
-              ...item.seller_address,
-              location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
-            },
-          }));
-
-          if (mapped.length > 0) {
+          if (result.length > 0) {
             resolve({
-              data: mapped,
-              meta: {
-                total,
-                total_result: mapped.length,
-                limit: parseInt(query.limit, 10) || limit,
-                page: parseInt(query.page, 10) || (offset + 1),
-              },
+              data: result,
+              meta: null,
             });
           } else {
             reject(httpErrors(404, 'No Data Found', {
               data: {
                 data: [],
-                meta: {
-                  total,
-                  total_result: mapped.length,
-                  limit: parseInt(query.limit, 10) || limit,
-                  page: parseInt(query.page, 10) || (offset + 1),
-                },
+                meta: null,
               },
             }));
           }
@@ -150,13 +119,16 @@ module.exports = class {
   }
 
   querySearch() {
-    const { query } = this.request;
+    const { body } = this.request;
     const condition = {
-      [this.op.or]: {
-        resi: { [this.op.substring]: query.keyword?.toUpperCase() },
+      createdAt: {
+        [this.op.between]: [
+          moment(`${body?.date_start} 23:59:59`).toISOString(),
+          moment(`${body?.date_end} 23:59:59`).toISOString(),
+        ],
       },
     };
 
-    return query.keyword ? condition : {};
+    return condition;
   }
 };
