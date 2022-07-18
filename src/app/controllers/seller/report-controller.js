@@ -6,6 +6,9 @@ const PercentageProcessingReponse = require('../../responses/seller/report/selle
 const CodSentReponse = require('../../responses/seller/report/seller-report-cod-sent');
 const NonCodSentReponse = require('../../responses/seller/report/seller-report-non-cod-sent');
 const ReturnToSellerReponse = require('../../responses/seller/report/seller-report-return-to-seller');
+const NeedAttentionReponse = require('../../responses/seller/report/seller-report-need-attention');
+const RateReturReponse = require('../../responses/seller/report/seller-report-rate-retur');
+const RateSuccessReponse = require('../../responses/seller/report/seller-report-rate-success');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -109,6 +112,48 @@ module.exports = {
   returnToSeller: async (request, response, next) => {
     try {
       const result = await new ReturnToSellerReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  needAttention: async (request, response, next) => {
+    try {
+      const result = await new NeedAttentionReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  rateRetur: async (request, response, next) => {
+    try {
+      const result = await new RateReturReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  rateSuccess: async (request, response, next) => {
+    try {
+      const result = await new RateSuccessReponse({ request });
 
       response.send({
         code: 200,
