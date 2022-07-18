@@ -9,6 +9,7 @@ const ReturnToSellerReponse = require('../../responses/seller/report/seller-repo
 const NeedAttentionReponse = require('../../responses/seller/report/seller-report-need-attention');
 const RateReturReponse = require('../../responses/seller/report/seller-report-rate-retur');
 const RateSuccessReponse = require('../../responses/seller/report/seller-report-rate-success');
+const OrderTotalChartReponse = require('../../responses/seller/report/seller-report-order-total-chart');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -154,6 +155,20 @@ module.exports = {
   rateSuccess: async (request, response, next) => {
     try {
       const result = await new RateSuccessReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  orderTotalChart: async (request, response, next) => {
+    try {
+      const result = await new OrderTotalChartReponse({ request });
 
       response.send({
         code: 200,
