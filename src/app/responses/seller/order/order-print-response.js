@@ -187,8 +187,13 @@ module.exports = class {
   querySearch() {
     const { body } = this.request;
     const condition = {
-      batchId: {
-        [this.op.in]: body.ids,
+      [this.op.or]: {
+        batchId: {
+          [this.op.in]: body.batch_ids,
+        },
+        orderId: {
+          [this.op.in]: body.order_ids,
+        },
       },
     };
 
