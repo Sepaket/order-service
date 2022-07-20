@@ -6,42 +6,34 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    batchId: {
+    orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    orderCode: {
+    discountSeller: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    discountSellerType: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    resi: {
+    discountProvider: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    discountProviderType: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      allowNull: true,
     },
-    expedition: {
+    discountGlobal: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    discountGlobalType: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    serviceCode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    isCod: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    orderDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    orderTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      comment: 'this discount get from admin when admin set discount fee',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -58,27 +50,23 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  const Order = sequelize.define('Order', schema, {
+  const OrderDiscount = sequelize.define('OrderDiscount', schema, {
     timestamps: true,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'orders',
+    tableName: 'order_discounts',
   });
 
-  Order.associate = (model) => {
-    model.Order.hasOne(model.OrderDetail, {
-      as: 'detail',
+  OrderDiscount.associate = (model) => {
+    model.OrderDiscount.belongsTo(model.OrderDetail, {
+      as: 'orderDetail',
       foreignKey: 'orderId',
-    });
-
-    model.Order.hasMany(model.OrderLog, {
-      as: 'statuses',
-      foreignKey: 'orderId',
+      targetKey: 'orderId',
     });
   };
 
-  return Order;
+  return OrderDiscount;
 };

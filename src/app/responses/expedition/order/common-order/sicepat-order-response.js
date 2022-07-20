@@ -6,16 +6,18 @@ const orderStatus = require('../../../../../constant/order-status');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const {
-  Location,
   Seller,
   Order,
+  OrderTax,
   OrderLog,
+  Location,
+  sequelize,
   OrderBatch,
   OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
-  sequelize,
+  OrderDiscount,
 } = require('../../../../models');
 
 module.exports = class {
@@ -26,12 +28,27 @@ module.exports = class {
     this.request = request;
     this.batch = OrderBatch;
     this.location = Location;
+    this.orderTax = OrderTax;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
     this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
+    this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
+
+    this.vat = {
+      raw: 3.33,
+      calculated: (parseFloat(3.33) / parseInt(100, 10)),
+      type: 'PERCENTAGE',
+    };
+
+    this.discount = {
+      raw: 0.00,
+      calculated: (parseFloat(0.00) / parseInt(100, 10)),
+      type: 'PERCENTAGE',
+    };
+
     return this.process();
   }
 
@@ -98,12 +115,17 @@ module.exports = class {
             where: { id: item.receiver_location_id },
           });
 
+          const codFee = (parseFloat(3.33) / parseInt(100, 10));
           const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
           const sicepatCondition = (origin.sicepatOriginCode !== '' && destination.sicepatDestinationCode !== '');
+          const goodsAmount = !body.is_cod
+            ? body.goods_amount
+            : parseFloat(body.cod_value) - (parseFloat(shippingFee || 0) + codFee);
 
           const payload = {
             resi,
             origin,
+            goodsAmount,
             destination,
             shippingFee,
             ...item,
@@ -120,7 +142,9 @@ module.exports = class {
             const order = await this.sicepat.createOrder(parameter);
             const responseResi = order?.length > 0 ? order[0].receipt_number : '';
             const orderId = await this.insertLog({ ...payload, resi: responseResi });
-            const totalAmount = parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee);
+            const totalAmount = payload?.is_cod
+              ? parseFloat(payload?.cod_value)
+              : (parseFloat(payload?.goods_amount) + parseFloat(payload?.shippingFee));
 
             result = [{
               resi,
@@ -131,7 +155,6 @@ module.exports = class {
                 service_code: payload.service_code,
                 weight: payload.weight,
                 goods_content: payload.goods_content,
-                goods_amount: payload.gppds_amount,
                 goods_qty: payload.goods_qty,
                 goods_notes: payload.notes,
                 insurance_amount: 0,
@@ -181,13 +204,13 @@ module.exports = class {
     const sicepatCondition = (
       body.type === 'SICEPAT'
       && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goods_amount) <= parseFloat(15000000)
+      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
     );
 
     const jneCondition = (
       body.type === 'JNE'
       && payload.weight <= 70
-      && parseFloat(payload.goods_amount) <= parseFloat(5000000)
+      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
     );
 
     if (sicepatCondition) return true;
@@ -218,6 +241,8 @@ module.exports = class {
 
     try {
       const orderQuery = await this.orderQuery(payload);
+      const orderTaxQuery = await this.orderQueryTax(payload);
+      const orderDiscountQuery = await this.orderQueryDiscount();
       const orderDetailQuery = await this.orderQueryDetail(payload);
       const orderAddressQuery = await this.orderQueryAddress(payload);
 
@@ -241,12 +266,41 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
+      await this.orderTax.create(
+        { ...orderTaxQuery, orderId: order.id },
+        { transaction: dbTransaction },
+      );
+
+      await this.orderDiscount.create(
+        { ...orderDiscountQuery, orderId: order.id },
+        { transaction: dbTransaction },
+      );
+
       await dbTransaction.commit();
       return order.id;
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
     }
+  }
+
+  async receivedFeeFormula(payload) {
+    let result = 0;
+    const tax = parseFloat(payload?.shippingFee) * this.vat.calculated;
+
+    if (payload.is_cod) {
+      const codFee = (parseFloat(3.33) / parseInt(100, 10));
+      const codFeeSeller = parseFloat(codFee) * parseFloat(payload?.cod_value);
+
+      const formulaOne = parseFloat(payload?.cod_value) - parseFloat(codFeeSeller);
+      const formulaTwo = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
+      result = (formulaOne - formulaTwo) - tax;
+    } else {
+      const formulaOne = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
+      result = (payload?.goods_amount - formulaOne) - tax;
+    }
+
+    return result;
   }
 
   async orderQuery(payload) {
@@ -262,12 +316,13 @@ module.exports = class {
       isCod: payload.is_cod,
       orderDate: payload.pickup_date,
       orderTime: payload.pickup_time,
-      totalAmount: parseFloat(payload.goods_amount) + parseFloat(payload.shippingFee),
       status: orderStatus.WAITING_PICKUP.text,
     };
   }
 
   async orderQueryDetail(payload) {
+    const calculateFee = await this.receivedFeeFormula(payload);
+
     return {
       batchId: this.createBatch.id,
       sellerId: this.sellerData?.id,
@@ -276,9 +331,11 @@ module.exports = class {
       totalItem: payload.goods_qty,
       notes: payload.notes,
       goodsContent: payload.goods_content,
-      goodsPrice: payload.goods_amount,
+      goodsPrice: !payload.is_cod ? payload.goods_amount : 0.00,
+      codFee: payload.is_cod ? payload.cod_value : 0.00,
       shippingCharge: payload.shippingFee,
       useInsurance: payload.is_insurance,
+      sellerReceivedAmount: calculateFee,
       insuranceAmount: 0,
       isTrouble: false,
     };
@@ -296,6 +353,32 @@ module.exports = class {
       receiverAddress: payload.receiver_address,
       receiverAddressNote: payload.receiver_address_note,
       receiverLocationId: payload.receiver_location_id,
+    };
+  }
+
+  async orderQueryTax(payload) {
+    // eslint-disable-next-line no-unused-vars
+    const { body } = this.request;
+
+    return {
+      taxAmount: parseFloat(payload?.shippingFee) * this.vat.calculated,
+      taxType: 'DECIMAL',
+      vatTax: this.vat.raw,
+      vatType: this.vat.type,
+    };
+  }
+
+  async orderQueryDiscount() {
+    // eslint-disable-next-line no-unused-vars
+    const { body } = this.request;
+
+    return {
+      discountSeller: this.discount.raw,
+      discountSellerType: this.discount.type,
+      discountProvider: this.discount.raw,
+      discountProviderType: this.discount.type,
+      discountGlobal: this.discount.raw,
+      discountGlobalType: this.discount.type,
     };
   }
 
@@ -348,7 +431,7 @@ module.exports = class {
           parcel_content: payload.goods_content,
           parcel_qty: payload.goods_qty,
           parcel_uom: 'Pcs',
-          parcel_value: payload.goods_amount,
+          parcel_value: payload.goodsAmount,
           total_weight: payload.weight,
           shipper_name: payload.sender_name,
           shipper_address: pickupAddress.replace(/\n/g, ' ').replace(/  +/g, ' '),
