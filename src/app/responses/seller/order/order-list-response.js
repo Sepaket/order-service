@@ -53,7 +53,7 @@ module.exports = class {
               required: true,
               attributes: [
                 ['id', 'receiver_id'],
-                'senderName',
+                'receiverName',
               ],
             },
             {
