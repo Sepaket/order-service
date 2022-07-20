@@ -67,7 +67,10 @@ const tracking = async () => {
           });
 
           await Order.update(
-            { status: currentStatus },
+            {
+              status: currentStatus,
+              podStatus: trackingStatus?.code,
+            },
             { where: { resi: item.resi } },
           );
         }
