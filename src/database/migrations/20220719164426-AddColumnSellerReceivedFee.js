@@ -12,19 +12,10 @@ module.exports = {
       defaultValue: 0.00,
     }),
     queryInterface.removeColumn(table, 'goods_price'),
-    queryInterface.addColumn(table, 'goods_price', {
-      type: Sequelize.DECIMAL(10, 2),
-      defaultValue: 0.00,
-      allowNull: false,
-    }),
   ]),
 
-  down: async (queryInterface, Sequelize) => Promise.all([
+  down: async (queryInterface) => Promise.all([
     queryInterface.removeColumn(table, 'seller_received_amount'),
     queryInterface.removeColumn(table, 'cod_fee'),
-    queryInterface.addColumn(table, 'goods_price', {
-      type: Sequelize.STRING,
-      allowNull: true,
-    }),
   ]),
 };
