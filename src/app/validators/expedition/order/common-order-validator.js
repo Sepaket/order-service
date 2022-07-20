@@ -72,7 +72,16 @@ const validator = joi.object({
         sicepatParcelCategories.NORMAL,
         sicepatParcelCategories.ELECTRONIC,
       ),
-    goods_amount: joi.number().required(),
+    cod_value: joi.any().when('is_cod', {
+      is: joi.boolean().valid(true),
+      then: joi.number().min(1).required(),
+      otherwise: joi.allow(0),
+    }),
+    goods_amount: joi.any().when('is_cod', {
+      is: joi.boolean().valid(false),
+      then: joi.number().min(10000).required(),
+      otherwise: joi.allow(0),
+    }),
     goods_qty: joi.number().min(1).required(),
     notes: joi.string().allow(null, '').max(50),
     is_insurance: joi.boolean().required(),

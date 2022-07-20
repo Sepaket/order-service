@@ -43,7 +43,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     goodsPrice: {
-      type: DataTypes.STRING,
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    codFee: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
     shippingCharge: {
@@ -66,6 +70,10 @@ module.exports = (sequelize, DataTypes) => {
     isCompleted: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+    },
+    sellerReceivedAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -107,6 +115,18 @@ module.exports = (sequelize, DataTypes) => {
 
     model.OrderDetail.belongsTo(model.OrderAddress, {
       as: 'receiverAddress',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
+
+    model.OrderDetail.hasOne(model.OrderTax, {
+      as: 'tax',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
+
+    model.OrderDetail.hasOne(model.OrderDiscount, {
+      as: 'discount',
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
