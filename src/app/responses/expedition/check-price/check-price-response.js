@@ -129,6 +129,7 @@ module.exports = class {
         );
 
         return {
+          weight: body.weight,
           serviceName: item.service_display,
           serviceCode: item.service_code,
           availableCod: codCondition,
@@ -163,6 +164,7 @@ module.exports = class {
         );
 
         return {
+          weight: body.weight,
           serviceName: `Sicepat ${item.service}`,
           serviceCode: item.service,
           availableCod: codCondition,
@@ -230,6 +232,7 @@ module.exports = class {
         const rawEstimation = item.estimation.split(' hari');
 
         return {
+          weight: body.weight,
           price: item.price,
           serviceName: `IDX ${item.name}`,
           serviceCode: item.code,
