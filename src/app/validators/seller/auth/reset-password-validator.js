@@ -18,7 +18,7 @@ const validator = joi.object({
     .external((request) => isExist({ params: request })),
   new_password: joi.string()
     .min(6)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{6,}$/)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/)
     .message({
       'string.pattern.base': 'password must include low character, capital character, special character, and number,',
     })
