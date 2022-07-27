@@ -21,6 +21,7 @@ module.exports = class {
           'id',
           'name',
           'email',
+          'phone',
         ],
         where: { id: params.id },
         include: [
@@ -28,6 +29,7 @@ module.exports = class {
             attributes: [
               ['id', 'seller_detail_id'],
               'credit',
+              'photo',
             ],
             model: this.sellerDetail,
             as: 'sellerDetail',
@@ -35,7 +37,7 @@ module.exports = class {
           },
         ],
       }).then((response) => {
-        const result = this.converter.arrayToSnakeCase(
+        const result = this.converter.objectToSnakeCase(
           JSON.parse(JSON.stringify(response)),
         );
 
