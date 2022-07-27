@@ -43,7 +43,6 @@ module.exports = class {
           },
         ],
         where: search,
-        logging: console.log,
         order: [['id', 'DESC']],
         limit: parseInt(query.limit, 10) || parseInt(limit, 10),
         offset: nextPage,
