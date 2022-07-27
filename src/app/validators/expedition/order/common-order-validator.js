@@ -55,7 +55,7 @@ const validator = joi.object({
       .min(1)
       .required()
       .external((req) => isExist({ params: req, identifier: 'id', model: Location })),
-    weight: joi.number().min(1).required(),
+    weight: joi.number().min(1).max(50).required(),
     is_cod: joi.boolean().required(),
     sender_name: joi.string().required(),
     sender_phone: joi.string().required(),
@@ -79,7 +79,7 @@ const validator = joi.object({
     }),
     goods_amount: joi.any().when('is_cod', {
       is: joi.boolean().valid(false),
-      then: joi.number().min(10000).required(),
+      then: joi.number().min(10000).max(5000000).required(),
       otherwise: joi.allow(0),
     }),
     goods_qty: joi.number().min(1).required(),
