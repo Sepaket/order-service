@@ -6,6 +6,7 @@ const Authorization = require('../app/middlewares/admin-authentication');
 
 const AuthController = require('../app/controllers/admin/auth-controller');
 const ProfileController = require('../app/controllers/admin/profile-controller');
+const UserController = require('../app/controllers/admin/user-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -13,6 +14,11 @@ router.group('/auth', (route) => {
 
 router.group('/profile', (route) => {
   route.get('/me', Authorization, ProfileController.index);
+});
+
+router.group('/user', (route) => {
+  route.get('/', Authorization, UserController.index);
+  route.get('/:id', Authorization, UserController.detail);
 });
 
 // method not allowed when method request http is failure
