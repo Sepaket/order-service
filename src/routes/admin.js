@@ -20,6 +20,7 @@ router.group('/seller', (route) => {
   route.get('/', Authorization, SellerController.index);
   route.get('/:id', Authorization, SellerController.detail);
   route.post('/', Authorization, SellerController.create);
+  route.delete('/:id', Authorization, SellerController.delete);
 });
 
 // method not allowed when method request http is failure
