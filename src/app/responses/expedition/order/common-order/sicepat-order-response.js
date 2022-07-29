@@ -133,9 +133,7 @@ module.exports = class {
           };
 
           const parameter = await this.paramsMapper({ payload });
-          const codCondition = (item.is_cod)
-            ? (this.codValidator({ payload }))
-            : true;
+          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
           if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
           if (shippingFee && codCondition) {
@@ -198,25 +196,9 @@ module.exports = class {
     }
   }
 
-  codValidator({ payload }) {
+  codValidator() {
     const { body } = this.request;
-    const ninjaCondition = (body.type === 'NINJA');
-    const sicepatCondition = (
-      body.type === 'SICEPAT'
-      && (body.service_code === 'GOKIL' || body.service_code === 'BEST' || body.service_code === 'SIUNT')
-      && parseFloat(payload.goodsAmount) <= parseFloat(15000000)
-    );
-
-    const jneCondition = (
-      body.type === 'JNE'
-      && payload.weight <= 70
-      && parseFloat(payload.goodsAmount) <= parseFloat(5000000)
-    );
-
-    if (sicepatCondition) return true;
-    if (jneCondition) return true;
-    if (ninjaCondition) return true;
-    return false;
+    return (body.service_code === 'SIUNT');
   }
 
   async shippingFee({ origin, weight, destination }) {
