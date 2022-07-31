@@ -41,11 +41,21 @@ module.exports = {
       if (body.type === 'SICEPAT') result = await new SicepatBulkOrderResponse({ request });
       if (body.type === 'NINJA') result = await new NinjaBulkOrderResponse({ request });
 
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
+      const condition = result?.find((item) => item.error !== '');
+
+      if (condition) {
+        response.status(400).json({
+          code: 400,
+          message: 'There is some error',
+          data: result,
+        });
+      } else {
+        response.send({
+          code: 200,
+          message: 'OK',
+          data: result,
+        });
+      }
     } catch (error) {
       next(error);
     }
