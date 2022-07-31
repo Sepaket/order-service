@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    requestPayload: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    responsePayload: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
   };
 
   return sequelize.define('CreditHistory', schema, {

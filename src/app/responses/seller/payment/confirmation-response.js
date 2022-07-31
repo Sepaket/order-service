@@ -26,6 +26,10 @@ module.exports = class {
         where: { externalId: body.external_id },
       });
 
+      if (!credit) {
+        throw new Error('Invalid Data (external_id)');
+      }
+
       if (credit.status !== PENDING.text) {
         throw new Error('This id has been processed');
       }
@@ -40,7 +44,7 @@ module.exports = class {
       if (body.status === 'FAILED') status = FAILED.text;
 
       await this.credit.update(
-        { status },
+        { status, payloadResponse: JSON.stringify(body) },
         { where: { id: credit?.id } },
         { transaction: dbTransaction },
       );

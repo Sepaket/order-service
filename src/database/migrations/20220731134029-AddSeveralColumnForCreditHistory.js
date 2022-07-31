@@ -15,10 +15,22 @@ module.exports = {
     }).then(() => [
       queryInterface.addIndex(table, { fields: ['provider'], name: 'provider_credit_history_idx' }),
     ]),
+
+    queryInterface.addColumn(table, 'request_payload', {
+      type: Sequelize.JSON,
+      allowNull: true,
+    }),
+
+    queryInterface.addColumn(table, 'response_payload', {
+      type: Sequelize.JSON,
+      allowNull: true,
+    }),
   ]),
 
   down: async (queryInterface) => Promise.all([
     queryInterface.removeColumn(table, 'external_id'),
     queryInterface.removeColumn(table, 'provider'),
+    queryInterface.removeColumn(table, 'request_payload'),
+    queryInterface.removeColumn(table, 'response_payload'),
   ]),
 };
