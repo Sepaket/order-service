@@ -1,10 +1,11 @@
 const httpErrors = require('http-errors');
-const { SellerDetail, sequelize } = require('../../../models');
-const jwtSelector = require('../../../../helpers/jwt-selector');
+const { SellerDetail, CreditHistory, sequelize } = require('../../../models');
+const { paymentStatus } = require('../../../../constant/status');
 
 module.exports = class {
   constructor({ request }) {
     this.request = request;
+    this.credit = CreditHistory;
     this.sellerDetail = SellerDetail;
     return this.process();
   }
@@ -13,33 +14,40 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      this.seller = await jwtSelector({ request: this.request });
-      const parameterMapper = await this.mapper();
+      const { PAID, FAILED, EXPIRED } = paymentStatus;
+      const { body } = this.request;
+      const credit = await this.credit.findOne({
+        where: { externalId: body.external_id },
+      });
 
-      await this.address.create(
-        { ...parameterMapper },
+      const currentCredit = await this.sellerDetail.findOne({
+        where: { sellerId: credit.sellerId },
+      });
+
+      let { status } = body;
+      if (body.status === 'PAID') status = PAID.text;
+      if (body.status === 'EXPIRED') status = EXPIRED.text;
+      if (body.status === 'FAILED') status = FAILED.text;
+
+      await this.credit.update(
+        { status },
+        { where: { id: credit?.id } },
         { transaction: dbTransaction },
       );
 
+      if (body.status === 'PAID') {
+        await this.sellerDetail.update(
+          { credit: parseFloat(currentCredit) + parseFloat(body.amount) },
+          { where: { sellerId: credit.sellerId } },
+          { transaction: dbTransaction },
+        );
+      }
+
       await dbTransaction.commit();
-      return true;
+      return body.status === 'PAID';
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
-  }
-
-  async mapper() {
-    const { body } = this.request;
-
-    return {
-      sellerId: this.seller.id,
-      name: body.name,
-      picName: body.pic_name,
-      picPhoneNumber: body.pic_phone,
-      address: body.address,
-      locationId: body.location_id,
-      active: true,
-    };
   }
 };
