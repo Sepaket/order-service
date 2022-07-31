@@ -58,6 +58,7 @@ module.exports = class {
               required: true,
               attributes: [
                 'resi',
+                'orderCode',
                 'expedition',
                 'serviceCode',
                 'isCod',
@@ -133,6 +134,7 @@ module.exports = class {
               resi: item.order.resi,
               order_id: item.order_id,
               order: {
+                order_code: item.order.orderCode,
                 order_id: item.order_id,
                 service: item.order.expedition,
                 service_code: item.order.serviceCode,
