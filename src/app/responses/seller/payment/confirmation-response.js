@@ -14,11 +14,21 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const { PAID, FAILED, EXPIRED } = paymentStatus;
+      const {
+        PAID,
+        FAILED,
+        EXPIRED,
+        PENDING,
+      } = paymentStatus;
+
       const { body } = this.request;
       const credit = await this.credit.findOne({
         where: { externalId: body.external_id },
       });
+
+      if (credit.status !== PENDING.text) {
+        throw new Error('This id has been processed');
+      }
 
       const seller = await this.sellerDetail.findOne({
         where: { sellerId: credit?.sellerId },
