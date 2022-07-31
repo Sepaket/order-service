@@ -1,5 +1,6 @@
 // validator
 const TopupValidator = require('../../validators/seller/payment/topup-validator');
+const ConfirmationValidator = require('../../validators/seller/payment/callback-validator');
 
 // responses
 const TopupResponse = require('../../responses/seller/payment/topup-response');
@@ -24,6 +25,8 @@ module.exports = {
 
   callback: async (request, response, next) => {
     try {
+      await ConfirmationValidator(request.body);
+
       const result = await new ConfirmationResponse({ request });
 
       response.send({

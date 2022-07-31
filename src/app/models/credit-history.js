@@ -30,32 +30,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    requestPayload: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
-    responsePayload: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   };
 
   return sequelize.define('CreditHistory', schema, {
-    timestamps: true,
-    paranoid: true,
+    timestamps: false,
+    paranoid: false,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',

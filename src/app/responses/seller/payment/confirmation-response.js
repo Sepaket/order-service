@@ -20,8 +20,8 @@ module.exports = class {
         where: { externalId: body.external_id },
       });
 
-      const currentCredit = await this.sellerDetail.findOne({
-        where: { sellerId: credit.sellerId },
+      const seller = await this.sellerDetail.findOne({
+        where: { sellerId: credit?.sellerId },
       });
 
       let { status } = body;
@@ -37,8 +37,8 @@ module.exports = class {
 
       if (body.status === 'PAID') {
         await this.sellerDetail.update(
-          { credit: parseFloat(currentCredit) + parseFloat(body.amount) },
-          { where: { sellerId: credit.sellerId } },
+          { credit: parseFloat(seller?.credit || 0) + parseFloat(body.amount) },
+          { where: { sellerId: credit?.sellerId } },
           { transaction: dbTransaction },
         );
       }
