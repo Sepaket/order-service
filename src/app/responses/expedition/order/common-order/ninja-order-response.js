@@ -146,9 +146,10 @@ module.exports = class {
 
             result = [{
               resi,
-              order_id: orderId,
+              order_id: orderId.id,
               order: {
-                order_id: orderId,
+                order_code: orderId.orderCode,
+                order_id: orderId.id,
                 service: payload.type,
                 service_code: payload.service_code,
                 weight: payload.weight,
@@ -254,7 +255,7 @@ module.exports = class {
       );
 
       await dbTransaction.commit();
-      return order.id;
+      return order;
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
