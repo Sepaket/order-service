@@ -24,6 +24,7 @@ module.exports = class {
           'pic_name',
           'pic_phone_number',
           'address',
+          'hideInResi',
           'active',
         ],
         where: {
