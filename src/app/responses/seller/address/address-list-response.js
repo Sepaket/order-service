@@ -31,9 +31,10 @@ module.exports = class {
           attributes: [
             ['id', 'address_id'],
             'name',
-            'pic_name',
-            'pic_phone_number',
+            'picName',
+            'picPhoneNumber',
             'address',
+            'hideInResi',
             'active',
           ],
           include: [

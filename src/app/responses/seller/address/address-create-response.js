@@ -40,6 +40,7 @@ module.exports = class {
       address: body.address,
       locationId: body.location_id,
       active: true,
+      hideInResi: false,
     };
   }
 };

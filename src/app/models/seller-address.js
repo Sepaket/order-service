@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     address: {
       type: DataTypes.STRING,
     },
+    hideInResi: {
+      type: DataTypes.STRING,
+    },
     locationId: {
       type: DataTypes.INTEGER,
     },

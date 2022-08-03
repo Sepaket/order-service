@@ -32,6 +32,8 @@ router.group('/address', (route) => {
   route.post('/', Authorization, AddressController.create);
   route.get('/:id', Authorization, AddressController.detail);
   route.post('/:id', Authorization, AddressController.update);
+  route.delete('/:id', Authorization, AddressController.delete);
+  route.get('/toggle-hide/:id', Authorization, AddressController.toggleHide);
 });
 
 router.group('/order', (route) => {
