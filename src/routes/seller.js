@@ -25,6 +25,7 @@ router.group('/profile', (route) => {
   route.get('/me', Authorization, ProfileController.index);
   route.post('/update', Authorization, ProfileController.update);
   route.post('/change-password', Authorization, ProfileController.changePassword);
+  route.post('/update-payment-method', Authorization, ProfileController.updatePaymentMethod);
 });
 
 router.group('/address', (route) => {
