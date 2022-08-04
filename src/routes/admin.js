@@ -8,6 +8,7 @@ const AuthController = require('../app/controllers/admin/auth-controller');
 const ProfileController = require('../app/controllers/admin/profile-controller');
 const SellerController = require('../app/controllers/admin/seller-controller');
 const UserController = require('../app/controllers/admin/user-controller');
+const TransactionFeeController = require('../app/controllers/admin/transaction-fee-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -29,6 +30,11 @@ router.group('/user', (route) => {
   route.get('/:id', Authorization, UserController.detail);
   route.post('/', Authorization, UserController.create);
   route.delete('/:id', Authorization, UserController.delete);
+});
+
+router.group('/transaction-fee', (route) => {
+  route.get('/', Authorization, TransactionFeeController.index);
+  route.post('/update', Authorization, TransactionFeeController.update);
 });
 
 // method not allowed when method request http is failure
