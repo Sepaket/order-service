@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
     model.SellerDetail.belongsTo(model.Bank, {
       as: 'bank',
     });
+
+    model.SellerDetail.hasMany(model.CreditHistory, {
+      as: 'creditHistories',
+      foreignKey: 'sellerId',
+    });
   };
 
   return SellerDetail;
