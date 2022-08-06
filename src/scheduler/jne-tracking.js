@@ -1,7 +1,12 @@
 const { Sequelize } = require('sequelize');
 const jne = require('../helpers/jne');
-const { Order, OrderLog } = require('../app/models');
 const orderStatus = require('../constant/order-status');
+const {
+  Order,
+  OrderLog,
+  OrderDetail,
+  SellerDetail,
+} = require('../app/models');
 
 const getLastStatus = (trackingStatus) => {
   let currentStatus = '';
@@ -45,6 +50,11 @@ const tracking = async () => {
               [Sequelize.Op.ne]: 'CANCELED',
             },
           },
+          {
+            status: {
+              [Sequelize.Op.ne]: 'RETURN_TO_SELLER',
+            },
+          },
         ],
       },
     });
@@ -56,6 +66,10 @@ const tracking = async () => {
         if (!track?.error) {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
+          const revertCredit = (
+            (currentStatus === orderStatus.CANCELED.text)
+            || (currentStatus === orderStatus.RETURN_TO_SELLER.text)
+          );
 
           track?.history?.forEach((historical) => {
             trackHistories.push({
@@ -73,6 +87,22 @@ const tracking = async () => {
             },
             { where: { resi: item.resi } },
           );
+
+          if (revertCredit) {
+            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
+            const currentCredit = await SellerDetail.findOne({
+              where: { sellerId: orderDetail.sellerId },
+            });
+
+            const calculated = (
+              parseFloat(currentCredit.credit) + parseFloat(orderDetail.goodsPrice)
+            );
+
+            await SellerDetail.update(
+              { credit: parseFloat(calculated) },
+              { where: { sellerId: orderDetail.sellerId } },
+            );
+          }
         }
 
         return item;

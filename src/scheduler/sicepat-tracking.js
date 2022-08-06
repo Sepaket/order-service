@@ -1,7 +1,12 @@
 const { Sequelize } = require('sequelize');
 const sicepat = require('../helpers/sicepat');
-const { Order, OrderLog } = require('../app/models');
 const orderStatus = require('../constant/order-status');
+const {
+  Order,
+  OrderLog,
+  OrderDetail,
+  SellerDetail,
+} = require('../app/models');
 
 const getLastStatus = (trackingStatus) => {
   let currentStatus = '';
@@ -45,6 +50,11 @@ const tracking = async () => {
               [Sequelize.Op.ne]: 'CANCELED',
             },
           },
+          {
+            status: {
+              [Sequelize.Op.ne]: 'RETURN_TO_SELLER',
+            },
+          },
         ],
       },
     });
@@ -56,6 +66,10 @@ const tracking = async () => {
         if (track?.sicepat?.status?.code === 200) {
           const trackingStatus = track?.sicepat?.result?.last_status;
           const currentStatus = getLastStatus(trackingStatus?.status || '');
+          const revertCredit = (
+            (currentStatus === orderStatus.CANCELED.text && item.isCod)
+            || (currentStatus === orderStatus.RETURN_TO_SELLER.text && item.isCod)
+          );
 
           trackHistories.push({
             orderId: item.id,
@@ -67,10 +81,26 @@ const tracking = async () => {
           await Order.update(
             {
               status: currentStatus,
-              pod_status: trackingStatus.status,
+              pod_status: trackingStatus?.status,
             },
             { where: { resi: item.resi } },
           );
+
+          if (revertCredit) {
+            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
+            const currentCredit = await SellerDetail.findOne({
+              where: { sellerId: orderDetail.sellerId },
+            });
+
+            const calculated = (
+              parseFloat(currentCredit.credit) + parseFloat(orderDetail.goodsPrice)
+            );
+
+            await SellerDetail.update(
+              { credit: parseFloat(calculated) },
+              { where: { sellerId: orderDetail.sellerId } },
+            );
+          }
         }
 
         return item;
@@ -83,7 +113,7 @@ const tracking = async () => {
           where: {
             orderId: item?.orderId,
             currentStatus: item?.currentStatus,
-            note: item?.note,
+            note: item?.note || '',
           },
         });
 
@@ -92,7 +122,7 @@ const tracking = async () => {
             orderId: item?.orderId,
             previousStatus: item?.previousStatus,
             currentStatus: item?.currentStatus,
-            note: item?.note,
+            note: item?.note || '',
           });
         }
       }),

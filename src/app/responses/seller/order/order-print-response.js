@@ -71,6 +71,7 @@ module.exports = class {
               attributes: [
                 ['id', 'seller_address_id'],
                 'address',
+                'hideInResi',
               ],
               include: [
                 {
@@ -160,6 +161,7 @@ module.exports = class {
               sender: {
                 name: item?.receiver_address?.senderName || '',
                 phone: item?.receiver_address?.senderPhone || '',
+                hide_address: item.seller_address?.hideInResi,
                 address: item?.seller_address?.address || '',
                 address_note: '',
                 location: this.converter.arrayToSnakeCase(item?.seller_address?.location) || null,
