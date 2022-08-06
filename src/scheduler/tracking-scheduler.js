@@ -3,6 +3,7 @@ const jne = require('./jne-tracking');
 // const ninja = require('./ninja-tracking');
 const sicepat = require('./sicepat-tracking');
 
+// every 3 hour
 const runner = cron.schedule('0 */3 * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('tracking scheduler run');
