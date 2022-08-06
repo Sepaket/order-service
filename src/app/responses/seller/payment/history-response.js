@@ -1,6 +1,7 @@
+const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { SellerAddress, Location } = require('../../../models');
+const { CreditHistory, SellerDetail } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
@@ -8,8 +9,8 @@ module.exports = class {
   constructor({ request }) {
     this.op = Sequelize.Op;
     this.request = request;
-    this.location = Location;
-    this.address = SellerAddress;
+    this.credit = CreditHistory;
+    this.sellerDetail = SellerDetail;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -19,38 +20,24 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.address.count();
+    const seller = await jwtSelector({ request: this.request });
+    const total = await this.credit.count({
+      where: { sellerId: seller.id },
+    });
+
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
-    const seller = await jwtSelector({ request: this.request });
 
     return new Promise((resolve, reject) => {
       try {
-        this.address.findAll({
+        this.credit.findAll({
           attributes: [
-            ['id', 'address_id'],
-            'name',
-            'picName',
-            'picPhoneNumber',
-            'address',
-            'hideInResi',
-            'active',
-          ],
-          include: [
-            {
-              model: this.location,
-              as: 'location',
-              required: false,
-              attributes: [
-                ['id', 'location_id'],
-                'province',
-                'city',
-                'district',
-                'subDistrict',
-                'postalCode',
-              ],
-            },
+            ['id', 'credit_id'],
+            'status',
+            'topup',
+            'withdraw',
+            'updatedAt',
           ],
           where: { ...search, sellerId: seller.id },
           order: [['id', 'DESC']],
@@ -63,7 +50,8 @@ module.exports = class {
 
           const mapped = result?.map((item) => ({
             ...item,
-            location: this.converter.objectToSnakeCase(item?.location) || null,
+            type: item?.topup ? 'TOPUP' : 'WITHDRAW',
+            description: item?.topup ? 'Topup Saldo' : 'Tarik Saldo',
           }));
 
           if (mapped.length > 0) {
@@ -82,7 +70,7 @@ module.exports = class {
                 data: [],
                 meta: {
                   total,
-                  total_result: mapped.length,
+                  total_result: 0,
                   limit: parseInt(query.limit, 10) || limit,
                   page: parseInt(query.page, 10) || (offset + 1),
                 },
@@ -98,16 +86,49 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
+    let filtered = {};
+    if (query?.filter_by === 'DATE_RANGE') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).tz('Asia/Jakarta').startOf('day').format(),
+            moment(query.date_end).endOf('day').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'MONTH') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.month, 'M').startOf('month').format(),
+            moment(query.month, 'M').endOf('month').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'YEAR') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.year, 'YYYY').startOf('year').format(),
+            moment(query.year, 'YYYY').endOf('year').format(),
+          ],
+        },
+      };
+    }
+
     const condition = {
       [this.op.or]: {
-        name: { [this.op.substring]: query.keyword },
-        picName: { [this.op.substring]: query.keyword },
-        picPhoneNumber: { [this.op.substring]: query.keyword },
-        address: { [this.op.substring]: query.keyword },
-        addressDetail: { [this.op.substring]: query.keyword },
+        status: { [this.op.eq]: query.status || '' },
+      },
+      [this.op.and]: {
+        ...filtered,
       },
     };
 
-    return query.keyword ? condition : {};
+    return query?.status || query?.filter_by ? condition : {};
   }
 };

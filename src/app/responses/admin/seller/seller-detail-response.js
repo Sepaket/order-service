@@ -1,10 +1,12 @@
 const httpErrors = require('http-errors');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
-const { Admin } = require('../../../models');
+const { Admin, Seller, SellerDetail } = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.admin = Admin;
+    this.seller = Seller;
+    this.sellerDetail = SellerDetail;
     this.request = request;
     this.converter = snakeCaseConverter;
     return this.process();
@@ -14,15 +16,26 @@ module.exports = class {
     const { params } = this.request;
 
     return new Promise((resolve, reject) => {
-      this.admin.findOne({
+      this.seller.findOne({
         attributes: [
           'id',
           'name',
           'email',
           'phone',
-          'role',
         ],
         where: { id: params.id },
+        include: [
+          {
+            attributes: [
+              ['id', 'seller_detail_id'],
+              'credit',
+              'photo',
+            ],
+            model: this.sellerDetail,
+            as: 'sellerDetail',
+            required: true,
+          },
+        ],
       }).then((response) => {
         const result = this.converter.objectToSnakeCase(
           JSON.parse(JSON.stringify(response)),

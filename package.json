@@ -63,7 +63,8 @@
     "read-excel-file": "^5.4.2",
     "redis": "^4.1.0",
     "sequelize": "^6.20.1",
-    "shortid-36": "^0.1.2"
+    "shortid-36": "^0.1.2",
+    "xendit-node": "^1.21.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

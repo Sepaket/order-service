@@ -90,7 +90,23 @@ const expeditionService = [
   },
 ];
 
+const paymentStatus = {
+  PENDING: {
+    text: 'PENDING',
+  },
+  PAID: {
+    text: 'PAID',
+  },
+  EXPIRED: {
+    text: 'EXPIRED',
+  },
+  FAILED: {
+    text: 'FAILED',
+  },
+};
+
 module.exports = {
+  paymentStatus,
   idxServiceStatus,
   ninjaServiceStatus,
   jneServiceStatus,

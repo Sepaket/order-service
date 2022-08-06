@@ -6,73 +6,68 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
+    externalId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    provider: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     sellerId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
-    photo: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    credit: {
+    topup: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    bankId: {
-      type: DataTypes.INTEGER,
+    withdraw: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    bankAccountName: {
+    status: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    bankAccountNumber: {
-      type: DataTypes.STRING,
+    requestPayload: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
-    referalCode: {
-      type: DataTypes.STRING,
+    responsePayload: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deletedAt: {
+    deleted_at: {
       type: DataTypes.DATE,
       allowNull: true,
     },
   };
 
-  const SellerDetail = sequelize.define('SellerDetail', schema, {
+  const Credit = sequelize.define('CreditHistory', schema, {
     timestamps: true,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'seller_details',
+    tableName: 'credit_histories',
   });
 
-  SellerDetail.associate = (model) => {
-    model.SellerDetail.belongsTo(model.Seller, {
+  Credit.associate = (model) => {
+    model.CreditHistory.belongsTo(model.SellerDetail, {
       as: 'seller',
-    });
-
-    model.SellerDetail.belongsTo(model.Bank, {
-      as: 'bank',
-    });
-
-    model.SellerDetail.hasMany(model.CreditHistory, {
-      as: 'creditHistories',
-      foreignKey: 'sellerId',
     });
   };
 
-  return SellerDetail;
+  return Credit;
 };

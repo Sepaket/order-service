@@ -173,6 +173,7 @@ module.exports = class {
               sender: {
                 name: payload.receiver_name,
                 phone: payload.receiver_phone,
+                hide_address: this.sellerAddress?.hideInResi,
                 address: this.sellerAddress?.address || '',
                 address_note: '',
                 location: payload.origin || null,

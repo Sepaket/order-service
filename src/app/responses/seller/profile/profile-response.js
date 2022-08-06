@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 const httpErrors = require('http-errors');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
-const { Seller, SellerDetail } = require('../../../models');
+const { Seller, Bank, SellerDetail } = require('../../../models');
 const role = require('../../../../constant/role');
 
 module.exports = class {
   constructor({ request }) {
     this.seller = Seller;
+    this.bank = Bank;
     this.sellerDetail = SellerDetail;
     this.request = request;
     this.converter = snakeCaseConverter;
@@ -42,6 +43,13 @@ module.exports = class {
               'bankAccountName',
               'bankAccountNumber',
               'referalCode',
+            ],
+            include: [
+              {
+                model: this.bank,
+                as: 'bank',
+                required: false,
+              },
             ],
             model: this.sellerDetail,
             as: 'sellerDetail',

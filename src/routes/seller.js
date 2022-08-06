@@ -10,6 +10,7 @@ const ProfileController = require('../app/controllers/seller/profile-controller'
 const AddressController = require('../app/controllers/seller/address-controller');
 const OrderController = require('../app/controllers/seller/order-controller');
 const ReportController = require('../app/controllers/seller/report-controller');
+const PaymentController = require('../app/controllers/seller/payment-controller');
 
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
@@ -24,6 +25,7 @@ router.group('/profile', (route) => {
   route.get('/me', Authorization, ProfileController.index);
   route.post('/update', Authorization, ProfileController.update);
   route.post('/change-password', Authorization, ProfileController.changePassword);
+  route.post('/update-payment-method', Authorization, ProfileController.updatePaymentMethod);
 });
 
 router.group('/address', (route) => {
@@ -31,6 +33,8 @@ router.group('/address', (route) => {
   route.post('/', Authorization, AddressController.create);
   route.get('/:id', Authorization, AddressController.detail);
   route.post('/:id', Authorization, AddressController.update);
+  route.delete('/:id', Authorization, AddressController.delete);
+  route.get('/toggle-hide/:id', Authorization, AddressController.toggleHide);
 });
 
 router.group('/order', (route) => {
@@ -54,6 +58,13 @@ router.group('/reports', (route) => {
   route.get('/rate-retur', Authorization, ReportController.rateRetur);
   route.get('/rate-success-delivered', Authorization, ReportController.rateSuccess);
   route.get('/order-total-chart', Authorization, ReportController.orderTotalChart);
+});
+
+router.group('/payment', (route) => {
+  route.post('/topup', Authorization, PaymentController.topup);
+  route.post('/callback', Authorization, PaymentController.callback);
+  route.get('/history', Authorization, PaymentController.history);
+  route.get('/summary', Authorization, PaymentController.summary);
 });
 
 // method not allowed when method request http is failure

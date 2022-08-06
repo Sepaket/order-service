@@ -1,11 +1,11 @@
 const httpErrors = require('http-errors');
-const { SellerAddress, sequelize } = require('../../../models');
-const jwtSelector = require('../../../../helpers/jwt-selector');
+const { Admin, sequelize } = require('../../../models');
+const hash = require('../../../../helpers/hash');
 
 module.exports = class {
   constructor({ request }) {
+    this.admin = Admin;
     this.request = request;
-    this.address = SellerAddress;
     return this.process();
   }
 
@@ -13,10 +13,9 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      this.seller = await jwtSelector({ request: this.request });
       const parameterMapper = await this.mapper();
 
-      await this.address.create(
+      await this.admin.create(
         { ...parameterMapper },
         { transaction: dbTransaction },
       );
@@ -33,14 +32,13 @@ module.exports = class {
     const { body } = this.request;
 
     return {
-      sellerId: this.seller.id,
-      name: body.name,
-      picName: body.pic_name,
-      picPhoneNumber: body.pic_phone,
-      address: body.address,
-      locationId: body.location_id,
-      active: true,
-      hideInResi: false,
+      name: body.username,
+      email: body.email,
+      password: await hash({ payload: body.password }),
+      phone: -1,
+      is_new: true,
+      is_verified: true,
+      role: body.role,
     };
   }
 };
