@@ -63,6 +63,8 @@ router.group('/reports', (route) => {
 router.group('/payment', (route) => {
   route.post('/topup', Authorization, PaymentController.topup);
   route.post('/callback', Authorization, PaymentController.callback);
+  route.get('/history', Authorization, PaymentController.history);
+  route.get('/summary', Authorization, PaymentController.summary);
 });
 
 // method not allowed when method request http is failure

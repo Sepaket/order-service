@@ -38,15 +38,36 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   };
 
-  return sequelize.define('CreditHistory', schema, {
-    timestamps: false,
-    paranoid: false,
+  const Credit = sequelize.define('CreditHistory', schema, {
+    timestamps: true,
+    paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
     tableName: 'credit_histories',
   });
+
+  Credit.associate = (model) => {
+    model.CreditHistory.belongsTo(model.SellerDetail, {
+      as: 'seller',
+    });
+  };
+
+  return Credit;
 };
