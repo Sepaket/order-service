@@ -85,7 +85,8 @@ module.exports = class {
               receiverAddressPostalCode: item[5],
               weight: item[6],
               volume: item[7],
-              goodsAmount: item[9],
+              goodsAmount: item[8],
+              codValue: item[9],
               goodsContent: item[10],
               goodsQty: item[11],
               isInsurance: item[12],
@@ -108,6 +109,7 @@ module.exports = class {
 
             let errorMessage = '';
             const origin = this.sellerAddress.location;
+            const price = excelData?.isCod ? excelData?.codValue : excelData?.goodsAmount;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
             const shippingFee = await this.shippingFee({
               origin,
@@ -134,7 +136,7 @@ module.exports = class {
               receiver_address_note: excelData?.receiverAddressNote || '',
               is_cod: excelData?.isCod,
               weight: excelData?.weight || 1,
-              goods_amount: excelData?.goodsAmount || 0,
+              goods_amount: price || 0,
               goods_content: excelData?.goodsContent || '',
               goods_qty: excelData?.goodsQty || 1,
               note: excelData?.note || '',
