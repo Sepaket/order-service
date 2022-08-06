@@ -69,6 +69,7 @@ module.exports = class {
                 'address',
                 'picName',
                 'picPhoneNumber',
+                'hideInResi',
               ],
               include: [
                 {

@@ -13,11 +13,11 @@ const {
   Location,
   sequelize,
   OrderBatch,
-  OrderFailed,
   OrderDetail,
   OrderAddress,
   SellerAddress,
   OrderDiscount,
+  SellerDetail,
 } = require('../../../../models');
 
 module.exports = class {
@@ -31,8 +31,8 @@ module.exports = class {
     this.orderTax = OrderTax;
     this.orderLog = OrderLog;
     this.address = SellerAddress;
-    this.orderFailed = OrderFailed;
     this.orderDetail = OrderDetail;
+    this.sellerDetail = SellerDetail;
     this.orderAddress = OrderAddress;
     this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
@@ -71,7 +71,17 @@ module.exports = class {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
 
-      this.sellerData = await this.seller.findOne({ where: { id: sellerId.id } });
+      this.sellerData = await this.seller.findOne({
+        where: { id: sellerId.id },
+        include: [
+          {
+            model: this.sellerDetail,
+            as: 'sellerDetail',
+            required: true,
+          },
+        ],
+      });
+
       this.sellerAddress = await this.address.findOne({
         where: { id: body.seller_location_id, sellerId: sellerId.id },
         include: [
@@ -96,7 +106,7 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
-      if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
+      if (!this.sellerAddress) throw new Error('Harap lengkapi alamat anda terlebih dahulu');
 
       const response = await Promise.all(
         body.order_items.map(async (item) => {
@@ -104,7 +114,7 @@ module.exports = class {
             {
               resi: '',
               order_id: null,
-              error: 'Service for this destination not found or service code does not exist when you choose COD',
+              error: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD atau destinasi yang dituju tidak ditemukan',
               payload: item,
             },
           ];
@@ -119,7 +129,7 @@ module.exports = class {
           const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
           const sicepatCondition = (origin.sicepatOriginCode !== '' && destination.sicepatDestinationCode !== '');
           const goodsAmount = !body.is_cod
-            ? body.goods_amount
+            ? item.goods_amount
             : parseFloat(body.cod_value) - (parseFloat(shippingFee || 0) + codFee);
 
           const payload = {
@@ -132,11 +142,23 @@ module.exports = class {
             ...body,
           };
 
+          const { credit } = this.sellerData.sellerDetail;
           const parameter = await this.paramsMapper({ payload });
-          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
+          const codCondition = (item.is_cod) ? (this.codValidator()) : creditCondition;
 
-          if (!sicepatCondition) throw new Error(`Origin or destination code for ${body.type} not setting up yet!`);
-          if (shippingFee && codCondition) {
+          if (!creditCondition) {
+            result = [
+              {
+                resi: '',
+                order_id: null,
+                error: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD',
+                payload: item,
+              },
+            ];
+          }
+
+          if (shippingFee && codCondition && sicepatCondition) {
             const order = await this.sicepat.createOrder(parameter);
             const responseResi = order?.length > 0 ? order[0].receipt_number : '';
             const orderId = await this.insertLog({ ...payload, resi: responseResi });
@@ -229,6 +251,7 @@ module.exports = class {
       const orderDiscountQuery = await this.orderQueryDiscount();
       const orderDetailQuery = await this.orderQueryDetail(payload);
       const orderAddressQuery = await this.orderQueryAddress(payload);
+      const sellerDetailQuery = await this.sellerDetailQuery(payload);
 
       const order = await this.order.create(
         { ...orderQuery },
@@ -259,6 +282,14 @@ module.exports = class {
         { ...orderDiscountQuery, orderId: order.id },
         { transaction: dbTransaction },
       );
+
+      if (!payload.is_cod) {
+        await this.sellerDetail.update(
+          { ...sellerDetailQuery },
+          { where: { sellerId: this.sellerData.id } },
+          { transaction: dbTransaction },
+        );
+      }
 
       await dbTransaction.commit();
       return order;
@@ -363,6 +394,16 @@ module.exports = class {
       discountProviderType: this.discount.type,
       discountGlobal: this.discount.raw,
       discountGlobalType: this.discount.type,
+    };
+  }
+
+  async sellerDetailQuery(payload) {
+    const result = (
+      parseFloat(this.sellerData.sellerDetail.credit) - parseFloat(payload.goodsAmount)
+    );
+
+    return {
+      credit: result,
     };
   }
 
