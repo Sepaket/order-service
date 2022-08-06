@@ -90,7 +90,7 @@ module.exports = class {
               goodsQty: item[11],
               isInsurance: item[12],
               note: item[13],
-              isCod: !!((item[9] || item[9] !== '' || item[9] !== 0)),
+              isCod: !!((item[9] && item[9] !== '' && item[9] !== 0) || item[9] !== null),
             };
 
             const locations = await this.location.findAll({
