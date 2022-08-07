@@ -6,32 +6,32 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    cod_fee: {
+    codFee: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    cod_fee_type: {
+    codFeeType: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    rate_referal: {
+    rateReferal: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    rate_referal_type: {
+    rateReferalType: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },

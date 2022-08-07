@@ -9,6 +9,7 @@ const NinjaCommonOrderResponse = require('../../responses/expedition/order/commo
 const JneBulkOrderResponse = require('../../responses/expedition/order/bulk-order/jne-order-response');
 const SicepatBulkOrderResponse = require('../../responses/expedition/order/bulk-order/sicepat-order-response');
 const NinjaBulkOrderResponse = require('../../responses/expedition/order/bulk-order/ninja-order-response');
+const TransactionFeeResponse = require('../../responses/expedition/order/transaction-fee/transaction-fee-response');
 
 module.exports = {
   commonOrder: async (request, response, next) => {
@@ -40,6 +41,20 @@ module.exports = {
       if (body.type === 'JNE') result = await new JneBulkOrderResponse({ request });
       if (body.type === 'SICEPAT') result = await new SicepatBulkOrderResponse({ request });
       if (body.type === 'NINJA') result = await new NinjaBulkOrderResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  transactionFee: async (request, response, next) => {
+    try {
+      const result = await new TransactionFeeResponse({ request });
 
       response.send({
         code: 200,

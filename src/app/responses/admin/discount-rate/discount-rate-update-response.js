@@ -40,8 +40,8 @@ module.exports = class {
       await this.discount.create({
         value: dt.value,
         type: dt.type,
-        minimum_order: dt.minimum_order,
-        maximum_order: dt.maximum_order,
+        minimumOrder: dt.minimum_order,
+        maximumOrder: dt.maximum_order,
       }, { transaction: dbTransaction });
     }
   }
@@ -53,8 +53,8 @@ module.exports = class {
       await this.discount.update({
         value: dt.value,
         type: dt.type,
-        minimum_order: dt.minimum_order,
-        maximum_order: dt.maximum_order,
+        minimumOrder: dt.minimum_order,
+        maximumOrder: dt.maximum_order,
       }, { where: { id: dt.id }, transaction: dbTransaction });
     }
   }

@@ -16,19 +16,19 @@ module.exports = class {
 
       if (!oldData) {
         TransactionFee.create({
-          cod_fee: body.cod_fee,
-          cod_fee_type: body.cod_fee_type,
-          rate_referal: body.rate_referral,
-          rate_referal_type: body.rate_referral_type,
+          codFee: body.cod_fee,
+          codFeeType: body.cod_fee_type,
+          rateReferal: body.rate_referral,
+          rateReferalType: body.rate_referral_type,
         })
           .then((result) => resolve(result))
           .catch((error) => reject(error));
       } else {
         oldData.update({
-          cod_fee: body.cod_fee,
-          cod_fee_type: body.cod_fee_type,
-          rate_referal: body.rate_referral,
-          rate_referal_type: body.rate_referral_type,
+          codFee: body.cod_fee,
+          codFeeType: body.cod_fee_type,
+          rateReferal: body.rate_referral,
+          rateReferalType: body.rate_referral_type,
         })
           .then((result) => resolve(result))
           .catch((error) => reject(error));

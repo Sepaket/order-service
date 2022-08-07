@@ -10,32 +10,32 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    insurance_value: {
+    insuranceValue: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    insurance_value_type: {
+    insuranceValueType: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    admin_fee: {
+    adminFee: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    admin_fee_type: {
+    adminFeeType: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
