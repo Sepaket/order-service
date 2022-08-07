@@ -38,8 +38,8 @@ module.exports = class {
 
       return {
         cod_fee: {
-          value: trxFee.codFee,
-          type: trxFee.codFeeType,
+          value: trxFee?.codFee || 0,
+          type: trxFee?.codFeeType || 'PERCENTAGE',
         },
         vat: {
           value: tax.vat,
