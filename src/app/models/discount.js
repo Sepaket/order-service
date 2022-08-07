@@ -14,26 +14,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    minimum_order: {
+    minimumOrder: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: true,
     },
-    maximum_order: {
+    maximumOrder: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       allowNull: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },

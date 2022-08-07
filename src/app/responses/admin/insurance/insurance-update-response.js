@@ -45,10 +45,10 @@ module.exports = class {
   itemMpper(item) {
     return {
       expedition: item.expedition,
-      insurance_value: item.insurance_value,
-      insurance_value_type: item.insurance_value_type,
-      admin_fee: item.admin_fee,
-      admin_fee_type: item.admin_fee_type,
+      insuranceValue: item.insurance_value,
+      insuranceValueType: item.insurance_value_type,
+      adminFee: item.admin_fee,
+      adminFeeType: item.admin_fee_type,
     };
   }
 };
