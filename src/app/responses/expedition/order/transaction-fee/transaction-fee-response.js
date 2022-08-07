@@ -37,7 +37,10 @@ module.exports = class {
       });
 
       return {
-        cod_fee: trxFee.codFee,
+        cod_fee: {
+          value: trxFee.codFee,
+          type: trxFee.codFeeType,
+        },
         vat: {
           value: tax.vat,
           type: tax.vatType,
