@@ -34,6 +34,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    codFee: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    codFeeType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    discount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    discountType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    rateReferal: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    rateReferalType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
