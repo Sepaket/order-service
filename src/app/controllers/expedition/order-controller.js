@@ -3,13 +3,15 @@ const CommonOrderValidator = require('../../validators/expedition/order/common-o
 const BulkOrderValidator = require('../../validators/expedition/order/bulk-order-validator');
 
 // responses
-const JneCommonOrderResponse = require('../../responses/expedition/order/common-order/jne-order-response');
+// const JneCommonOrderResponse =
+// require('../../responses/expedition/order/common-order/jne-order-response');
 const SicepatCommonOrderResponse = require('../../responses/expedition/order/common-order/sicepat-order-response');
 const NinjaCommonOrderResponse = require('../../responses/expedition/order/common-order/ninja-order-response');
 const JneBulkOrderResponse = require('../../responses/expedition/order/bulk-order/jne-order-response');
 const SicepatBulkOrderResponse = require('../../responses/expedition/order/bulk-order/sicepat-order-response');
 const NinjaBulkOrderResponse = require('../../responses/expedition/order/bulk-order/ninja-order-response');
 const TransactionFeeResponse = require('../../responses/expedition/order/transaction-fee/transaction-fee-response');
+const OrderResponse = require('../../responses/expedition/order/common-order/order-response');
 
 module.exports = {
   commonOrder: async (request, response, next) => {
@@ -18,7 +20,7 @@ module.exports = {
       const { body } = request;
       await CommonOrderValidator(request);
 
-      if (body.type === 'JNE') result = await new JneCommonOrderResponse({ request });
+      if (body.type === 'JNE') result = await new OrderResponse({ request });
       if (body.type === 'SICEPAT') result = await new SicepatCommonOrderResponse({ request });
       if (body.type === 'NINJA') result = await new NinjaCommonOrderResponse({ request });
 
