@@ -11,6 +11,7 @@ const UserController = require('../app/controllers/admin/user-controller');
 const TransactionFeeController = require('../app/controllers/admin/transaction-fee-controller');
 const InsuranceController = require('../app/controllers/admin/insurance-controller');
 const DiscountRateController = require('../app/controllers/admin/discount-rate-controller');
+const TrackingController = require('../app/controllers/admin/order-tracking-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -47,6 +48,10 @@ router.group('/insurance', (route) => {
 router.group('/discount-rate', (route) => {
   route.get('/', Authorization, DiscountRateController.index);
   route.post('/update', Authorization, DiscountRateController.update);
+});
+
+router.group('/tracking', (route) => {
+  route.post('/', Authorization, TrackingController);
 });
 
 // method not allowed when method request http is failure
