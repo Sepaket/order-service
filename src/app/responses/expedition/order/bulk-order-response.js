@@ -1,9 +1,11 @@
 const { Sequelize } = require('sequelize');
 const excelReader = require('read-excel-file/node');
-const sicepat = require('../../../../../helpers/sicepat');
-const jwtSelector = require('../../../../../helpers/jwt-selector');
-const { formatCurrency } = require('../../../../../helpers/currency-converter');
-const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
+const jne = require('../../../../helpers/jne');
+const ninja = require('../../../../helpers/ninja');
+const sicepat = require('../../../../helpers/sicepat');
+const jwtSelector = require('../../../../helpers/jwt-selector');
+const { formatCurrency } = require('../../../../helpers/currency-converter');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const {
   Location,
   Seller,
@@ -12,11 +14,13 @@ const {
   OrderDetail,
   OrderAddress,
   SellerAddress,
-} = require('../../../../models');
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.sicepat = sicepat;
+    this.ninja = ninja;
+    this.jne = jne;
     this.order = Order;
     this.seller = Seller;
     this.op = Sequelize.Op;
@@ -59,7 +63,6 @@ module.exports = class {
         ],
       });
 
-      if (!this.sellerAddress) throw new Error('Please complete your address data (Seller Address)');
       const fileName = body.file.split('/public/');
       if (!fileName[1]) throw new Error('File not found!');
 
@@ -118,8 +121,8 @@ module.exports = class {
               weight: excelData.weight,
             });
 
-            if (!shippingFee) errorMessage = 'Service for this destination not found';
-            if (!destination) errorMessage = 'Sorry! Your district or postal code may wrong';
+            if (!shippingFee) errorMessage = 'Tipe penjemputan ini tidak tersedia saat anda memilih COD atau destinasi yang dituju tidak ditemukan';
+            if (!destination) errorMessage = 'Maaf! Kelurahan atau kode pos yang anda input mungkin salah';
 
             result.push({
               error: errorMessage,
@@ -161,16 +164,45 @@ module.exports = class {
 
   async shippingFee({ origin, weight, destination }) {
     try {
+      let shippingFee = 0;
       const { body } = this.request;
-      const prices = await this.sicepat.checkPrice({
-        origin: origin.sicepatOriginCode,
-        destination: destination.sicepatDestinationCode,
-        weight,
-      });
 
-      const service = await prices?.find((item) => item.service === body.service_code);
+      if (body.type === 'SICEPAT') {
+        const prices = await this.sicepat.checkPrice({
+          origin: origin.sicepatOriginCode,
+          destination: destination.sicepatDestinationCode,
+          weight,
+        });
 
-      return service?.tariff;
+        const service = await prices?.find((item) => item.service === body.service_code);
+
+        shippingFee = service?.tariff;
+      }
+
+      if (body.type === 'JNE') {
+        const prices = await this.jne.checkPrice({
+          origin: origin?.jneOriginCode || '',
+          destination: destination?.jneDestinationCode || '',
+          weight,
+        });
+
+        const service = await prices?.find((item) => item.service_code === body.service_code);
+
+        shippingFee = service?.price;
+      }
+
+      if (body.type === 'NINJA') {
+        const price = await this.ninja.checkPrice({
+          origin: origin.ninjaOriginCode,
+          destination: destination.ninjaDestinationCode,
+          service: body.service_code,
+          weight,
+        });
+
+        shippingFee = process.env.APP_ENV === 'development' ? 1 : price;
+      }
+
+      return shippingFee;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
