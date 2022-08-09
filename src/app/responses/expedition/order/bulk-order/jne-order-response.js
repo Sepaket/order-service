@@ -105,6 +105,9 @@ module.exports = class {
                   district: {
                     [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
                   },
+                  postalCode: {
+                    [this.op.eq]: `${excelData?.receiverAddressPostalCode}`,
+                  },
                 },
               },
             });
