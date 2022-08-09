@@ -1,5 +1,7 @@
 const shortid = require('shortid-36');
+const { Sequelize } = require('sequelize');
 const randomNumber = require('random-number');
+const tax = require('../../../../../constant/tax');
 const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
@@ -11,13 +13,16 @@ const {
   OrderTax,
   OrderLog,
   Location,
+  Discount,
+  Insurance,
   sequelize,
   OrderBatch,
   OrderDetail,
   OrderAddress,
+  SellerDetail,
   SellerAddress,
   OrderDiscount,
-  SellerDetail,
+  TransactionFee,
 } = require('../../../../models');
 
 module.exports = class {
@@ -26,29 +31,21 @@ module.exports = class {
     this.order = Order;
     this.seller = Seller;
     this.request = request;
+    this.op = Sequelize.Op;
     this.batch = OrderBatch;
     this.location = Location;
     this.orderTax = OrderTax;
     this.orderLog = OrderLog;
+    this.fee = TransactionFee;
+    this.discount = Discount;
+    this.insurance = Insurance;
     this.address = SellerAddress;
     this.orderDetail = OrderDetail;
     this.sellerDetail = SellerDetail;
     this.orderAddress = OrderAddress;
     this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
-
-    this.vat = {
-      raw: 3.33,
-      calculated: (parseFloat(3.33) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
-    this.discount = {
-      raw: 0.00,
-      calculated: (parseFloat(0.00) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
+    this.tax = tax;
     return this.process();
   }
 
@@ -301,18 +298,50 @@ module.exports = class {
 
   async receivedFeeFormula(payload) {
     let result = 0;
-    const tax = parseFloat(payload?.shippingFee) * this.vat.calculated;
+    let selectedDiscount = 0;
+    const { body } = this.request;
+    const { vat } = parseFloat(payload?.shippingFee) * this.tax;
+    const transactionFee = await this.fee.findOne();
+    const sellerDiscount = this.sellerData.sellerDetail.discount;
+    const sellerDiscountType = this.sellerData.sellerDetail.discountType;
+    const globalDiscount = await this.discount.findOne({
+      where: {
+        [this.op.or]: {
+          minimumOrder: {
+            [this.op.gte]: 0,
+          },
+          maximumOrder: {
+            [this.op.lte]: body.order_items.length,
+          },
+        },
+      },
+    });
+
+    const codFeeSeller = (
+      parseFloat(transactionFee.codFee) * parseFloat(payload?.cod_value)
+    ) / 100;
+
+    if (sellerDiscount && sellerDiscount !== 0) {
+      selectedDiscount = {
+        value: sellerDiscount,
+        type: sellerDiscountType,
+      };
+    }
+
+    if (globalDiscount) {
+      selectedDiscount = {
+        value: globalDiscount?.value || 0,
+        type: globalDiscount.type,
+      };
+    }
 
     if (payload.is_cod) {
-      const codFee = (parseFloat(3.33) / parseInt(100, 10));
-      const codFeeSeller = parseFloat(codFee) * parseFloat(payload?.cod_value);
-
       const formulaOne = parseFloat(payload?.cod_value) - parseFloat(codFeeSeller);
-      const formulaTwo = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (formulaOne - formulaTwo) - tax;
-    } else {
-      const formulaOne = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (payload?.goods_amount - formulaOne) - tax;
+      const formulaTwo = parseFloat(payload?.shippingFee) - parseFloat(selectedDiscount.value);
+      result = (formulaOne - formulaTwo) - vat;
+    // } else {
+    //   const formulaOne = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
+    //   result = (payload?.goods_amount - formulaOne) - tax;
     }
 
     return result;
@@ -376,10 +405,13 @@ module.exports = class {
     const { body } = this.request;
 
     return {
-      taxAmount: parseFloat(payload?.shippingFee) * this.vat.calculated,
+      taxAmount: parseFloat(payload?.shippingFee) * 0,
+      // taxAmount: parseFloat(payload?.shippingFee) * this.vat.calculated,
       taxType: 'DECIMAL',
-      vatTax: this.vat.raw,
-      vatType: this.vat.type,
+      vatTax: 0,
+      // vatTax: this.vat.raw,
+      vatType: 'PERCENTAGE',
+      // vatType: this.vat.type,
     };
   }
 
@@ -388,12 +420,18 @@ module.exports = class {
     const { body } = this.request;
 
     return {
-      discountSeller: this.discount.raw,
-      discountSellerType: this.discount.type,
-      discountProvider: this.discount.raw,
-      discountProviderType: this.discount.type,
-      discountGlobal: this.discount.raw,
-      discountGlobalType: this.discount.type,
+      discountSeller: 0,
+      discountSellerType: 'PERCENTAGE',
+      discountProvider: 0,
+      discountProviderType: 'PERCENTAGE',
+      discountGlobal: 0,
+      discountGlobalType: 'PERCENTAGE',
+      // discountSeller: this.discount.raw,
+      // discountSellerType: this.discount.type,
+      // discountProvider: this.discount.raw,
+      // discountProviderType: this.discount.type,
+      // discountGlobal: this.discount.raw,
+      // discountGlobalType: this.discount.type,
     };
   }
 

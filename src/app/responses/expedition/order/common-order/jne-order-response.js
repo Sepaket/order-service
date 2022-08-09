@@ -4,6 +4,7 @@ const { Sequelize } = require('sequelize');
 const jne = require('../../../../../helpers/jne');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
+const tax = require('../../../../../constant/tax');
 const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
 const { formatCurrency } = require('../../../../../helpers/currency-converter');
 const {
@@ -19,6 +20,9 @@ const {
   SellerAddress,
   OrderDiscount,
   SellerDetail,
+  Discount,
+  Insurance,
+  TransactionFee,
 } = require('../../../../models');
 
 module.exports = class {
@@ -32,25 +36,16 @@ module.exports = class {
     this.location = Location;
     this.orderTax = OrderTax;
     this.orderLog = OrderLog;
+    this.discount = Discount;
+    this.fee = TransactionFee;
+    this.insurance = Insurance;
     this.address = SellerAddress;
     this.orderDetail = OrderDetail;
     this.sellerDetail = SellerDetail;
     this.orderAddress = OrderAddress;
     this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
-
-    this.vat = {
-      raw: 3.33,
-      calculated: (parseFloat(3.33) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
-    this.discount = {
-      raw: 0.00,
-      calculated: (parseFloat(0.00) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
+    this.vat = tax;
     return this.process();
   }
 
@@ -310,18 +305,18 @@ module.exports = class {
 
   async receivedFeeFormula(payload) {
     let result = 0;
-    const tax = parseFloat(payload?.shippingFee) * this.vat.calculated;
+    const taxed = (parseFloat(payload?.shippingFee) * this.vat.calculated) / 100;
+    const codFee = this.TransactionFee.findOne();
 
     if (payload.is_cod) {
-      const codFee = (parseFloat(3.33) / parseInt(100, 10));
       const codFeeSeller = parseFloat(codFee) * parseFloat(payload?.cod_value);
 
       const formulaOne = parseFloat(payload?.cod_value) - parseFloat(codFeeSeller);
       const formulaTwo = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (formulaOne - formulaTwo) - tax;
+      result = (formulaOne - formulaTwo) - taxed;
     } else {
       const formulaOne = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (payload?.goods_amount - formulaOne) - tax;
+      result = (payload?.goods_amount - formulaOne) - taxed;
     }
 
     return result;
