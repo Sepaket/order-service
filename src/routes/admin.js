@@ -58,6 +58,7 @@ router.group('/tracking', (route) => {
 
 router.group('/balance', (route) => {
   route.get('/total-balance', Authorization, BalanceController.totalBalance);
+  route.get('/balance-history', Authorization, BalanceController.balanceHistory);
 });
 
 router.group('/order', (route) => {
