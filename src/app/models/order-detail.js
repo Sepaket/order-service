@@ -75,6 +75,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    codFeeAdmin: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    codFeeAdminType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
