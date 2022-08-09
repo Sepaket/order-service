@@ -199,7 +199,7 @@ module.exports = class {
           weight,
         });
 
-        shippingFee = process.env.NODE_ENV === 'development' ? 1 : price;
+        shippingFee = process.env.APP_ENV === 'development' ? 1 : price;
       }
 
       return shippingFee;
