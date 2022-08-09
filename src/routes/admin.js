@@ -27,6 +27,7 @@ router.group('/seller', (route) => {
   route.get('/', Authorization, SellerController.index);
   route.get('/:id', Authorization, SellerController.detail);
   route.post('/', Authorization, SellerController.create);
+  route.post('/update-balance', Authorization, SellerController.updateBalance);
   route.delete('/:id', Authorization, SellerController.delete);
 });
 
