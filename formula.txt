@@ -8,7 +8,7 @@ GOODS AMOUNT = [dynamic - value from seller set if type non cod]
 COD FEE = [dynamic - value from seller set] -> default : 3.33%
 
 --- FORMULA : COD ---
-COD FEE SELLER = COD FEE * COD VALUE ✅
+COD FEE SELLER = COD FEE * COD VALUE / 100 ✅
 TAX = SHIPPING CHARGE * VAT ✅
 SELLER RECEIVED FEE = (COD VALUE - COD FEE SELLER) - (SHIPPING CHARGE - DISCOUNT) - TAX ✅
 

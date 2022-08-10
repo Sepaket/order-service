@@ -11,6 +11,9 @@ const UserController = require('../app/controllers/admin/user-controller');
 const TransactionFeeController = require('../app/controllers/admin/transaction-fee-controller');
 const InsuranceController = require('../app/controllers/admin/insurance-controller');
 const DiscountRateController = require('../app/controllers/admin/discount-rate-controller');
+const TrackingController = require('../app/controllers/admin/order-tracking-controller');
+const BalanceController = require('../app/controllers/admin/balance-controller');
+const OrderController = require('../app/controllers/admin/order-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -24,6 +27,7 @@ router.group('/seller', (route) => {
   route.get('/', Authorization, SellerController.index);
   route.get('/:id', Authorization, SellerController.detail);
   route.post('/', Authorization, SellerController.create);
+  route.post('/update-balance', Authorization, SellerController.updateBalance);
   route.delete('/:id', Authorization, SellerController.delete);
 });
 
@@ -47,6 +51,19 @@ router.group('/insurance', (route) => {
 router.group('/discount-rate', (route) => {
   route.get('/', Authorization, DiscountRateController.index);
   route.post('/update', Authorization, DiscountRateController.update);
+});
+
+router.group('/tracking', (route) => {
+  route.post('/', Authorization, TrackingController);
+});
+
+router.group('/balance', (route) => {
+  route.get('/total-balance', Authorization, BalanceController.totalBalance);
+  route.get('/balance-history', Authorization, BalanceController.balanceHistory);
+});
+
+router.group('/order', (route) => {
+  route.get('/', Authorization, OrderController.index);
 });
 
 // method not allowed when method request http is failure

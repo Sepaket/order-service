@@ -1,5 +1,7 @@
 const shortid = require('shortid-36');
+const { Sequelize } = require('sequelize');
 const randomNumber = require('random-number');
+const tax = require('../../../../../constant/tax');
 const sicepat = require('../../../../../helpers/sicepat');
 const jwtSelector = require('../../../../../helpers/jwt-selector');
 const orderStatus = require('../../../../../constant/order-status');
@@ -11,13 +13,16 @@ const {
   OrderTax,
   OrderLog,
   Location,
+  Discount,
+  Insurance,
   sequelize,
   OrderBatch,
   OrderDetail,
   OrderAddress,
+  SellerDetail,
   SellerAddress,
   OrderDiscount,
-  SellerDetail,
+  TransactionFee,
 } = require('../../../../models');
 
 module.exports = class {
@@ -26,29 +31,21 @@ module.exports = class {
     this.order = Order;
     this.seller = Seller;
     this.request = request;
+    this.op = Sequelize.Op;
     this.batch = OrderBatch;
     this.location = Location;
     this.orderTax = OrderTax;
     this.orderLog = OrderLog;
+    this.fee = TransactionFee;
+    this.discount = Discount;
+    this.insurance = Insurance;
     this.address = SellerAddress;
     this.orderDetail = OrderDetail;
     this.sellerDetail = SellerDetail;
     this.orderAddress = OrderAddress;
     this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
-
-    this.vat = {
-      raw: 3.33,
-      calculated: (parseFloat(3.33) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
-    this.discount = {
-      raw: 0.00,
-      calculated: (parseFloat(0.00) / parseInt(100, 10)),
-      type: 'PERCENTAGE',
-    };
-
+    this.tax = tax;
     return this.process();
   }
 
@@ -125,9 +122,14 @@ module.exports = class {
             where: { id: item.receiver_location_id },
           });
 
-          const codFee = (parseFloat(3.33) / parseInt(100, 10));
+          const trxFee = await this.fee.findOne();
+          const insuranceSelected = await this.insurance.findOne({
+            where: { expedition: body.type },
+          });
+
           const shippingFee = await this.shippingFee({ origin, destination, weight: item.weight });
           const sicepatCondition = (origin.sicepatOriginCode !== '' && destination.sicepatDestinationCode !== '');
+          const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingFee)) / parseInt(100, 10);
           const goodsAmount = !body.is_cod
             ? item.goods_amount
             : parseFloat(body.cod_value) - (parseFloat(shippingFee || 0) + codFee);
@@ -138,6 +140,7 @@ module.exports = class {
             goodsAmount,
             destination,
             shippingFee,
+            insuranceSelected,
             ...item,
             ...body,
           };
@@ -178,7 +181,7 @@ module.exports = class {
                 goods_content: payload.goods_content,
                 goods_qty: payload.goods_qty,
                 goods_notes: payload.notes,
-                insurance_amount: 0,
+                insurance_amount: insuranceSelected?.insuranceValue || 0,
                 is_cod: payload.is_cod,
                 total_amount: {
                   raw: totalAmount,
@@ -301,21 +304,109 @@ module.exports = class {
 
   async receivedFeeFormula(payload) {
     let result = 0;
-    const tax = parseFloat(payload?.shippingFee) * this.vat.calculated;
+    let shippingFromApp = 0;
+    let codValueWithFee = 0;
+    let shippingCalculated = 0;
+    let calculatedInsurance = 0;
+    let selectedDiscount = null;
 
-    if (payload.is_cod) {
-      const codFee = (parseFloat(3.33) / parseInt(100, 10));
-      const codFeeSeller = parseFloat(codFee) * parseFloat(payload?.cod_value);
+    const { vat } = this.tax;
+    const { body } = this.request;
 
-      const formulaOne = parseFloat(payload?.cod_value) - parseFloat(codFeeSeller);
-      const formulaTwo = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (formulaOne - formulaTwo) - tax;
-    } else {
-      const formulaOne = parseFloat(payload?.shippingFee) - parseFloat(this.discount.calculated);
-      result = (payload?.goods_amount - formulaOne) - tax;
+    const trxFee = await this.fee.findOne();
+    const sellerDiscount = this.sellerData.sellerDetail.discount;
+    const sellerDiscountType = this.sellerData.sellerDetail.discountType;
+    const insurance = await this.insurance.findOne({ where: { expedition: body.type } });
+    const globalDiscount = await this.discount.findOne({
+      where: {
+        [this.op.or]: {
+          minimumOrder: {
+            [this.op.gte]: 0,
+          },
+          maximumOrder: {
+            [this.op.lte]: body.order_items.length,
+          },
+        },
+      },
+    });
+
+    if (sellerDiscount && sellerDiscount !== 0) {
+      selectedDiscount = {
+        value: sellerDiscount || 0,
+        type: sellerDiscountType || '',
+      };
     }
 
-    return result;
+    if (globalDiscount) {
+      selectedDiscount = {
+        value: globalDiscount?.value || 0,
+        type: globalDiscount.type || '',
+      };
+    }
+
+    const vatCalculated = (parseFloat(payload?.shippingFee) * parseFloat(vat)) / 100;
+
+    if (selectedDiscount.type === 'PERCENTAGE') {
+      const discountCalculated = (
+        parseFloat(payload?.shippingFee) * parseFloat(selectedDiscount.value)
+      ) / 100;
+
+      shippingCalculated = parseFloat(payload?.shippingFee) - parseFloat(discountCalculated);
+    } else {
+      shippingCalculated = parseFloat(payload?.shippingFee) - parseFloat(selectedDiscount.value);
+    }
+
+    if (payload.is_cod) {
+      if (payload.is_insurance && insurance && insurance.insuranceValue !== 0) {
+        if (insurance.type === 'PERCENTAGE') {
+          calculatedInsurance = (
+            parseFloat(insurance.insuranceValue) * parseFloat(payload?.cod_value)
+          ) / 100;
+        } else {
+          calculatedInsurance = parseFloat(insurance.insuranceValue);
+        }
+      }
+
+      if (trxFee && trxFee.codFee !== 0) {
+        if (trxFee.codFeeType === 'PERCENTAGE') {
+          const feeCalculated = (
+            parseFloat(payload?.shippingFee) * parseFloat(trxFee.codFee)
+          ) / 100;
+
+          codValueWithFee = parseFloat(feeCalculated) + parseFloat(vatCalculated);
+        } else {
+          codValueWithFee = parseFloat(trxFee.codFee) + parseFloat(vatCalculated);
+        }
+      }
+
+      shippingFromApp = (
+        parseFloat(shippingCalculated)
+        + parseFloat(codValueWithFee)
+        + parseFloat(calculatedInsurance)
+      );
+
+      result = parseFloat(payload?.cod_value) - parseFloat(shippingFromApp);
+    } else {
+      if (payload.is_insurance && insurance && insurance.value !== 0) {
+        if (insurance.type === 'PERCENTAGE') {
+          calculatedInsurance = (
+            parseFloat(insurance.value) * parseFloat(payload?.goods_amount)
+          ) / 100;
+        } else {
+          calculatedInsurance = parseFloat(insurance.value);
+        }
+      }
+
+      shippingFromApp = (
+        parseFloat(shippingCalculated)
+        + parseFloat(vatCalculated)
+        + parseFloat(calculatedInsurance)
+      );
+
+      result = parseFloat(payload?.goods_amount) - parseFloat(shippingFromApp);
+    }
+
+    return parseFloat(result);
   }
 
   async orderQuery(payload) {
@@ -337,6 +428,7 @@ module.exports = class {
 
   async orderQueryDetail(payload) {
     const calculateFee = await this.receivedFeeFormula(payload);
+    const trxFee = await this.fee.findOne();
 
     return {
       batchId: this.createBatch.id,
@@ -351,8 +443,10 @@ module.exports = class {
       shippingCharge: payload.shippingFee,
       useInsurance: payload.is_insurance,
       sellerReceivedAmount: calculateFee,
-      insuranceAmount: 0,
+      insuranceAmount: payload?.insuranceSelected?.insuranceValue || 0,
       isTrouble: false,
+      codFeeAdmin: trxFee?.codFee || 0,
+      codFeeAdminType: trxFee?.codFeeType || '',
     };
   }
 
@@ -374,26 +468,40 @@ module.exports = class {
   async orderQueryTax(payload) {
     // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
+    const { vat, vatType } = this.tax;
 
     return {
-      taxAmount: parseFloat(payload?.shippingFee) * this.vat.calculated,
-      taxType: 'DECIMAL',
-      vatTax: this.vat.raw,
-      vatType: this.vat.type,
+      taxAmount: (parseFloat(payload?.shippingFee) * parseFloat(vat)) / 100,
+      taxType: 'AMOUNT',
+      vatTax: vat,
+      vatType,
     };
   }
 
   async orderQueryDiscount() {
-    // eslint-disable-next-line no-unused-vars
     const { body } = this.request;
+    const sellerDiscount = this.sellerData.sellerDetail.discount;
+    const sellerDiscountType = this.sellerData.sellerDetail.discountType;
+    const globalDiscount = await this.discount.findOne({
+      where: {
+        [this.op.or]: {
+          minimumOrder: {
+            [this.op.gte]: 0,
+          },
+          maximumOrder: {
+            [this.op.lte]: body.order_items.length,
+          },
+        },
+      },
+    });
 
     return {
-      discountSeller: this.discount.raw,
-      discountSellerType: this.discount.type,
-      discountProvider: this.discount.raw,
-      discountProviderType: this.discount.type,
-      discountGlobal: this.discount.raw,
-      discountGlobalType: this.discount.type,
+      discountSeller: sellerDiscount || 0,
+      discountSellerType: sellerDiscountType || '',
+      discountProvider: 0,
+      discountProviderType: 'PERCENTAGE',
+      discountGlobal: globalDiscount?.value || 0,
+      discountGlobalType: globalDiscount?.type || '',
     };
   }
 

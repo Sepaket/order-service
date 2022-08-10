@@ -40,10 +40,14 @@ module.exports = class {
             'notes',
             'goodsContent',
             'goodsPrice',
+            'codFee',
             'shippingCharge',
             'useInsurance',
             'insuranceAmount',
             'isCompleted',
+            'sellerReceivedAmount',
+            'codFeeAdmin',
+            'codFeeAdminType',
           ],
           include: [
             {
@@ -131,6 +135,7 @@ module.exports = class {
           });
 
           result.order = await this.converter.objectToSnakeCase(result?.order) || null;
+          result.cod_value = result?.cod_fee || 0;
 
           result.seller_address = await this.converter.objectToSnakeCase(
             result?.seller_address,
@@ -151,6 +156,8 @@ module.exports = class {
           result.order_log = await this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(orderLogs)),
           );
+
+          delete result?.cod_fee;
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
