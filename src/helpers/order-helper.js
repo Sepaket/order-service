@@ -1,18 +1,122 @@
+require('dotenv').config();
 const shortid = require('shortid-36');
+const { Sequelize } = require('sequelize');
+const randomNumber = require('random-number');
+const profitHandler = require('./profit-seller');
 const orderStatus = require('../constant/order-status');
 const tax = require('../constant/tax');
+const sicepat = require('./sicepat');
+const ninja = require('./ninja');
+const jne = require('./jne');
 const {
   Order,
   OrderTax,
   OrderLog,
   Discount,
   sequelize,
+  OrderBatch,
   OrderDetail,
   OrderAddress,
   SellerDetail,
   OrderDiscount,
   TransactionFee,
 } = require('../app/models');
+
+const batchCreator = (params) => new Promise(async (resolve, reject) => {
+  const {
+    dbTransaction,
+    expedition,
+    sellerId,
+    totalOrder,
+    batchCode,
+  } = params;
+
+  try {
+    const batch = await OrderBatch.create(
+      {
+        expedition,
+        sellerId,
+        batchCode,
+        totalOrder,
+        totalOrderProcessed: 0,
+        totalOrderSent: 0,
+        totalOrderProblem: 0,
+      },
+      { transaction: dbTransaction },
+    );
+    await dbTransaction.commit();
+    resolve(batch);
+  } catch (error) {
+    await dbTransaction.rollback();
+    reject(error);
+  }
+});
+
+const resiMapper = (params) => new Promise(async (resolve, reject) => {
+  try {
+    let resi = '';
+    const { expedition } = params;
+    const sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 10000 })}`;
+    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
+    const jneResi = `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`;
+    if (expedition === 'SICEPAT') resi = sicepatResi;
+    if (expedition === 'NINJA') resi = ninjaResi;
+    if (expedition === 'JNE') resi = jneResi;
+    resolve(resi);
+  } catch (error) {
+    reject(error);
+  }
+});
+
+const shippingFee = (payload) => new Promise(async (resolve, reject) => {
+  try {
+    let price = 0;
+    const {
+      origin,
+      weight,
+      expedition,
+      destination,
+      serviceCode,
+    } = payload;
+
+    if (expedition === 'JNE') {
+      const prices = await jne.checkPrice({
+        origin: origin.jneOriginCode,
+        destination: destination.jneDestinationCode,
+        weight,
+      });
+
+      const service = await prices?.find((item) => item.service_code === serviceCode);
+      price = service?.price || 0;
+    }
+
+    if (expedition === 'NINJA') {
+      const prices = await ninja.checkPrice({
+        origin: origin.ninjaOriginCode,
+        destination: destination.ninjaDestinationCode,
+        service: serviceCode,
+        weight,
+      });
+
+      price = prices;
+    }
+
+    if (expedition === 'SICEPAT') {
+      const prices = await sicepat.checkPrice({
+        origin: origin.sicepatOriginCode,
+        destination: destination.sicepatDestinationCode,
+        weight,
+      });
+
+      const service = await prices?.find((item) => item.service === serviceCode);
+      price = service?.tariff || 0;
+    }
+
+    resolve(parseFloat(price));
+  } catch (error) {
+    reject(error);
+  }
+});
 
 const receiverAmount = (params) => new Promise((resolve, reject) => {
   try {
@@ -22,38 +126,33 @@ const receiverAmount = (params) => new Promise((resolve, reject) => {
   }
 });
 
-const orderQuery = async (payload) => {
-  // eslint-disable-next-line no-unused-vars
-  const { body } = this.request;
-
-  return {
-    batchId: this.createBatch.id,
-    orderCode: shortid.generate(),
-    resi: payload.resi,
-    expedition: payload.type,
-    serviceCode: payload.service_code,
-    isCod: payload.is_cod,
-    orderDate: payload.pickup_date,
-    orderTime: payload.pickup_time,
-    status: orderStatus.WAITING_PICKUP.text,
-  };
-};
+const orderQuery = async (payload) => ({
+  batchId: payload.batchId,
+  orderCode: shortid.generate(),
+  resi: payload.resi,
+  expedition: payload.type,
+  serviceCode: payload.service_code,
+  isCod: payload.is_cod,
+  orderDate: payload.pickup_date,
+  orderTime: payload.pickup_time,
+  status: orderStatus.WAITING_PICKUP.text,
+});
 
 const orderQueryDetail = async (payload) => {
-  const calculateFee = await this.receivedFeeFormula(payload);
+  const calculateFee = await profitHandler(payload);
   const trxFee = await TransactionFee.findOne();
 
   return {
-    batchId: this.createBatch.id,
-    sellerId: this.sellerData?.id,
-    sellerAddressId: this.sellerAddress?.id,
+    batchId: payload.batchId,
+    sellerId: payload.seller.id,
+    sellerAddressId: payload.sellerLocation?.id,
     weight: payload.weight,
     totalItem: payload.goods_qty,
     notes: payload.notes,
     goodsContent: payload.goods_content,
     goodsPrice: !payload.is_cod ? payload.goods_amount : 0.00,
     codFee: payload.is_cod ? payload.cod_value : 0.00,
-    shippingCharge: payload.shippingFee,
+    shippingCharge: payload.shippingCharge,
     useInsurance: payload.is_insurance,
     sellerReceivedAmount: calculateFee,
     insuranceAmount: payload?.insuranceSelected?.insuranceValue || 0,
@@ -63,46 +162,38 @@ const orderQueryDetail = async (payload) => {
   };
 };
 
-const orderQueryAddress = async (payload) => {
-  // eslint-disable-next-line no-unused-vars
-  const { body } = this.request;
-
-  return {
-    senderName: payload.sender_name,
-    senderPhone: payload.sender_phone,
-    receiverName: payload.receiver_name,
-    receiverPhone: payload.receiver_phone,
-    receiverAddress: payload.receiver_address,
-    receiverAddressNote: payload.receiver_address_note,
-    receiverLocationId: payload.receiver_location_id,
-  };
-};
+const orderQueryAddress = async (payload) => ({
+  senderName: payload.sender_name,
+  senderPhone: payload.sender_phone,
+  receiverName: payload.receiver_name,
+  receiverPhone: payload.receiver_phone,
+  receiverAddress: payload.receiver_address,
+  receiverAddressNote: payload.receiver_address_note,
+  receiverLocationId: payload.receiver_location_id,
+});
 
 const orderQueryTax = async (payload) => {
-  // eslint-disable-next-line no-unused-vars
-  const { body } = this.request;
   const { vat, vatType } = tax;
 
   return {
-    taxAmount: (parseFloat(payload?.shippingFee) * parseFloat(vat)) / 100,
+    taxAmount: (parseFloat(payload?.shippingCharge) * parseFloat(vat)) / 100,
     taxType: 'AMOUNT',
     vatTax: vat,
     vatType,
   };
 };
 
-const orderQueryDiscount = async () => {
-  const { body } = this.request;
-  const sellerDiscount = this.sellerData.sellerDetail.discount;
-  const sellerDiscountType = this.sellerData.sellerDetail.discountType;
+const orderQueryDiscount = async (payload) => {
+  const sellerDiscount = payload.seller.sellerDetail.discount;
+  const sellerDiscountType = payload.seller.sellerDetail.discountType;
   const globalDiscount = await Discount.findOne({
     where: {
-      [this.op.or]: {
+      [Sequelize.Op.or]: {
         minimumOrder: {
-          [this.op.gte]: 0,
+          [Sequelize.Op.gte]: 0,
         },
         maximumOrder: {
-          [this.op.lte]: body.order_items.length,
+          [Sequelize.Op.lte]: payload.order_items.length,
         },
       },
     },
@@ -120,7 +211,7 @@ const orderQueryDiscount = async () => {
 
 const sellerDetailQuery = async (payload) => {
   const result = (
-    parseFloat(this.sellerData.sellerDetail.credit) - parseFloat(payload.goodsAmount)
+    parseFloat(payload.seller.sellerDetail.credit) - parseFloat(payload.goodsAmount)
   );
 
   return {
@@ -134,10 +225,10 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
   try {
     const queryOrder = await orderQuery(params);
     const orderTaxQuery = await orderQueryTax(params);
-    const orderDiscountQuery = await orderQueryDiscount();
     const orderDetailQuery = await orderQueryDetail(params);
     const orderAddressQuery = await orderQueryAddress(params);
     const querySellerDetail = await sellerDetailQuery(params);
+    const orderDiscountQuery = await orderQueryDiscount(params);
 
     const order = await Order.create(
       { ...queryOrder },
@@ -172,7 +263,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
     if (!params.is_cod) {
       await SellerDetail.update(
         { ...querySellerDetail },
-        { where: { sellerId: this.sellerData.id } },
+        { where: { sellerId: params.seller.id } },
         { transaction: dbTransaction },
       );
     }
@@ -181,11 +272,14 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
     resolve(order);
   } catch (error) {
     await dbTransaction.rollback();
-    reject(error?.message);
+    reject(error);
   }
 });
 
 module.exports = {
+  resiMapper,
+  shippingFee,
   orderLogger,
+  batchCreator,
   receiverAmount,
 };
