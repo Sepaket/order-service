@@ -1,28 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
   const schema = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
     },
-    resi: {
+    batchId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    provider: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    reason: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    request: {
+    payload: {
       type: DataTypes.JSON,
       allowNull: false,
     },

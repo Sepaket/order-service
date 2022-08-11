@@ -1,6 +1,6 @@
-const snakeCaseConverter = require('../../../../../helpers/snakecase-converter');
-const { TransactionFee, Insurance, Discount } = require('../../../../models');
-const tax = require('../../../../../constant/tax');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const { TransactionFee, Insurance, Discount } = require('../../../models');
+const tax = require('../../../../constant/tax');
 
 module.exports = class {
   constructor({ request }) {
