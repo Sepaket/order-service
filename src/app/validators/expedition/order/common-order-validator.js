@@ -34,6 +34,7 @@ const serviceCodeValidator = async () => new Promise((resolve, reject) => {
 */
 
 const validator = joi.object({
+  batch_id: joi.number().allow(null),
   type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS'),
   service_code: joi
     .string()

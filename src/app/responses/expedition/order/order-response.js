@@ -28,6 +28,7 @@ const {
   sequelize,
   OrderBatch,
   OrderDetail,
+  OrderFailed,
   OrderAddress,
   SellerDetail,
   SellerAddress,
@@ -55,6 +56,7 @@ module.exports = class {
     this.insurance = Insurance;
     this.address = SellerAddress;
     this.orderDetail = OrderDetail;
+    this.orderFailed = OrderFailed;
     this.sellerDetail = SellerDetail;
     this.orderAddress = OrderAddress;
     this.orderDiscount = OrderDiscount;
@@ -84,8 +86,13 @@ module.exports = class {
       const result = [];
       const { body } = this.request;
 
+      const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
       const sellerId = await jwtSelector({ request: this.request });
       const trxFee = await this.fee.findOne();
+
+      let batch = await this.batch.findOne({
+        where: { id: body?.batch_id, sellerId: sellerId.id },
+      });
 
       const insurance = await this.insurance.findOne({
         where: { expedition: body.type },
@@ -101,13 +108,15 @@ module.exports = class {
         include: [{ model: this.location, as: 'location' }],
       });
 
-      const batch = await batchCreator({
-        dbTransaction,
-        sellerId: sellerId.id,
-        expedition: body.type,
-        batchCode: `B${body?.order_items?.length}${shortid.generate()}`,
-        totalOrder: body?.order_items?.length || 0,
-      });
+      if (!batchConditon) {
+        batch = await batchCreator({
+          dbTransaction,
+          sellerId: sellerId.id,
+          expedition: body.type,
+          batchCode: `B${body?.order_items?.length}${shortid.generate()}`,
+          totalOrder: body?.order_items?.length || 0,
+        });
+      }
 
       const response = await Promise.all(
         body.order_items.map(async (item) => {
@@ -185,19 +194,7 @@ module.exports = class {
       );
 
       const filtered = response?.filter((item) => item);
-
-      if (filtered?.length > 0) {
-        await this.batch.update(
-          {
-            totalOrderSent: 0,
-            totalOrderProblem: filtered.length,
-            totalOrderProcessed: body.order_items?.length - filtered?.length,
-          },
-          { where: { id: batch.id } },
-        );
-      }
-
-      return {
+      const orderResponse = {
         info: {
           success: body.order_items.length - filtered.length,
           failed: filtered.length,
@@ -217,6 +214,34 @@ module.exports = class {
           failed_log: filtered,
         },
       };
+
+      if (filtered?.length > 0 && !batchConditon) {
+        await this.batch.update(
+          {
+            totalOrderSent: 0,
+            totalOrderProblem: filtered.length,
+            totalOrderProcessed: body.order_items?.length - filtered?.length,
+          },
+          { where: { id: batch.id } },
+        );
+        await this.insertOrderFailed({
+          ...orderResponse,
+          batchId: batch.id,
+        });
+      }
+
+      if (batchConditon) {
+        await this.batch.update(
+          {
+            totalOrderSent: batch.totalOrderSent,
+            totalOrderProblem: filtered?.length,
+            totalOrderProcessed: batch.totalOrderProcessed,
+          },
+          { where: { id: batch.id } },
+        );
+      }
+
+      return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
@@ -243,7 +268,29 @@ module.exports = class {
       await dbTransaction.commit();
     } catch (error) {
       await dbTransaction.rollback();
-      throw new Error(error);
+      throw new Error(error?.message);
+    }
+  }
+
+  async insertOrderFailed(parameter) {
+    const dbTransaction = await sequelize.transaction();
+
+    const payload = { ...parameter };
+    delete payload.batchId;
+
+    try {
+      await this.orderFailed.create(
+        {
+          id: `${shortid.generate()}${moment().format('HHmmss')}`,
+          batchId: parameter.batchId,
+          payload: JSON.stringify(payload),
+        },
+        { transaction: dbTransaction },
+      );
+      await dbTransaction.commit();
+    } catch (error) {
+      await dbTransaction.rollback();
+      throw new Error(error?.message);
     }
   }
 
