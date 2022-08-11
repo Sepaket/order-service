@@ -67,6 +67,10 @@ router.group('/balance', (route) => {
 
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
+  route.get('/batch', Authorization, OrderController.batch);
+  route.post('/export', Authorization, OrderController.export);
+  route.post('/print', Authorization, OrderController.print);
+  route.get('/:id', Authorization, OrderController.detail);
 });
 
 // method not allowed when method request http is failure
