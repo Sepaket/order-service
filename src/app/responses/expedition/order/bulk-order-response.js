@@ -51,7 +51,6 @@ module.exports = class {
       const { body } = this.request;
       const sellerId = await jwtSelector({ request: this.request });
 
-      this.sellerData = await this.seller.findOne({ where: { id: sellerId.id } });
       this.sellerAddress = await this.address.findOne({
         where: { id: body.seller_location_id, sellerId: sellerId.id },
         include: [
@@ -70,13 +69,7 @@ module.exports = class {
       const dataOrders = await excelReader(`public/${fileName[1]}`);
       await Promise.all(
         dataOrders?.map(async (item, index) => {
-          const dataOrderCondition = (
-            (item[0]
-            && item[0] !== ''
-            && item[0] !== null)
-          );
-
-          if (index !== 0 && dataOrderCondition) {
+          if (index !== 0) {
             const excelData = {
               receiverName: item[0],
               receiverPhone: item[1],
@@ -111,8 +104,7 @@ module.exports = class {
               },
             });
 
-            let errorMessage = '';
-            const origin = this.sellerAddress.location;
+            const origin = this.sellerAddress?.location || null;
             const price = excelData?.isCod ? excelData?.codValue : excelData?.goodsAmount;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
             const shippingFee = await this.shippingFee({
@@ -121,11 +113,8 @@ module.exports = class {
               weight: excelData.weight,
             });
 
-            if (!shippingFee) errorMessage = 'Tipe penjemputan ini tidak tersedia saat anda memilih COD atau destinasi yang dituju tidak ditemukan';
-            if (!destination) errorMessage = 'Maaf! Kelurahan atau kode pos yang anda input mungkin salah';
-
             result.push({
-              error: errorMessage,
+              error: '',
               receiver_name: excelData?.receiverName || '',
               receiver_phone: excelData?.receiverPhone || '',
               receiver_location: {
@@ -169,14 +158,14 @@ module.exports = class {
 
       if (body.type === 'SICEPAT') {
         const prices = await this.sicepat.checkPrice({
-          origin: origin.sicepatOriginCode,
-          destination: destination.sicepatDestinationCode,
+          origin: origin?.sicepatOriginCode,
+          destination: destination?.sicepatDestinationCode,
           weight,
         });
 
         const service = await prices?.find((item) => item.service === body.service_code);
 
-        shippingFee = service?.tariff;
+        shippingFee = service?.tariff || 0;
       }
 
       if (body.type === 'JNE') {
@@ -188,18 +177,18 @@ module.exports = class {
 
         const service = await prices?.find((item) => item.service_code === body.service_code);
 
-        shippingFee = service?.price;
+        shippingFee = service?.price || 0;
       }
 
       if (body.type === 'NINJA') {
         const price = await this.ninja.checkPrice({
-          origin: origin.ninjaOriginCode,
-          destination: destination.ninjaDestinationCode,
+          origin: origin?.ninjaOriginCode,
+          destination: destination?.ninjaDestinationCode,
           service: body.service_code,
           weight,
         });
 
-        shippingFee = process.env.APP_ENV === 'development' ? 1 : price;
+        shippingFee = price || 0;
       }
 
       return shippingFee;
