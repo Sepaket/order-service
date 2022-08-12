@@ -62,7 +62,7 @@ router.group('/reports', (route) => {
 
 router.group('/payment', (route) => {
   route.post('/topup', Authorization, PaymentController.topup);
-  route.all('/callback', Authorization, PaymentController.callback);
+  route.post('/callback', PaymentController.callback);
   route.get('/history', Authorization, PaymentController.history);
   route.get('/summary', Authorization, PaymentController.summary);
 });
