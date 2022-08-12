@@ -18,7 +18,6 @@ module.exports = {
       },
     }).then(() => [
       queryInterface.addIndex(table, { fields: ['batch_id'], name: 'batch_id_order_failed_idx' }),
-      queryInterface.addIndex(table, { fields: ['seller_id'], name: 'seller_id_order_failed_idx' }),
     ]),
   ]),
 
