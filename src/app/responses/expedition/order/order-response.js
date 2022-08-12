@@ -69,7 +69,7 @@ module.exports = class {
       const trxFee = await this.fee.findOne();
 
       let batch = await this.batch.findOne({
-        where: { id: body?.batch_id, sellerId: sellerId.id },
+        where: { id: body?.batch_id || 0, sellerId: sellerId.id },
       });
 
       const insurance = await this.insurance.findOne({
