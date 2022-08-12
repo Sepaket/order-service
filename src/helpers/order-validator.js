@@ -23,7 +23,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       weight,
     } = payload;
 
-    const categories = ['NORMAL', 'ORGANIC', 'ELECTRONIC'];
+    const categories = ['Normal', 'Organic', 'FragileElectronic'];
 
     if (!shippingCharge) error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     if (!codCondition) error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD' });
