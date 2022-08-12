@@ -115,9 +115,9 @@ module.exports = class {
           });
 
           const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
-          const goodsAmount = !body.is_cod
+          const goodsAmount = !item.is_cod
             ? item.goods_amount
-            : parseFloat(body.cod_value) - (parseFloat(shippingFee || 0) + codFee);
+            : parseFloat(item.cod_value) - (parseFloat(shippingFee || 0) + codFee);
 
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
           const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
