@@ -1,7 +1,7 @@
 const joi = require('joi');
 const moment = require('moment');
-const { Location, SellerAddress } = require('../../../models');
-const { serviceCode, sicepatParcelCategories } = require('../../../../constant/status');
+const { SellerAddress } = require('../../../models');
+const { serviceCode } = require('../../../../constant/status');
 
 let request = null;
 const isExist = async ({ params, identifier, model }) => new Promise((resolve, reject) => {
@@ -51,41 +51,24 @@ const validator = joi.object({
     .required()
     .external((req) => isExist({ params: req, identifier: 'id', model: SellerAddress })),
   order_items: joi.array().items(joi.object({
-    receiver_location_id: joi
-      .number()
-      .min(1)
-      .required()
-      .external((req) => isExist({ params: req, identifier: 'id', model: Location })),
-    weight: joi.number().min(1).max(50).required(),
-    is_cod: joi.boolean().required(),
-    sender_name: joi.string().required(),
-    sender_phone: joi.string().required(),
-    receiver_name: joi.string().required(),
-    receiver_phone: joi.string().required(),
-    receiver_address: joi.string().max(80).required(),
-    receiver_address_note: joi.string().max(20),
-    goods_content: joi.string().max(50).required(),
-    goods_category: joi
-      .string()
-      .required()
-      .allow(
-        sicepatParcelCategories.ORGANIC,
-        sicepatParcelCategories.NORMAL,
-        sicepatParcelCategories.ELECTRONIC,
-      ),
-    cod_value: joi.any().when('is_cod', {
-      is: joi.boolean().valid(true),
-      then: joi.number().min(1).required(),
-      otherwise: joi.allow(0),
-    }),
-    goods_amount: joi.any().when('is_cod', {
-      is: joi.boolean().valid(false),
-      then: joi.number().min(10000).max(5000000).required(),
-      otherwise: joi.allow(0),
-    }),
-    goods_qty: joi.number().min(1).required(),
+    receiver_location_id: joi.number().allow(null, ''),
+    weight: joi.number().allow(null, ''),
+    is_cod: joi.boolean().allow(null, ''),
+    sender_name: joi.string().allow(null, ''),
+    sender_phone: joi.string().allow(null, ''),
+    receiver_name: joi.string().allow(null, ''),
+    receiver_phone: joi.string().allow(null, ''),
+    receiver_address: joi.string().allow(null, ''),
+    receiver_address_note: joi.string().allow(null, ''),
+    goods_content: joi.string().allow(null, ''),
+    goods_category: joi.string().allow(null, ''),
+    cod_value: joi.any().allow(null, ''),
+    goods_amount: joi.any().allow(null, ''),
+    goods_qty: joi.number().allow(null, ''),
     notes: joi.string().allow(null, '').max(50),
-    is_insurance: joi.boolean().required(),
+    is_insurance: joi.boolean().allow(null, ''),
+    postal_code: joi.any().allow(null, ''),
+    sub_district: joi.any().allow(null, ''),
   })).required(),
 });
 
