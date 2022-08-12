@@ -87,11 +87,11 @@ module.exports = class {
   querySearch() {
     const { query } = this.request;
     let filtered = {};
-    if (query?.filter_by === 'DATE_RANGE') {
+    if (query?.filter_by === 'DATE') {
       filtered = {
         updatedAt: {
           [this.op.between]: [
-            moment(query.date_start).tz('Asia/Jakarta').startOf('day').format(),
+            moment(query.date_start).startOf('day').format(),
             moment(query.date_end).endOf('day').format(),
           ],
         },
@@ -122,12 +122,14 @@ module.exports = class {
 
     const condition = {
       [this.op.or]: {
-        status: { [this.op.eq]: query.status || '' },
+        status: { [this.op.eq]: query?.status || '' },
       },
       [this.op.and]: {
         ...filtered,
       },
     };
+
+    if (!query?.status) delete condition[this.op.or];
 
     return query?.status || query?.filter_by ? condition : {};
   }

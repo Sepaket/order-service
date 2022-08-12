@@ -1,3 +1,4 @@
+const moment = require('moment');
 const shortid = require('shortid-36');
 const httpErrors = require('http-errors');
 const { topup } = require('../../../../helpers/xendit');
@@ -40,6 +41,8 @@ module.exports = class {
         sellerId: seller?.id,
         topup: parseFloat(body.amount),
         status: PENDING.text,
+        createdAt: moment().format(),
+        updatedAt: moment().format(),
         requestPayload: JSON.stringify({
           externalId,
           amount: parseFloat(body.amount),

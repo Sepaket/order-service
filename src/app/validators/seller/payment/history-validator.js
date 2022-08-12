@@ -4,7 +4,7 @@ const validator = joi.object({
   page: joi.number().min(1).allow('', null),
   limit: joi.number().min(0).allow('', null),
   status: joi.string().allow('', null).valid('PENDING', 'PAID', 'EXPIRED', 'FAILED'),
-  filter_by: joi.string().allow('', null).valid('DATE_RANGE', 'MONTH', 'YEAR'),
+  filter_by: joi.string().allow('', null).valid('DATE', 'MONTH', 'YEAR'),
   date_start: joi.any().when('filter_by', {
     is: 'DATE_RANGE',
     then: joi.date().required(),
