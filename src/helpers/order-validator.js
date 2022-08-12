@@ -27,7 +27,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
 
     if (!shippingCharge) error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     if (!codCondition) error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD' });
-    if (!creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
+    if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
     if (!weight || weight === null || weight === '') error.push({ message: 'Berat harus di isi dan minimal 1 KG' });
 
     if (await required(payload?.is_cod)) error.push({ message: 'Metode pengiriman harus diisi 1 atau 0' });
