@@ -1,4 +1,5 @@
 require('dotenv').config();
+const moment = require('moment');
 const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
 const randomNumber = require('random-number');
@@ -17,9 +18,11 @@ const {
   OrderBatch,
   OrderDetail,
   OrderAddress,
+  OrderFailed,
   SellerDetail,
   OrderDiscount,
   TransactionFee,
+  OrderBackground,
 } = require('../app/models');
 
 const batchCreator = (params) => new Promise(async (resolve, reject) => {
@@ -81,8 +84,8 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 
     if (expedition === 'JNE') {
       const prices = await jne.checkPrice({
-        origin: origin.jneOriginCode,
-        destination: destination.jneDestinationCode,
+        origin: origin?.jneOriginCode,
+        destination: destination?.jneDestinationCode,
         weight,
       });
 
@@ -92,19 +95,19 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 
     if (expedition === 'NINJA') {
       const prices = await ninja.checkPrice({
-        origin: origin.ninjaOriginCode,
-        destination: destination.ninjaDestinationCode,
+        origin: origin?.ninjaOriginCode,
+        destination: destination?.ninjaDestinationCode,
         service: serviceCode,
         weight,
       });
 
-      price = prices;
+      price = prices || 0;
     }
 
     if (expedition === 'SICEPAT') {
       const prices = await sicepat.checkPrice({
-        origin: origin.sicepatOriginCode,
-        destination: destination.sicepatDestinationCode,
+        origin: origin?.sicepatOriginCode,
+        destination: destination?.sicepatDestinationCode,
         weight,
       });
 
@@ -118,21 +121,13 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
   }
 });
 
-const receiverAmount = (params) => new Promise((resolve, reject) => {
-  try {
-    resolve(params);
-  } catch (error) {
-    reject(error?.message);
-  }
-});
-
 const orderQuery = async (payload) => ({
   batchId: payload.batchId,
   orderCode: shortid.generate(),
   resi: payload.resi,
   expedition: payload.type,
   serviceCode: payload.service_code,
-  isCod: payload.is_cod,
+  isCod: payload.is_cod || false,
   orderDate: payload.pickup_date,
   orderTime: payload.pickup_time,
   status: orderStatus.WAITING_PICKUP.text,
@@ -276,10 +271,56 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
   }
 });
 
+const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
+  const dbTransaction = await sequelize.transaction();
+  const payload = { ...parameter };
+  delete payload.type;
+
+  try {
+    await OrderBackground.create(
+      {
+        id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        expedition: parameter.type,
+        parameter: JSON.stringify(payload),
+      },
+      { transaction: dbTransaction },
+    );
+    await dbTransaction.commit();
+    resolve(true);
+  } catch (error) {
+    await dbTransaction.rollback();
+    reject(error);
+  }
+});
+
+const orderFailedLogger = async (parameter) => new Promise(async (resolve, reject) => {
+  const dbTransaction = await sequelize.transaction();
+
+  const payload = { ...parameter };
+  delete payload.batchId;
+
+  try {
+    await OrderFailed.create(
+      {
+        id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        batchId: parameter.batchId,
+        payload: JSON.stringify(payload),
+      },
+      { transaction: dbTransaction },
+    );
+    await dbTransaction.commit();
+    resolve(true);
+  } catch (error) {
+    await dbTransaction.rollback();
+    reject(error);
+  }
+});
+
 module.exports = {
   resiMapper,
   shippingFee,
   orderLogger,
   batchCreator,
-  receiverAmount,
+  orderSuccessLogger,
+  orderFailedLogger,
 };

@@ -1,67 +1,45 @@
-const moment = require('moment');
 const shortid = require('shortid-36');
-const { Sequelize } = require('sequelize');
 const jne = require('../../../../helpers/jne');
-const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const jneParameter = require('./order-parameter/jne');
 const sicepat = require('../../../../helpers/sicepat');
 const ninjaParameter = require('./order-parameter/ninja');
 const sicepatParameter = require('./order-parameter/sicepat');
 const jwtSelector = require('../../../../helpers/jwt-selector');
-const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const orderValidator = require('../../../../helpers/order-validator');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
 const {
   batchCreator,
   resiMapper,
   shippingFee,
   orderLogger,
+  orderSuccessLogger,
+  orderFailedLogger,
 } = require('../../../../helpers/order-helper');
 const {
   Seller,
-  Order,
-  OrderTax,
-  OrderLog,
   Location,
-  Discount,
   Insurance,
   sequelize,
   OrderBatch,
-  OrderDetail,
-  OrderFailed,
-  OrderAddress,
   SellerDetail,
   SellerAddress,
-  OrderDiscount,
   TransactionFee,
-  OrderBackground,
 } = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
-    this.tax = tax;
     this.jne = jne;
     this.ninja = ninja;
-    this.order = Order;
     this.seller = Seller;
     this.sicepat = sicepat;
     this.request = request;
-    this.op = Sequelize.Op;
     this.batch = OrderBatch;
     this.location = Location;
-    this.orderTax = OrderTax;
-    this.orderLog = OrderLog;
-    this.discount = Discount;
     this.fee = TransactionFee;
     this.insurance = Insurance;
     this.address = SellerAddress;
-    this.orderDetail = OrderDetail;
-    this.orderFailed = OrderFailed;
     this.sellerDetail = SellerDetail;
-    this.orderAddress = OrderAddress;
-    this.orderDiscount = OrderDiscount;
-    this.converter = snakeCaseConverter;
-    this.orderBackground = OrderBackground;
 
     return this.process();
   }
@@ -120,7 +98,6 @@ module.exports = class {
 
       const response = await Promise.all(
         body.order_items.map(async (item) => {
-          const messages = [];
           let parameter = null;
           const { credit } = seller.sellerDetail;
           const resi = await resiMapper({ expedition: body.type });
@@ -142,13 +119,17 @@ module.exports = class {
             ? item.goods_amount
             : parseFloat(body.cod_value) - (parseFloat(shippingFee || 0) + codFee);
 
+          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
           const payload = {
+            creditCondition,
             sellerLocation,
             shippingCharge,
+            codCondition,
             goodsAmount,
             destination,
             insurance,
@@ -159,21 +140,15 @@ module.exports = class {
             ...body,
           };
 
-          const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
-          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          const messages = await orderValidator(payload);
+
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
+          if (messages?.length > 0) error.push({ order: item, errors: messages });
 
-          if (!shippingFee) messages.push({ message: 'Destinasi yang dituju tidak ditemukan' });
-          if (!codCondition) messages.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD' });
-          if (!creditCondition) messages.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
-          if (!shippingFee || !codCondition || !creditCondition) {
-            error.push({ order: item, errors: messages });
-          }
-
-          if (shippingFee && codCondition && creditCondition) {
-            await this.insertSuccessOrder(parameter);
+          if (messages?.length < 1) {
+            await orderSuccessLogger({ ...parameter, type: body.type });
             const order = await orderLogger({
               ...payload,
               batchId: batch.id,
@@ -224,18 +199,19 @@ module.exports = class {
           },
           { where: { id: batch.id } },
         );
-        await this.insertOrderFailed({
+        await orderFailedLogger({
           ...orderResponse,
           batchId: batch.id,
         });
       }
 
       if (batchConditon) {
+        const total = body.order_items?.length - filtered?.length;
         await this.batch.update(
           {
             totalOrderSent: batch.totalOrderSent,
             totalOrderProblem: filtered?.length,
-            totalOrderProcessed: batch.totalOrderProcessed,
+            totalOrderProcessed: parseInt(batch.totalOrderProcessed, 10) + parseInt(total, 10),
           },
           { where: { id: batch.id } },
         );
@@ -250,48 +226,6 @@ module.exports = class {
   codValidator() {
     const { body } = this.request;
     return (body.service_code === 'SIUNT');
-  }
-
-  async insertSuccessOrder(parameter) {
-    const { body } = this.request;
-    const dbTransaction = await sequelize.transaction();
-
-    try {
-      await this.orderBackground.create(
-        {
-          id: `${shortid.generate()}${moment().format('HHmmss')}`,
-          expedition: body.type,
-          parameter: JSON.stringify(parameter),
-        },
-        { transaction: dbTransaction },
-      );
-      await dbTransaction.commit();
-    } catch (error) {
-      await dbTransaction.rollback();
-      throw new Error(error?.message);
-    }
-  }
-
-  async insertOrderFailed(parameter) {
-    const dbTransaction = await sequelize.transaction();
-
-    const payload = { ...parameter };
-    delete payload.batchId;
-
-    try {
-      await this.orderFailed.create(
-        {
-          id: `${shortid.generate()}${moment().format('HHmmss')}`,
-          batchId: parameter.batchId,
-          payload: JSON.stringify(payload),
-        },
-        { transaction: dbTransaction },
-      );
-      await dbTransaction.commit();
-    } catch (error) {
-      await dbTransaction.rollback();
-      throw new Error(error?.message);
-    }
   }
 
   responseMapper(payload) {
@@ -320,6 +254,8 @@ module.exports = class {
         address: payload.receiver_address,
         address_note: payload.receiver_address_note,
         location: payload.destination || null,
+        postal_code: payload.postal_code,
+        sub_district: payload.sub_district,
       },
       sender: {
         name: payload.receiver_name,
