@@ -1,3 +1,4 @@
+const moment = require('moment');
 const multer = require('multer');
 const str = require('shortid-36');
 
@@ -7,7 +8,7 @@ const storage = multer.diskStorage({
   },
   filename: (request, file, callback) => {
     const extention = file.mimetype.split('/').pop();
-    callback(null, `${str.generate()}.${extention}`);
+    callback(null, `${str.generate()}-${moment().format('HHmmss')}.${extention}`);
   },
 });
 
