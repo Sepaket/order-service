@@ -69,7 +69,7 @@ const validator = joi.object({
     is_insurance: joi.boolean().allow(null, ''),
     postal_code: joi.any().allow(null, ''),
     sub_district: joi.any().allow(null, ''),
-  })).required(),
+  })).min(1).required(),
 });
 
 module.exports = (object) => {
