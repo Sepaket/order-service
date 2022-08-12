@@ -224,8 +224,13 @@ module.exports = class {
   }
 
   codValidator() {
+    let result;
     const { body } = this.request;
-    return (body.service_code === 'SIUNT');
+    if (body.type === 'JNE') result = (body.service_code === 'REG19');
+    if (body.type === 'SICEPAT') result = (body.service_code === 'SIUNT');
+    if (body.type === 'NINJA') result = (body.service_code === 'Standard');
+
+    return result;
   }
 
   responseMapper(payload) {
