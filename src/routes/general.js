@@ -13,6 +13,7 @@ const BankController = require('../app/controllers/general/bank-controller');
 
 router.group('/location', (route) => {
   route.get('/', LocationController.index);
+  route.post('/detail', LocationController.detail);
 });
 
 router.group('/faq', (route) => {
