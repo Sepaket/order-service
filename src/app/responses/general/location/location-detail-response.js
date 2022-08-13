@@ -17,6 +17,7 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
+        const { body } = this.request;
         this.location.findAll({
           where: search,
         }).then((response) => {
@@ -24,8 +25,16 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
 
+          const mapped = {};
+          result.forEach((item) => {
+            const selectedId = body.ids.find((id) => id === item.id);
+            if (selectedId) mapped[selectedId] = item;
+
+            return result;
+          });
+
           if (result.length > 0) {
-            resolve(result);
+            resolve(mapped);
           } else {
             reject(httpErrors(404, 'No Data Found', []));
           }
