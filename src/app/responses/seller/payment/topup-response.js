@@ -1,5 +1,5 @@
-const moment = require('moment');
 const shortid = require('shortid-36');
+const moment = require('moment-timezone');
 const httpErrors = require('http-errors');
 const { topup } = require('../../../../helpers/xendit');
 const { Seller, CreditHistory } = require('../../../models');
@@ -20,14 +20,12 @@ module.exports = class {
       const { PENDING } = paymentStatus;
       this.user = await jwtSelector({ request: this.request });
       const seller = await this.seller.findOne({ where: { id: this.user.id } });
-      const latestCredit = this.credit.findOne({
+      const latestCredit = await this.credit.findOne({
         order: [['id', 'DESC']],
         limit: 1,
       });
 
       const externalId = `Sepaket-${shortid.generate()}${latestCredit?.id || 1}`;
-
-      if (!seller) throw new Error('');
 
       const payment = await topup({
         externalId,
@@ -41,8 +39,8 @@ module.exports = class {
         sellerId: seller?.id,
         topup: parseFloat(body.amount),
         status: PENDING.text,
-        createdAt: moment().format(),
-        updatedAt: moment().format(),
+        createdAt: moment().tz('Asia/Jakarta').format(),
+        updatedAt: moment().tz('Asia/Jakarta').format(),
         requestPayload: JSON.stringify({
           externalId,
           amount: parseFloat(body.amount),
