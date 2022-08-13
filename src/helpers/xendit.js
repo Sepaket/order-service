@@ -1,3 +1,4 @@
+const qs = require('querystring');
 const axios = require('axios');
 
 const topup = (payload) => new Promise(async (resolve, reject) => {
@@ -14,13 +15,41 @@ const topup = (payload) => new Promise(async (resolve, reject) => {
     },
   }).then((response) => {
     resolve(response);
-  }).catch(async (error) => {
-    reject(new Error(error));
+  }).catch((error) => {
+    reject(new Error(error?.response?.data?.message || error?.message || error));
   });
 });
 
-const withdraw = () => new Promise(() => {
-  //
+const withdraw = (payload) => new Promise((resolve, reject) => {
+  const {
+    amount,
+    bankCode,
+    externalId,
+    accountName,
+    accountNumber,
+    description,
+  } = payload;
+
+  axios.post(`${process.env.XENDIT_BASE_URL}/disbursements`, qs.stringify({
+    amount,
+    external_id: externalId,
+    bank_code: bankCode,
+    account_holder_name: accountName,
+    account_number: accountNumber,
+    description,
+  }), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    auth: {
+      username: process.env.XENDIT_SECRET_KEY,
+      password: '',
+    },
+  }).then((response) => {
+    resolve(response);
+  }).catch((error) => {
+    reject(new Error(error?.response?.data?.message || error?.message || error));
+  });
 });
 
 const balance = () => new Promise(() => {

@@ -50,11 +50,21 @@ module.exports = class {
       );
 
       if (body.status === 'PAID') {
-        await this.sellerDetail.update(
-          { credit: parseFloat(seller?.credit || 0) + parseFloat(body.amount) },
-          { where: { sellerId: credit?.sellerId } },
-          { transaction: dbTransaction },
-        );
+        if (credit.withdraw && credit.withdraw !== null) {
+          await this.sellerDetail.update(
+            { credit: parseFloat(seller?.credit || 0) - parseFloat(body.amount) },
+            { where: { sellerId: credit?.sellerId } },
+            { transaction: dbTransaction },
+          );
+        }
+
+        if (credit.topup && credit.topup !== null) {
+          await this.sellerDetail.update(
+            { credit: parseFloat(seller?.credit || 0) + parseFloat(body.amount) },
+            { where: { sellerId: credit?.sellerId } },
+            { transaction: dbTransaction },
+          );
+        }
       }
 
       await dbTransaction.commit();
