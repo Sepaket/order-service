@@ -1,0 +1,42 @@
+
+VAT = 1.11%
+INSURANCE = [dynamic - value from admin set]
+SHIPPING CHARGE = [dynamic - value from 3pl]
+COD VALUE = [dynamic - value from seller set if type cod]
+DISCOUNT = [dynamic - value from global disc or specific seller]
+GOODS AMOUNT = [dynamic - value from seller set if type non cod]
+COD FEE = [dynamic - value from seller set] -> default : 3.33%
+
+--- FORMULA : COD ---
+COD FEE SELLER = COD FEE * COD VALUE / 100 ✅
+TAX = SHIPPING CHARGE * VAT ✅
+SELLER RECEIVED FEE = (COD VALUE - COD FEE SELLER) - (SHIPPING CHARGE - DISCOUNT) - TAX ✅
+
+--- FORMULA : NON COD ---
+TAX = SHIPPING CHARGE * VAT ✅
+SELLER RECEIVED FEE = (GOODS AMOUNT) - (SHIPPING CHARGE - DISCOUNT) - TAX ✅
+
+
+- nilai cod (cod value) = 50.000
+- cod fee value (dari admin) = 3.33 %
+- tax = ongkir * vat
+- vat = 1.1 %
+
+- asuransi = 5 %
+- nilai barang = nilai cod - ongkir 3pl
+- asuransi processed = nilai barang * asuransi
+
+
+----- COD - ASURANSI
+BIAYA COD = (nilai cod - (cod fee value + tax + vat)) + asuransi processed
+BIAYA COD = 50.000 - (3.33 + 2 + 1)
+BIAYA COD = 50.000 - 6.33 %
+BiAYA COD = (50.000 * 6.33) / 100
+
+
+
+----- COD - NON ASURANSI
+BIAYA COD = nilai cod - (cod fee value + tax + vat)
+BIAYA COD = 50.000 - (3.33 + 2 + 1)
+BIAYA COD = 50.000 - 6.33 %
+BiAYA COD = (50.000 * 6.33) / 100

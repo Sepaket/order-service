@@ -1,0 +1,41 @@
+const httpErrors = require('http-errors');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const { SellerDetail } = require('../../../models');
+
+module.exports = class {
+  constructor({ request }) {
+    this.sellerDetail = SellerDetail;
+    this.request = request;
+    this.converter = snakeCaseConverter;
+    return this.process();
+  }
+
+  async process() {
+    const { query } = this.request;
+
+    return new Promise((resolve, reject) => {
+      this.sellerDetail.findOne({
+        attributes: [
+          'id',
+          'seller_id',
+          'codFee',
+          'codFeeType',
+          'discount',
+          'discountType',
+          'rateReferal',
+          'rateReferalType',
+        ],
+        where: { seller_id: query.seller_id },
+      }).then((response) => {
+        const result = this.converter.objectToSnakeCase(
+          JSON.parse(JSON.stringify(response)),
+        );
+
+        if (response) resolve(result);
+        else reject(httpErrors(404, 'No Data Found', { data: null }));
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+};

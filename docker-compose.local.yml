@@ -1,0 +1,18 @@
+version: "3.7"
+
+networks:
+  default:
+    external:
+      name:
+        local
+
+services:
+  sepaket_api:
+    build: .
+    env_file: .env
+    volumes:
+      - .:/home/express/sepaket
+      - /home/express/sepaket/node_modules
+    ports:
+      - 3000:3000
+    command: "npm run dev"

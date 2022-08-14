@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    forgotPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -64,6 +68,21 @@ module.exports = (sequelize, DataTypes) => {
   Seller.associate = (model) => {
     model.Seller.hasOne(model.SellerDetail, {
       as: 'sellerDetail',
+      foreignKey: 'sellerId',
+    });
+
+    model.Seller.hasOne(model.SellerAddress, {
+      as: 'address',
+      foreignKey: 'sellerId',
+    });
+
+    model.Seller.hasOne(model.OrderBatch, {
+      as: 'batch',
+      foreignKey: 'sellerId',
+    });
+
+    model.Seller.hasOne(model.OrderDetail, {
+      as: 'orderDetail',
       foreignKey: 'sellerId',
     });
   };

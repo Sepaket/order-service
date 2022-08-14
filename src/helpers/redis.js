@@ -1,8 +1,7 @@
 const redis = require('redis');
 
 const client = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
+  url: process.env.REDIS_URL,
   user: process.env.REDIS_USER,
   password: process.env.REDIS_PASSWORD,
   prefix: process.env.REDIS_PREFIX,
@@ -20,7 +19,7 @@ const setRedisData = (payload) => {
     db = 0,
     key = '',
     data = null,
-    timeout = 3600000,
+    timeout = 3600000, // in milisecond
   } = payload;
 
   client.select(db, () => client.setex(key, timeout, data));
