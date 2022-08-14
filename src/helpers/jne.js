@@ -68,7 +68,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
   });
 });
 
-const createOrder = (payload) => new Promise((resolve, reject) => {
+const createOrder = (payload) => new Promise((resolve) => {
   try {
     axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, qs.stringify({
       username: process.env.JNE_USERNAME,
@@ -80,16 +80,28 @@ const createOrder = (payload) => new Promise((resolve, reject) => {
       },
     }).then((response) => {
       if (!response?.data?.detail) {
-        reject(new Error(`JNE: ${response?.data?.error || 'Something Wrong'}`));
+        resolve({
+          status: false,
+          message: response?.data?.error || 'Something Wrong',
+        });
         return;
       }
 
-      resolve(response?.data?.detail);
+      resolve({
+        status: true,
+        message: 'OK',
+      });
     }).catch((error) => {
-      reject(new Error(`JNE: ${error?.data?.reason || error?.message || 'Something Wrong'}`));
+      resolve({
+        status: false,
+        message: error?.data?.reason || error?.message || 'Something Wrong',
+      });
     });
   } catch (error) {
-    reject(error);
+    resolve({
+      status: false,
+      message: error?.message || 'Something Wrong',
+    });
   }
 });
 
