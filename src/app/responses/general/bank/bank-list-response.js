@@ -13,14 +13,7 @@ module.exports = class {
   }
 
   async process() {
-    const limit = 10;
-    const offset = 0;
-    const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.bank.count();
-    const nextPage = (
-      (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
-    ) || parseInt(offset, 10);
 
     return new Promise((resolve, reject) => {
       try {
@@ -32,8 +25,6 @@ module.exports = class {
           ],
           where: search,
           order: [['name', 'ASC']],
-          limit: parseInt(query.limit, 10) || parseInt(limit, 10),
-          offset: nextPage,
         }).then((response) => {
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
@@ -42,23 +33,11 @@ module.exports = class {
           if (result.length > 0) {
             resolve({
               data: result,
-              meta: {
-                total,
-                total_result: result.length,
-                limit: parseInt(query.limit, 10) || limit,
-                page: parseInt(query.page, 10) || (offset + 1),
-              },
             });
           } else {
             reject(httpErrors(404, 'No Data Found', {
               data: {
                 data: [],
-                meta: {
-                  total,
-                  total_result: result.length,
-                  limit: parseInt(query.limit, 10) || limit,
-                  page: parseInt(query.page, 10) || (offset + 1),
-                },
               },
             }));
           }
