@@ -17,7 +17,7 @@ const validator = joi.object({
     .min(6)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/)
     .message({
-      'string.pattern.base': 'Password harus 8 karakter, menggunakan min. 1 huruf kecil, 1 huruf kapital dan tanpa symbol',
+      'string.pattern.base': 'Password minimal 8 karakter, menggunakan min. 1 huruf kecil, 1 huruf kapital dan tanpa symbol',
     })
     .required(),
   password_confirmation: joi.ref('password'),
