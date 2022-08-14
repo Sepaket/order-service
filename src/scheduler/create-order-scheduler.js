@@ -68,14 +68,14 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('* * * * *', async () => {
+const runner = cron.schedule('0 */1 * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('order scheduler run');
 
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false || null },
-      limit: 10,
+      limit: 100,
     });
 
     orders?.forEach((item, index) => {
