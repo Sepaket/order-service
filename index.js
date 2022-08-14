@@ -24,6 +24,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
   origin: [
     'http://localhost:4200',
+    'https://sepaket.co.id',
     'https://frontend.sepaket.co.id',
     'https://api.xendit.co/',
   ],
