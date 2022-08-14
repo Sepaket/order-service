@@ -62,19 +62,28 @@ const checkPrice = (payload) => new Promise((resolve) => {
   });
 });
 
-const createOrder = (payload) => new Promise(async (resolve, reject) => {
+const createOrder = (payload) => new Promise(async (resolve) => {
   axios.post(`${process.env.SICEPAT_BASE_URL_PICKUP}/partner/requestpickuppackage`, {
     auth_key: process.env.SICEPAT_APIKEY_PICKUP,
     ...payload,
   }).then((response) => {
     if (!response?.data?.datas) {
-      reject(new Error(`SICEPAT: ${response?.data?.error_message}`));
+      resolve({
+        status: false,
+        message: response?.data?.error_message,
+      });
       return;
     }
 
-    resolve(response?.data?.datas);
+    resolve({
+      status: true,
+      message: 'OK',
+    });
   }).catch((error) => {
-    reject(new Error(`SICEPAT: ${error?.message}`));
+    resolve({
+      status: false,
+      message: error?.data?.error_message || error?.message || 'Something Wrong',
+    });
   });
 });
 
