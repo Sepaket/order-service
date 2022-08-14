@@ -14,6 +14,7 @@ const DiscountRateController = require('../app/controllers/admin/discount-rate-c
 const TrackingController = require('../app/controllers/admin/order-tracking-controller');
 const BalanceController = require('../app/controllers/admin/balance-controller');
 const OrderController = require('../app/controllers/admin/order-controller');
+const DashboardController = require('../app/controllers/admin/dashboard-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -21,6 +22,13 @@ router.group('/auth', (route) => {
 
 router.group('/profile', (route) => {
   route.get('/me', Authorization, ProfileController.index);
+});
+
+router.group('/dashboard', (route) => {
+  route.get('/cod-total', Authorization, DashboardController.codTotal);
+  route.get('/delivered', Authorization, DashboardController.delivered);
+  route.get('/non-delivered', Authorization, DashboardController.nonDelivered);
+  route.get('/problem', Authorization, DashboardController.problem);
 });
 
 router.group('/seller', (route) => {
