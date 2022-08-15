@@ -1,3 +1,4 @@
+const moment = require('moment');
 const shortid = require('shortid-36');
 const jne = require('../../../../helpers/jne');
 const ninja = require('../../../../helpers/ninja');
@@ -62,9 +63,12 @@ module.exports = class {
     try {
       const error = [];
       const result = [];
+      const querySuccess = [];
+      const queryrLogger = [];
       const { body } = this.request;
 
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
+      const locationIds = body.order_items.map((item) => item.receiver_location_id);
       const sellerId = await jwtSelector({ request: this.request });
       const trxFee = await this.fee.findOne();
 
@@ -86,6 +90,10 @@ module.exports = class {
         include: [{ model: this.location, as: 'location' }],
       });
 
+      const destinationLocation = await this.location.findAll({
+        where: { id: locationIds },
+      });
+
       if (!batchConditon) {
         batch = await batchCreator({
           dbTransaction,
@@ -102,8 +110,9 @@ module.exports = class {
           const { credit } = seller.sellerDetail;
           const resi = await resiMapper({ expedition: body.type });
           const origin = sellerLocation?.location;
-          const destination = await this.location.findOne({
-            where: { id: item.receiver_location_id },
+          const destination = destinationLocation?.find((location) => {
+            const locationId = locationIds.find((id) => id === location.id);
+            return location.id === locationId;
           });
 
           const shippingCharge = await shippingFee({
@@ -148,9 +157,10 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
-            await orderSuccessLogger({ ...parameter, type: body.type });
-            const order = await orderLogger({
+            querySuccess.push({ ...parameter, type: body.type });
+            queryrLogger.push({
               ...payload,
+              orderCode: `${shortid.generate()}${moment().format('mmss')}`,
               batchId: batch.id,
             });
 
@@ -158,7 +168,6 @@ module.exports = class {
               ...payload,
               totalAmount,
               insurance,
-              order,
             });
 
             result.push(resultResponse);
@@ -167,6 +176,11 @@ module.exports = class {
           return error?.shift();
         }),
       );
+
+      if (querySuccess?.length > 0) {
+        await orderSuccessLogger(querySuccess);
+        await orderLogger(queryrLogger);
+      }
 
       const filtered = response?.filter((item) => item);
       const orderResponse = {
@@ -236,10 +250,8 @@ module.exports = class {
   responseMapper(payload) {
     return {
       resi: payload.resi,
-      order_id: payload.order.id,
       order: {
-        order_code: payload.order.orderCode,
-        order_id: payload.order.id,
+        order_code: payload.orderCode,
         service: payload.type,
         service_code: payload.service_code,
         weight: payload.weight,
