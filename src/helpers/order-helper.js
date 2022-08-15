@@ -2,7 +2,6 @@ require('dotenv').config();
 const moment = require('moment');
 const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
-const randomNumber = require('random-number');
 const profitHandler = require('./profit-seller');
 const orderStatus = require('../constant/order-status');
 const tax = require('../constant/tax');
@@ -19,7 +18,7 @@ const {
   OrderDetail,
   OrderAddress,
   OrderFailed,
-  // SellerDetail,
+  SellerDetail,
   OrderDiscount,
   TransactionFee,
   OrderBackground,
@@ -58,8 +57,8 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
 const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
-    const { expedition } = params;
-    const sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}${randomNumber({ integer: true, max: 99999, min: 10000 })}`;
+    const { expedition, id } = params;
+    const sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}${moment().format('mmss')}${id.length > 1 ? id : `0${id}`}`;
     const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
     const jneResi = `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`;
     if (expedition === 'SICEPAT') resi = sicepatResi;
@@ -139,30 +138,26 @@ const orderQuery = async (payload) => {
 
 const orderQueryDetail = async (payload) => {
   const trxFee = await TransactionFee.findOne();
-  const mapped = Promise.all(
-    payload.map(async (item) => {
-      const calculateFee = await profitHandler(item);
+  const calculateFee = await profitHandler(payload);
 
-      return {
-        batchId: item.batchId,
-        sellerId: item.seller.id,
-        sellerAddressId: item.sellerLocation?.id,
-        weight: item.weight,
-        totalItem: item.goods_qty,
-        notes: item.notes,
-        goodsContent: item.goods_content,
-        goodsPrice: !item.is_cod ? item.goods_amount : 0.00,
-        codFee: item.is_cod ? item.cod_value : 0.00,
-        shippingCharge: item.shippingCharge,
-        useInsurance: item.is_insurance,
-        sellerReceivedAmount: calculateFee,
-        insuranceAmount: item?.insuranceSelected?.insuranceValue || 0,
-        isTrouble: false,
-        codFeeAdmin: trxFee?.codFee || 0,
-        codFeeAdminType: trxFee?.codFeeType || '',
-      };
-    }),
-  );
+  const mapped = payload.items.map((item, idx) => ({
+    batchId: item.batchId,
+    sellerId: item.seller.id,
+    sellerAddressId: item.sellerLocation?.id,
+    weight: item.weight,
+    totalItem: item.goods_qty,
+    notes: item.notes,
+    goodsContent: item.goods_content,
+    goodsPrice: !item.is_cod ? item.goods_amount : 0.00,
+    codFee: item.is_cod ? item.cod_value : 0.00,
+    shippingCharge: item.shippingCharge,
+    useInsurance: item.is_insurance,
+    sellerReceivedAmount: calculateFee[idx],
+    insuranceAmount: item?.insuranceSelected?.insuranceValue || 0,
+    isTrouble: false,
+    codFeeAdmin: trxFee?.codFee || 0,
+    codFeeAdminType: trxFee?.codFeeType || '',
+  }));
 
   return mapped;
 };
@@ -224,36 +219,25 @@ const orderQueryDiscount = async (payload) => {
   return mapped;
 };
 
-// const sellerDetailQuery = async (payload) => {
-//   const mapped = payload.map((item) => {
-//     const result = (
-//       parseFloat(item.seller.sellerDetail.credit) - parseFloat(item.goodsAmount)
-//     );
-//
-//     return {
-//       credit: result,
-//     };
-//   });
-//
-//   return mapped;
-// };
-
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
 
   try {
-    const queryOrder = await orderQuery(params);
+    const queryOrder = await orderQuery(params.items);
+
+    const seller = await SellerDetail.findOne({
+      where: { sellerId: params.sellerId },
+    });
 
     const orders = await Order.bulkCreate(
       queryOrder,
       { transaction: dbTransaction },
     );
 
-    const orderTaxQueries = await orderQueryTax(params);
+    const orderTaxQueries = await orderQueryTax(params.items);
     const orderDetailQueries = await orderQueryDetail(params);
-    const orderAddressQueries = await orderQueryAddress(params);
-    // const queriesSellerDetail = await sellerDetailQuery(params);
-    const orderDiscountQueries = await orderQueryDiscount(params);
+    const orderAddressQueries = await orderQueryAddress(params.items);
+    const orderDiscountQueries = await orderQueryDiscount(params.items);
     const orderDetail = orders?.map((item, idx) => ({
       orderId: item.id,
       ...orderDetailQueries[idx],
@@ -278,6 +262,12 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       orderId: item.id,
       previousStatus: orderStatus.WAITING_PICKUP.text,
     }));
+
+    let calculatedCredit = seller.credit;
+    params.items?.map((item) => {
+      if (item.is_cod) calculatedCredit -= item.goodsAmount;
+      return calculatedCredit;
+    });
 
     await OrderDetail.bulkCreate(
       orderDetail,
@@ -304,13 +294,11 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       { transaction: dbTransaction },
     );
 
-    // if (!params.is_cod) {
-    //   await SellerDetail.update(
-    //     { ...querySellerDetail },
-    //     { where: { sellerId: params.seller.id } },
-    //     { transaction: dbTransaction },
-    //   );
-    // }
+    await SellerDetail.update(
+      { credit: calculatedCredit },
+      { where: { sellerId: params.sellerId } },
+      { transaction: dbTransaction },
+    );
 
     await dbTransaction.commit();
     resolve(true);
