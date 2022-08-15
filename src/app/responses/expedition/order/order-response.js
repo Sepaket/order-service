@@ -94,6 +94,8 @@ module.exports = class {
         where: { id: locationIds },
       });
 
+      let calculatedCredit = seller.sellerDetail.credit;
+
       if (!batchConditon) {
         batch = await batchCreator({
           dbTransaction,
@@ -105,10 +107,9 @@ module.exports = class {
       }
 
       const response = await Promise.all(
-        body.order_items.map(async (item) => {
+        body.order_items.map(async (item, index) => {
           let parameter = null;
-          const { credit } = seller.sellerDetail;
-          const resi = await resiMapper({ expedition: body.type });
+          const resi = await resiMapper({ expedition: body.type, id: `${index}` });
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             const locationId = locationIds.find((id) => id === location.id);
@@ -126,10 +127,11 @@ module.exports = class {
           const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
           const goodsAmount = !item.is_cod
             ? item.goods_amount
-            : parseFloat(item.cod_value) - (parseFloat(shippingFee || 0) + codFee);
+            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
 
+          calculatedCredit -= goodsAmount;
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
+          const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
@@ -149,6 +151,7 @@ module.exports = class {
             ...body,
           };
 
+          const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
@@ -160,7 +163,7 @@ module.exports = class {
             querySuccess.push({ ...parameter, type: body.type });
             queryrLogger.push({
               ...payload,
-              orderCode: `${shortid.generate()}${moment().format('mmss')}`,
+              orderCode,
               batchId: batch.id,
             });
 
@@ -168,6 +171,7 @@ module.exports = class {
               ...payload,
               totalAmount,
               insurance,
+              orderCode,
             });
 
             result.push(resultResponse);
@@ -179,7 +183,10 @@ module.exports = class {
 
       if (querySuccess?.length > 0) {
         await orderSuccessLogger(querySuccess);
-        await orderLogger(queryrLogger);
+        await orderLogger({
+          items: queryrLogger,
+          sellerId: seller.id,
+        });
       }
 
       const filtered = response?.filter((item) => item);
