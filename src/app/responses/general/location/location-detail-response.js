@@ -28,9 +28,26 @@ module.exports = class {
           const mapped = {};
           result.forEach((item) => {
             const selectedId = body.ids.find((id) => id === item.id);
+            const undefinedId = body.ids.find((id) => id !== item.id);
+            if (!undefinedId) {
+              mapped[undefinedId] = {
+                id: '',
+                province: '',
+                city: '',
+                district: '',
+                sub_district: '',
+                postal_code: '',
+                jne_origin_code: '',
+                jne_destination_code: '',
+                sicepat_origin_code: '',
+                sicepat_destination_code: '',
+                ninja_origin_code: '',
+                ninja_destination_code: '',
+                idexpress_origin_code: '',
+                idexpress_destination_code: '',
+              };
+            }
             if (selectedId) mapped[selectedId] = item;
-
-            return result;
           });
 
           if (result.length > 0) {
