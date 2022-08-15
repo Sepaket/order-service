@@ -1,31 +1,26 @@
+const moment = require('moment');
 const { Sequelize } = require('sequelize');
 const { OrderDetail, sequelize } = require('../../../models');
 
 module.exports = class {
-  constructor() {
+  constructor({ request }) {
+    this.request = request;
+    this.op = Sequelize.Op;
     return this.process();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async process() {
     return new Promise((resolve, reject) => {
       try {
         const tempQuery = sequelize.dialect.queryGenerator.selectQuery('orders', {
           attributes: ['id'],
-          where: {
-            status: {
-              [Sequelize.Op.notIn]: ['CANCEL', 'RETURN_TO_SELLER'],
-            },
-            is_cod: {
-              [Sequelize.Op.eq]: true,
-            },
-          },
+          where: { ...this.query() },
         }).slice(0, -1);
 
         const totalBalance = OrderDetail.sum('cod_fee', {
           where: {
             order_id: {
-              [Sequelize.Op.in]: sequelize.literal(`(${tempQuery})`),
+              [this.op.in]: sequelize.literal(`(${tempQuery})`),
             },
           },
         });
@@ -39,5 +34,43 @@ module.exports = class {
         reject(error);
       }
     });
+  }
+
+  query() {
+    const { query } = this.request;
+    const condition = {
+      is_cod: { [this.op.eq]: true },
+    };
+
+    if (query.type === 'total-cod') {
+      condition.status = { [this.op.notIn]: ['CANCEL', 'RETURN_TO_SELLER'] };
+    }
+
+    if (query.type === 'delivered') {
+      condition.status = { [this.op.in]: ['DELIVERED'] };
+    }
+
+    if (query.type === 'non-delivered') {
+      condition.status = { [this.op.notIn]: ['DELIVERED', 'CANCELED', 'RETURN_TO_SELLER'] };
+    }
+
+    if (query.type === 'problem') {
+      condition.status = { [this.op.in]: ['PROBLEM'] };
+    }
+
+    if (query.expedition) {
+      condition.expedition = { [this.op.eq]: query.expedition };
+    }
+
+    if (query.start_date) {
+      condition.created_at = {
+        [this.op.between]: [
+          moment(query.start_date).tz('Asia/Jakarta').startOf('day').format(),
+          moment(query.end_date).endOf('day').format(),
+        ],
+      };
+    }
+
+    return condition;
   }
 };
