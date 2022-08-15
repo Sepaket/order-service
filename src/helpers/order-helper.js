@@ -19,7 +19,7 @@ const {
   OrderDetail,
   OrderAddress,
   OrderFailed,
-  SellerDetail,
+  // SellerDetail,
   OrderDiscount,
   TransactionFee,
   OrderBackground,
@@ -121,66 +121,79 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
   }
 });
 
-const orderQuery = async (payload) => ({
-  batchId: payload.batchId,
-  orderCode: shortid.generate(),
-  resi: payload.resi,
-  expedition: payload.type,
-  serviceCode: payload.service_code,
-  isCod: payload.is_cod || false,
-  orderDate: payload.pickup_date,
-  orderTime: payload.pickup_time,
-  status: orderStatus.WAITING_PICKUP.text,
-});
+const orderQuery = async (payload) => {
+  const mapped = payload?.map((item) => ({
+    batchId: item.batchId,
+    orderCode: item.orderCode,
+    resi: item.resi,
+    expedition: item.type,
+    serviceCode: item.service_code,
+    isCod: item.is_cod || false,
+    orderDate: item.pickup_date,
+    orderTime: item.pickup_time,
+    status: orderStatus.WAITING_PICKUP.text,
+  }));
 
-const orderQueryDetail = async (payload) => {
-  const calculateFee = await profitHandler(payload);
-  const trxFee = await TransactionFee.findOne();
-
-  return {
-    batchId: payload.batchId,
-    sellerId: payload.seller.id,
-    sellerAddressId: payload.sellerLocation?.id,
-    weight: payload.weight,
-    totalItem: payload.goods_qty,
-    notes: payload.notes,
-    goodsContent: payload.goods_content,
-    goodsPrice: !payload.is_cod ? payload.goods_amount : 0.00,
-    codFee: payload.is_cod ? payload.cod_value : 0.00,
-    shippingCharge: payload.shippingCharge,
-    useInsurance: payload.is_insurance,
-    sellerReceivedAmount: calculateFee,
-    insuranceAmount: payload?.insuranceSelected?.insuranceValue || 0,
-    isTrouble: false,
-    codFeeAdmin: trxFee?.codFee || 0,
-    codFeeAdminType: trxFee?.codFeeType || '',
-  };
+  return mapped;
 };
 
-const orderQueryAddress = async (payload) => ({
-  senderName: payload.sender_name,
-  senderPhone: payload.sender_phone,
-  receiverName: payload.receiver_name,
-  receiverPhone: payload.receiver_phone,
-  receiverAddress: payload.receiver_address,
-  receiverAddressNote: payload.receiver_address_note,
-  receiverLocationId: payload.receiver_location_id,
-});
+const orderQueryDetail = async (payload) => {
+  const trxFee = await TransactionFee.findOne();
+  const mapped = Promise.all(
+    payload.map(async (item) => {
+      const calculateFee = await profitHandler(item);
+
+      return {
+        batchId: item.batchId,
+        sellerId: item.seller.id,
+        sellerAddressId: item.sellerLocation?.id,
+        weight: item.weight,
+        totalItem: item.goods_qty,
+        notes: item.notes,
+        goodsContent: item.goods_content,
+        goodsPrice: !item.is_cod ? item.goods_amount : 0.00,
+        codFee: item.is_cod ? item.cod_value : 0.00,
+        shippingCharge: item.shippingCharge,
+        useInsurance: item.is_insurance,
+        sellerReceivedAmount: calculateFee,
+        insuranceAmount: item?.insuranceSelected?.insuranceValue || 0,
+        isTrouble: false,
+        codFeeAdmin: trxFee?.codFee || 0,
+        codFeeAdminType: trxFee?.codFeeType || '',
+      };
+    }),
+  );
+
+  return mapped;
+};
+
+const orderQueryAddress = async (payload) => {
+  const mapped = payload?.map((item) => ({
+    senderName: item.sender_name,
+    senderPhone: item.sender_phone,
+    receiverName: item.receiver_name,
+    receiverPhone: item.receiver_phone,
+    receiverAddress: item.receiver_address,
+    receiverAddressNote: item.receiver_address_note,
+    receiverLocationId: item.receiver_location_id,
+  }));
+
+  return mapped;
+};
 
 const orderQueryTax = async (payload) => {
   const { vat, vatType } = tax;
-
-  return {
-    taxAmount: (parseFloat(payload?.shippingCharge) * parseFloat(vat)) / 100,
+  const mapped = payload?.map((item) => ({
+    taxAmount: (parseFloat(item?.shippingCharge) * parseFloat(vat)) / 100,
     taxType: 'AMOUNT',
     vatTax: vat,
     vatType,
-  };
+  }));
+
+  return mapped;
 };
 
 const orderQueryDiscount = async (payload) => {
-  const sellerDiscount = payload.seller.sellerDetail.discount;
-  const sellerDiscountType = payload.seller.sellerDetail.discountType;
   const globalDiscount = await Discount.findOne({
     where: {
       [Sequelize.Op.or]: {
@@ -188,83 +201,119 @@ const orderQueryDiscount = async (payload) => {
           [Sequelize.Op.gte]: 0,
         },
         maximumOrder: {
-          [Sequelize.Op.lte]: payload.order_items.length,
+          [Sequelize.Op.lte]: payload.length,
         },
       },
     },
   });
 
-  return {
-    discountSeller: sellerDiscount || 0,
-    discountSellerType: sellerDiscountType || '',
-    discountProvider: 0,
-    discountProviderType: 'PERCENTAGE',
-    discountGlobal: globalDiscount?.value || 0,
-    discountGlobalType: globalDiscount?.type || '',
-  };
+  const mapped = payload?.map((item) => {
+    const sellerDiscount = item.seller.sellerDetail.discount;
+    const sellerDiscountType = item.seller.sellerDetail.discountType;
+
+    return {
+      discountSeller: sellerDiscount || 0,
+      discountSellerType: sellerDiscountType || '',
+      discountProvider: 0,
+      discountProviderType: 'PERCENTAGE',
+      discountGlobal: globalDiscount?.value || 0,
+      discountGlobalType: globalDiscount?.type || '',
+    };
+  });
+
+  return mapped;
 };
 
-const sellerDetailQuery = async (payload) => {
-  const result = (
-    parseFloat(payload.seller.sellerDetail.credit) - parseFloat(payload.goodsAmount)
-  );
-
-  return {
-    credit: result,
-  };
-};
+// const sellerDetailQuery = async (payload) => {
+//   const mapped = payload.map((item) => {
+//     const result = (
+//       parseFloat(item.seller.sellerDetail.credit) - parseFloat(item.goodsAmount)
+//     );
+//
+//     return {
+//       credit: result,
+//     };
+//   });
+//
+//   return mapped;
+// };
 
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
 
   try {
     const queryOrder = await orderQuery(params);
-    const orderTaxQuery = await orderQueryTax(params);
-    const orderDetailQuery = await orderQueryDetail(params);
-    const orderAddressQuery = await orderQueryAddress(params);
-    const querySellerDetail = await sellerDetailQuery(params);
-    const orderDiscountQuery = await orderQueryDiscount(params);
 
-    const order = await Order.create(
-      { ...queryOrder },
+    const orders = await Order.bulkCreate(
+      queryOrder,
       { transaction: dbTransaction },
     );
 
-    await OrderDetail.create(
-      { ...orderDetailQuery, orderId: order.id },
+    const orderTaxQueries = await orderQueryTax(params);
+    const orderDetailQueries = await orderQueryDetail(params);
+    const orderAddressQueries = await orderQueryAddress(params);
+    // const queriesSellerDetail = await sellerDetailQuery(params);
+    const orderDiscountQueries = await orderQueryDiscount(params);
+    const orderDetail = orders?.map((item, idx) => ({
+      orderId: item.id,
+      ...orderDetailQueries[idx],
+    }));
+
+    const orderTax = orders?.map((item, idx) => ({
+      orderId: item.id,
+      ...orderTaxQueries[idx],
+    }));
+
+    const orderAddress = orders?.map((item, idx) => ({
+      orderId: item.id,
+      ...orderAddressQueries[idx],
+    }));
+
+    const orderDiscount = orders?.map((item, idx) => ({
+      orderId: item.id,
+      ...orderDiscountQueries[idx],
+    }));
+
+    const orderLog = orders?.map((item) => ({
+      orderId: item.id,
+      previousStatus: orderStatus.WAITING_PICKUP.text,
+    }));
+
+    await OrderDetail.bulkCreate(
+      orderDetail,
       { transaction: dbTransaction },
     );
 
-    await OrderAddress.create(
-      { ...orderAddressQuery, orderId: order.id },
+    await OrderAddress.bulkCreate(
+      orderAddress,
       { transaction: dbTransaction },
     );
 
-    await OrderLog.create(
-      { previousStatus: orderStatus.WAITING_PICKUP.text, orderId: order.id },
+    await OrderLog.bulkCreate(
+      orderLog,
       { transaction: dbTransaction },
     );
 
-    await OrderTax.create(
-      { ...orderTaxQuery, orderId: order.id },
+    await OrderTax.bulkCreate(
+      orderTax,
       { transaction: dbTransaction },
     );
 
-    await OrderDiscount.create(
-      { ...orderDiscountQuery, orderId: order.id },
+    await OrderDiscount.bulkCreate(
+      orderDiscount,
       { transaction: dbTransaction },
     );
 
-    if (!params.is_cod) {
-      await SellerDetail.update(
-        { ...querySellerDetail },
-        { where: { sellerId: params.seller.id } },
-        { transaction: dbTransaction },
-      );
-    }
+    // if (!params.is_cod) {
+    //   await SellerDetail.update(
+    //     { ...querySellerDetail },
+    //     { where: { sellerId: params.seller.id } },
+    //     { transaction: dbTransaction },
+    //   );
+    // }
 
     await dbTransaction.commit();
-    resolve(order);
+    resolve(true);
   } catch (error) {
     await dbTransaction.rollback();
     reject(error);
@@ -273,18 +322,24 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 
 const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
-  const payload = { ...parameter };
-  delete payload.type;
 
   try {
-    await OrderBackground.create(
-      {
+    const queryMapped = parameter.map((item) => {
+      const payload = { ...item };
+      delete payload.type;
+
+      return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
-        expedition: parameter.type,
+        expedition: item.type,
         parameter: JSON.stringify(payload),
-      },
+      };
+    });
+
+    await OrderBackground.bulkCreate(
+      queryMapped,
       { transaction: dbTransaction },
     );
+
     await dbTransaction.commit();
     resolve(true);
   } catch (error) {
