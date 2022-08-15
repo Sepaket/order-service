@@ -67,6 +67,7 @@ module.exports = class {
 
         result.seller_detail.role = role.SELLER.text;
         result.seller_detail.is_login_socmed = !!(result.social_id !== 'NULL' && result.social_id);
+        result.seller_detail.credit = result.seller_detail.credit || 0;
 
         delete result.social_id;
 
