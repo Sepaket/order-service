@@ -68,7 +68,7 @@ module.exports = class {
         const { credit } = result.seller_detail;
         result.seller_detail.role = role.SELLER.text;
         result.seller_detail.is_login_socmed = !!(result.social_id !== 'NULL' && result.social_id);
-        result.seller_detail.credit = Number.isNaN(credit) ? 0 : credit;
+        result.seller_detail.credit = Number.isNaN(parseFloat(credit)) ? 0 : credit;
 
         delete result.social_id;
 
