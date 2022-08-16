@@ -17,7 +17,11 @@ module.exports = class {
           where: { ...this.query() },
         }).slice(0, -1);
 
-        const totalBalance = OrderDetail.sum('cod_fee', {
+        const result = OrderDetail.findOne({
+          attributes: [
+            [sequelize.fn('sum', sequelize.col('cod_fee')), 'total_cod'],
+            [sequelize.fn('count', sequelize.col('id')), 'count_cod'],
+          ],
           where: {
             order_id: {
               [this.op.in]: sequelize.literal(`(${tempQuery})`),
@@ -25,8 +29,8 @@ module.exports = class {
           },
         });
 
-        if (totalBalance) {
-          resolve(totalBalance);
+        if (result) {
+          resolve(result);
         }
 
         resolve(0);
