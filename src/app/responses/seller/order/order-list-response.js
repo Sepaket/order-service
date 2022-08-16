@@ -73,6 +73,7 @@ module.exports = class {
                 'isCod',
                 'status',
                 'updatedAt',
+                'createdAt',
               ],
             },
             {
