@@ -1,4 +1,5 @@
 const joi = require('joi');
+const { Sequelize } = require('sequelize');
 const { SellerAddress, Location } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
@@ -24,7 +25,9 @@ const isNameUnique = async ({ params }) => new Promise(async (resolve, reject) =
     where: {
       name: params,
       sellerId: seller?.id,
-      id: request.params.id,
+      id: {
+        [Sequelize.Op.ne]: request.params.id,
+      },
     },
   }).then((result) => {
     if (result) reject(new Error('The name already exists.'));
