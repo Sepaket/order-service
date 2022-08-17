@@ -20,7 +20,6 @@ const {
   OrderFailed,
   SellerDetail,
   OrderDiscount,
-  TransactionFee,
   OrderBackground,
 } = require('../app/models');
 
@@ -137,7 +136,6 @@ const orderQuery = async (payload) => {
 };
 
 const orderQueryDetail = async (payload) => {
-  const trxFee = await TransactionFee.findOne();
   const calculateFee = await profitHandler(payload);
 
   const mapped = payload.items.map((item, idx) => ({
@@ -155,8 +153,8 @@ const orderQueryDetail = async (payload) => {
     sellerReceivedAmount: calculateFee[idx],
     insuranceAmount: item.is_insurance ? item?.insuranceSelected || 0 : 0,
     isTrouble: false,
-    codFeeAdmin: trxFee?.codFee || 0,
-    codFeeAdminType: trxFee?.codFeeType || '',
+    codFeeAdmin: item.codFeeAdmin || 0,
+    codFeeAdminType: '',
   }));
 
   return mapped;

@@ -224,6 +224,7 @@ module.exports = class {
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
           const payload = {
+            codFeeAdmin: codValueCalculated,
             shippingCalculated,
             insuranceSelected,
             creditCondition,
