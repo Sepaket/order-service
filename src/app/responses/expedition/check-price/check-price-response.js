@@ -196,6 +196,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'JNE',
           discount: discountApplied,
+          discount_raw: this.selectedDiscount,
           tax: taxCalculated,
         };
       }) || [];
@@ -252,6 +253,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.tariff, 'Rp.'),
           type: 'SICEPAT',
           discount: discountApplied,
+          discount_raw: this.selectedDiscount,
           tax: taxCalculated,
         };
       }) || [];
@@ -301,6 +303,7 @@ module.exports = class {
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
         discount: discountApplied,
+        discount_raw: this.selectedDiscount,
         tax: taxCalculated,
       }] : [];
     } catch (error) {
@@ -361,6 +364,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'IDEXPRESS',
           discount: discountApplied,
+          discount_raw: this.selectedDiscount,
           tax: taxCalculated,
         };
       }) || [];
