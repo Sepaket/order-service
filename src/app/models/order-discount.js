@@ -10,30 +10,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    discountSeller: {
+    value: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
-    },
-    discountSellerType: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    discountProvider: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    discountProviderType: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    discountGlobal: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    discountGlobalType: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: 'this discount get from admin when admin set discount fee',
     },
     createdAt: {
       type: DataTypes.DATE,

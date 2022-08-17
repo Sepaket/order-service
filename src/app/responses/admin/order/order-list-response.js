@@ -161,7 +161,7 @@ module.exports = class {
       };
     }
 
-    if (query?.status && query?.date_start && query?.date_end) {
+    if (query?.status) {
       condition = {
         ...condition,
         [this.op.and]: {
