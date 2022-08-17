@@ -176,9 +176,9 @@ module.exports = class {
         let totalCalculatedCod = item.price;
         let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
-        let codCalculated = this.selectedFee.codFee;
-        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
-          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        let codCalculated = this.selectedFee?.codFee || 0;
+        if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.price)) / 100;
         }
 
         if (this.selectedVat.type === 'PERCENTAGE') {
@@ -249,9 +249,9 @@ module.exports = class {
         let totalCalculatedCod = item.tariff;
         let totalCalculatedNcod = item.tariff;
         let vatCalculated = this.selectedVat.value;
-        let codCalculated = this.selectedFee.codFee;
-        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
-          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.tariff)) / 100;
+        let codCalculated = this.selectedFee?.codFee || 0;
+        if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.tariff)) / 100;
         }
 
         if (this.selectedVat.type === 'PERCENTAGE') {
@@ -316,9 +316,9 @@ module.exports = class {
       let totalCalculatedCod = price;
       let totalCalculatedNcod = price;
       let vatCalculated = this.selectedVat.value;
-      let codCalculated = this.selectedFee.codFee;
-      if (this.selectedFee.codFeeType === 'PERCENTAGE') {
-        codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(price)) / 100;
+      let codCalculated = this.selectedFee?.codFee || 0;
+      if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
+        codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(price)) / 100;
       }
 
       if (this.selectedVat.type === 'PERCENTAGE') {
@@ -392,9 +392,9 @@ module.exports = class {
         let totalCalculatedCod = item.price;
         let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
-        let codCalculated = this.selectedFee.codFee;
-        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
-          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        let codCalculated = this.selectedFee?.codFee || 0;
+        if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.price)) / 100;
         }
 
         if (this.selectedVat.type === 'PERCENTAGE') {
