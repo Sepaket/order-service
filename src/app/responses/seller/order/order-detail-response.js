@@ -159,27 +159,6 @@ module.exports = class {
             JSON.parse(JSON.stringify(orderLogs)),
           );
 
-          let vatCalculated = tax.vat;
-          let feeCalculated = result.cod_fee_admin;
-          if (result.cod_fee_admin_type === 'PERCENTAGE') {
-            feeCalculated = (
-              parseFloat(result.cod_fee_admin) * parseFloat(result.shipping_charge)
-            ) / 100;
-          }
-
-          if (tax.vatType === 'PERCENTAGE') {
-            vatCalculated = (
-              parseFloat(result.shipping_charge) * parseFloat(tax.vat)
-            ) / 100;
-          }
-
-          const taxCalculated = parseFloat(feeCalculated) + parseFloat(vatCalculated);
-
-          result.cod_fee_admin = taxCalculated;
-
-          delete result.cod_fee_admin_type;
-          delete result?.cod_fee;
-
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
         });
