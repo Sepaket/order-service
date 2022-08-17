@@ -246,8 +246,8 @@ module.exports = class {
           ) / 100;
         }
 
-        let totalCalculatedCod = item.price;
-        let totalCalculatedNcod = item.price;
+        let totalCalculatedCod = item.tariff;
+        let totalCalculatedNcod = item.tariff;
         let vatCalculated = this.selectedVat.value;
         let codCalculated = this.selectedFee.codFee;
         if (this.selectedFee.codFeeType === 'PERCENTAGE') {
