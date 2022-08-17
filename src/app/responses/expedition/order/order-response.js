@@ -124,6 +124,13 @@ module.exports = class {
             serviceCode: body.service_code,
           });
 
+          let insuranceSelected = insurance?.insuranceValue || 0;
+          if (insurance?.insuranceValueType === 'PERCENTAGE') {
+            insuranceSelected = (
+              parseFloat(insurance?.insuranceValue) * parseFloat(shippingCharge)
+            ) / 100;
+          }
+
           const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
           const goodsAmount = !item.is_cod
             ? item.goods_amount
@@ -137,13 +144,13 @@ module.exports = class {
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
           const payload = {
+            insuranceSelected,
             creditCondition,
             sellerLocation,
             shippingCharge,
             codCondition,
             goodsAmount,
             destination,
-            insurance,
             origin,
             seller,
             resi,
