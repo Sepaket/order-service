@@ -8,9 +8,7 @@ module.exports = async (req, res, next) => {
   if (!authorizationHeader?.toLowerCase()?.startsWith('bearer ')) {
     return next(httpErrors.Unauthorized('Missing or wrong Authorization request header'));
   }
-  const token = authorizationHeader
-    .replace(/bearer/gi, '')
-    .replace(/ /g, '');
+  const token = authorizationHeader?.replace(/bearer/gi, '')?.replace(/ /g, '') || '';
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');

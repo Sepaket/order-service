@@ -128,8 +128,13 @@ module.exports = class {
 
   async discountCalculate() {
     try {
-      const selectedId = await jwtSelector({ request: this.request });
-      const seller = await this.seller.findOne({ where: { id: selectedId.id } });
+      let seller = null;
+      const authorizationHeader = this.request.headers.authorization;
+      if (authorizationHeader?.toLowerCase()?.startsWith('bearer ')) {
+        const selectedId = await jwtSelector({ request: this.request });
+        seller = await this.seller.findOne({ where: { id: selectedId?.id } });
+      }
+
       const discount = await this.discount.findOne({ order: [['id', 'ASC']] });
       const selectedDiscount = seller?.discount > 0
         ? {
