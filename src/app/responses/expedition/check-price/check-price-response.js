@@ -162,7 +162,7 @@ module.exports = class {
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
         const codCondition = (
-          body.service_code <= 'REG19'
+          item.service_code <= 'REG19'
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
         );
 
