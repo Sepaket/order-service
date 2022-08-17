@@ -173,6 +173,8 @@ module.exports = class {
           ) / 100;
         }
 
+        let totalCalculatedCod = item.price;
+        let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
         let codCalculated = this.selectedFee.codFee;
         if (this.selectedFee.codFeeType === 'PERCENTAGE') {
@@ -184,6 +186,18 @@ module.exports = class {
         }
 
         const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
+        if (codCondition) {
+          totalCalculatedCod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(taxCalculated)
+          ) - parseFloat(discountApplied);
+        }
+
+        if (!codCondition) {
+          totalCalculatedNcod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
+          ) - parseFloat(discountApplied);
+        }
 
         return {
           weight: body.weight,
@@ -198,6 +212,8 @@ module.exports = class {
           discount: discountApplied,
           discount_raw: this.selectedDiscount,
           tax: taxCalculated,
+          total_cod: totalCalculatedCod,
+          total_non_cod: totalCalculatedNcod,
         };
       }) || [];
 
@@ -230,6 +246,8 @@ module.exports = class {
           ) / 100;
         }
 
+        let totalCalculatedCod = item.price;
+        let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
         let codCalculated = this.selectedFee.codFee;
         if (this.selectedFee.codFeeType === 'PERCENTAGE') {
@@ -241,6 +259,18 @@ module.exports = class {
         }
 
         const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
+        if (codCondition) {
+          totalCalculatedCod = (
+            (parseFloat(item.tariff) * body.weight) + parseFloat(taxCalculated)
+          ) - parseFloat(discountApplied);
+        }
+
+        if (!codCondition) {
+          totalCalculatedNcod = (
+            (parseFloat(item.tariff) * body.weight) + parseFloat(vatCalculated)
+          ) - parseFloat(discountApplied);
+        }
 
         return {
           weight: body.weight,
@@ -255,6 +285,8 @@ module.exports = class {
           discount: discountApplied,
           discount_raw: this.selectedDiscount,
           tax: taxCalculated,
+          total_cod: totalCalculatedCod,
+          total_non_cod: totalCalculatedNcod,
         };
       }) || [];
 
@@ -281,6 +313,8 @@ module.exports = class {
         ) / 100;
       }
 
+      let totalCalculatedCod = price;
+      let totalCalculatedNcod = price;
       let vatCalculated = this.selectedVat.value;
       let codCalculated = this.selectedFee.codFee;
       if (this.selectedFee.codFeeType === 'PERCENTAGE') {
@@ -291,7 +325,18 @@ module.exports = class {
         vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(price)) / 100;
       }
 
+      const service = 'Standard';
       const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
+      if (service === 'Standard') {
+        totalCalculatedCod = (
+          (parseFloat(price) * body.weight) + parseFloat(taxCalculated)
+        ) - parseFloat(discountApplied);
+      } else {
+        totalCalculatedNcod = (
+          (parseFloat(price) * body.weight) + parseFloat(vatCalculated)
+        ) - parseFloat(discountApplied);
+      }
 
       return (price) ? [{
         price,
@@ -305,6 +350,8 @@ module.exports = class {
         discount: discountApplied,
         discount_raw: this.selectedDiscount,
         tax: taxCalculated,
+        total_cod: totalCalculatedCod,
+        total_non_cod: totalCalculatedNcod,
       }] : [];
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -342,6 +389,8 @@ module.exports = class {
           ) / 100;
         }
 
+        let totalCalculatedCod = item.price;
+        let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
         let codCalculated = this.selectedFee.codFee;
         if (this.selectedFee.codFeeType === 'PERCENTAGE') {
@@ -352,7 +401,20 @@ module.exports = class {
           vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
         }
 
+        const isCod = true;
         const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
+        if (isCod) {
+          totalCalculatedCod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(taxCalculated)
+          ) - parseFloat(discountApplied);
+        }
+
+        if (isCod) {
+          totalCalculatedNcod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
+          ) - parseFloat(discountApplied);
+        }
 
         return {
           weight: body.weight,
@@ -366,6 +428,8 @@ module.exports = class {
           discount: discountApplied,
           discount_raw: this.selectedDiscount,
           tax: taxCalculated,
+          total_cod: totalCalculatedCod,
+          total_non_cod: totalCalculatedNcod,
         };
       }) || [];
 
