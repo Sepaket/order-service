@@ -11,6 +11,7 @@ const AddressController = require('../app/controllers/seller/address-controller'
 const OrderController = require('../app/controllers/seller/order-controller');
 const ReportController = require('../app/controllers/seller/report-controller');
 const PaymentController = require('../app/controllers/seller/payment-controller');
+const DashboardController = require('../app/controllers/seller/dashboard-controller');
 
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
@@ -19,6 +20,11 @@ router.group('/auth', (route) => {
   route.get('/activate/:token', AuthController.activateEmail);
   route.post('/forgot-password', AuthController.forgotPassword);
   route.post('/reset-password', AuthController.resetPassword);
+});
+
+router.group('/dashboard', (route) => {
+  route.get('/cod-total', Authorization, DashboardController.codTotal);
+  route.get('/current-discount', Authorization, DashboardController.currentDiscount);
 });
 
 router.group('/profile', (route) => {
