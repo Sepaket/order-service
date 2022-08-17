@@ -43,8 +43,8 @@ module.exports = class {
           ['id', 'discount_id'],
           'value',
           'type',
-          'maximum_order',
-          'minimum_order',
+          'maximumOrder',
+          'minimumOrder',
         ],
       });
 
@@ -57,7 +57,10 @@ module.exports = class {
           maximum_order: null,
         }] : discounts?.map((item) => ({
           specific_seller: false,
-          ...item,
+          type: item.type,
+          value: item.value,
+          minimum_order: item.minimumOrder,
+          maximum_order: item.maximumOrder,
         }));
 
       return {
