@@ -1,22 +1,30 @@
 // const httpErrors = require('http-errors');
 const jne = require('../../../../helpers/jne');
+const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const sicepat = require('../../../../helpers/sicepat');
 const idexpress = require('../../../../helpers/idexpress');
 const { idxServiceStatus } = require('../../../../constant/status');
 const jwtSelector = require('../../../../helpers/jwt-selector');
-const { Location, Discount, SellerDetail } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
+const {
+  Location,
+  Discount,
+  SellerDetail,
+  TransactionFee,
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
+    this.tax = tax;
     this.ninja = ninja;
     this.request = request;
     this.sicepat = sicepat;
     this.location = Location;
     this.discount = Discount;
+    this.fee = TransactionFee;
     this.seller = SellerDetail;
     this.idexpress = idexpress;
     this.converter = snakeCaseConverter;
@@ -28,6 +36,8 @@ module.exports = class {
       try {
         let result = [];
         const { body } = this.request;
+        this.selectedFee = await this.fee.findOne();
+        this.selectedVat = { type: this.tax.vatType, value: this.tax.vat };
         this.origin = await this.location.findOne({ where: { id: body.origin } });
         this.destination = await this.location.findOne({ where: { id: body.destination } });
         this.selectedDiscount = await this.discountCalculate();
@@ -158,6 +168,18 @@ module.exports = class {
           ) / 100;
         }
 
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           serviceName: item.service_display,
@@ -169,6 +191,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'JNE',
           discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
@@ -201,6 +224,18 @@ module.exports = class {
           ) / 100;
         }
 
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.tariff)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.tariff)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           serviceName: `Sicepat ${item.service}`,
@@ -212,6 +247,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.tariff, 'Rp.'),
           type: 'SICEPAT',
           discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
@@ -238,6 +274,18 @@ module.exports = class {
         ) / 100;
       }
 
+      let vatCalculated = this.selectedVat.value;
+      let codCalculated = this.selectedFee.codFee;
+      if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+        codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(price)) / 100;
+      }
+
+      if (this.selectedVat.type === 'PERCENTAGE') {
+        vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(price)) / 100;
+      }
+
+      const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
       return (price) ? [{
         price,
         serviceName: 'Ninja Reguler',
@@ -248,6 +296,7 @@ module.exports = class {
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
         discount: discountApplied,
+        tax: taxCalculated,
       }] : [];
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -285,6 +334,18 @@ module.exports = class {
           ) / 100;
         }
 
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           price: item.price,
@@ -295,6 +356,7 @@ module.exports = class {
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'IDEXPRESS',
           discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
