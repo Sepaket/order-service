@@ -1,3 +1,4 @@
+const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
@@ -154,12 +155,31 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
-    const condition = {
-      [this.op.or]: {
-        resi: { [this.op.substring]: query.keyword?.toUpperCase() },
-      },
-    };
+    let condition = {};
 
-    return query.keyword ? condition : {};
+    if (query?.keyword) {
+      condition = {
+        [this.op.or]: {
+          resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+        },
+      };
+    }
+
+    if (query?.status && query?.date_start && query?.date_end) {
+      condition = {
+        ...condition,
+        [this.op.and]: {
+          status: query.status,
+          createdAt: {
+            [this.op.between]: [
+              moment(`${query?.date_start}`).startOf('day').format(),
+              moment(`${query?.date_end}`).endOf('day').format(),
+            ],
+          },
+        },
+      };
+    }
+
+    return condition;
   }
 };
