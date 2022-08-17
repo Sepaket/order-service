@@ -1,7 +1,6 @@
 require('dotenv').config();
 const moment = require('moment');
 const shortid = require('shortid-36');
-const { Sequelize } = require('sequelize');
 const profitHandler = require('./profit-seller');
 const orderStatus = require('../constant/order-status');
 const tax = require('../constant/tax');
@@ -12,7 +11,6 @@ const {
   Order,
   OrderTax,
   OrderLog,
-  Discount,
   sequelize,
   OrderBatch,
   OrderDetail,
@@ -187,32 +185,9 @@ const orderQueryTax = async (payload) => {
 };
 
 const orderQueryDiscount = async (payload) => {
-  const globalDiscount = await Discount.findOne({
-    where: {
-      [Sequelize.Op.or]: {
-        minimumOrder: {
-          [Sequelize.Op.gte]: 0,
-        },
-        maximumOrder: {
-          [Sequelize.Op.lte]: payload.length,
-        },
-      },
-    },
-  });
-
-  const mapped = payload?.map((item) => {
-    const sellerDiscount = item.seller.sellerDetail.discount;
-    const sellerDiscountType = item.seller.sellerDetail.discountType;
-
-    return {
-      discountSeller: sellerDiscount || 0,
-      discountSellerType: sellerDiscountType || '',
-      discountProvider: 0,
-      discountProviderType: 'PERCENTAGE',
-      discountGlobal: globalDiscount?.value || 0,
-      discountGlobalType: globalDiscount?.type || '',
-    };
-  });
+  const mapped = payload?.map((item) => ({
+    value: item.discuontSelected || 0,
+  }));
 
   return mapped;
 };

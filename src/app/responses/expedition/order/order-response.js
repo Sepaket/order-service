@@ -126,7 +126,7 @@ module.exports = class {
       if (globalDiscount) {
         selectedDiscount = {
           value: globalDiscount?.value || 0,
-          type: globalDiscount.type || '',
+          type: globalDiscount?.type || '',
         };
       }
 
@@ -162,16 +162,17 @@ module.exports = class {
 
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
-          let codFeeCalculated = trxFee.codFee;
+          let codFeeCalculated = trxFee?.codFee || 0;
+          let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
 
           let shippingWithDiscount = parseFloat(shippingCharge)
-            + parseFloat(selectedDiscount.value);
+            + parseFloat(selectedDiscount?.value || 0);
 
-          if (trxFee.codFeeType === 'PERCENTAGE' && item.is_cod) {
+          if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
             codFeeCalculated = (
-              parseFloat(item.cod_value) * parseFloat(trxFee.codFee)
+              parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
             ) / 100;
           }
 
@@ -185,8 +186,8 @@ module.exports = class {
             codValueCalculated = codFeeCalculated + vatCalculated;
           }
 
-          if (selectedDiscount.type === 'PERCENTAGE') {
-            const discountAmount = (
+          if (selectedDiscount?.type === 'PERCENTAGE') {
+            discountAmount = (
               parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
             ) / 100;
 
@@ -225,6 +226,7 @@ module.exports = class {
 
           const payload = {
             codFeeAdmin: codValueCalculated,
+            discuontSelected: discountAmount,
             shippingCalculated,
             insuranceSelected,
             creditCondition,
