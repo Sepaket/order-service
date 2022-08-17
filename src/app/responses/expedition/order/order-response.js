@@ -1,6 +1,8 @@
 const moment = require('moment');
 const shortid = require('shortid-36');
+const { Sequelize } = require('sequelize');
 const jne = require('../../../../helpers/jne');
+const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const jneParameter = require('./order-parameter/jne');
 const sicepat = require('../../../../helpers/sicepat');
@@ -20,6 +22,7 @@ const {
 const {
   Seller,
   Location,
+  Discount,
   Insurance,
   sequelize,
   OrderBatch,
@@ -31,12 +34,15 @@ const {
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
+    this.tax = tax;
     this.ninja = ninja;
     this.seller = Seller;
+    this.op = Sequelize.Op;
     this.sicepat = sicepat;
     this.request = request;
     this.batch = OrderBatch;
     this.location = Location;
+    this.discount = Discount;
     this.fee = TransactionFee;
     this.insurance = Insurance;
     this.address = SellerAddress;
@@ -72,6 +78,7 @@ module.exports = class {
       const sellerId = await jwtSelector({ request: this.request });
       const trxFee = await this.fee.findOne();
 
+      let selectedDiscount = null;
       let batch = await this.batch.findOne({
         where: { id: body?.batch_id || 0, sellerId: sellerId.id },
       });
@@ -93,6 +100,35 @@ module.exports = class {
       const destinationLocation = await this.location.findAll({
         where: { id: locationIds },
       });
+
+      const sellerDiscount = seller.sellerDetail.discount;
+      const sellerDiscountType = seller.discountType;
+      const globalDiscount = await this.discount.findOne({
+        where: {
+          [this.op.or]: {
+            minimumOrder: {
+              [this.op.gte]: 0,
+            },
+            maximumOrder: {
+              [this.op.lte]: body.order_items.length,
+            },
+          },
+        },
+      });
+
+      if (sellerDiscount && sellerDiscount !== 0) {
+        selectedDiscount = {
+          value: sellerDiscount || 0,
+          type: sellerDiscountType || '',
+        };
+      }
+
+      if (globalDiscount) {
+        selectedDiscount = {
+          value: globalDiscount?.value || 0,
+          type: globalDiscount.type || '',
+        };
+      }
 
       let calculatedCredit = seller.sellerDetail.credit;
 
@@ -124,12 +160,56 @@ module.exports = class {
             serviceCode: body.service_code,
           });
 
-          let insuranceSelected = insurance?.insuranceValue || 0;
-          if (insurance?.insuranceValueType === 'PERCENTAGE') {
-            insuranceSelected = (
-              parseFloat(insurance?.insuranceValue) * parseFloat(shippingCharge)
+          let codValueCalculated = 0;
+          let vatCalculated = this.tax.vat;
+          let codFeeCalculated = trxFee.codFee;
+          let insuranceSelected = item.is_insurance
+            ? insurance?.insuranceValue || 0 : 0;
+
+          let shippingWithDiscount = parseFloat(shippingCharge)
+            + parseFloat(selectedDiscount.value);
+
+          if (trxFee.codFeeType === 'PERCENTAGE' && item.is_cod) {
+            codFeeCalculated = (
+              parseFloat(item.cod_value) * parseFloat(trxFee.codFee)
             ) / 100;
           }
+
+          if (this.tax.vatType === 'PERCENTAGE') {
+            vatCalculated = (
+              parseFloat(shippingCharge) * parseFloat(this.tax.vat)
+            ) / 100;
+          }
+
+          if (item.is_cod) {
+            codValueCalculated = codFeeCalculated + vatCalculated;
+          }
+
+          if (selectedDiscount.type === 'PERCENTAGE') {
+            const discountAmount = (
+              parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
+            ) / 100;
+
+            shippingWithDiscount = parseFloat(shippingCharge) - discountAmount;
+          }
+
+          if (item.is_insurance) {
+            if (insurance?.insuranceValueType === 'PERCENTAGE') {
+              if (item.is_cod) {
+                insuranceSelected = (
+                  parseFloat(insurance?.insuranceValue) * parseFloat(item.cod_value)
+                ) / 100;
+              } else {
+                insuranceSelected = (
+                  parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
+                ) / 100;
+              }
+            }
+          }
+
+          const shippingCalculated = parseFloat(shippingWithDiscount)
+          + parseFloat(codValueCalculated)
+          + parseFloat(insuranceSelected);
 
           const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
           const goodsAmount = !item.is_cod
@@ -144,6 +224,7 @@ module.exports = class {
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
           const payload = {
+            shippingCalculated,
             insuranceSelected,
             creditCondition,
             sellerLocation,

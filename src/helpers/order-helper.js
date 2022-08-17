@@ -150,7 +150,7 @@ const orderQueryDetail = async (payload) => {
     goodsContent: item.goods_content,
     goodsPrice: !item.is_cod ? item.goods_amount : 0.00,
     codFee: item.is_cod ? item.cod_value : 0.00,
-    shippingCharge: item.shippingCharge,
+    shippingCharge: item.shippingCalculated,
     useInsurance: item.is_insurance,
     sellerReceivedAmount: calculateFee[idx],
     insuranceAmount: item.is_insurance ? item?.insuranceSelected || 0 : 0,
