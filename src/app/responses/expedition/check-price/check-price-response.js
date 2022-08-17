@@ -1,20 +1,31 @@
 // const httpErrors = require('http-errors');
 const jne = require('../../../../helpers/jne');
-const { Location } = require('../../../models');
+const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const sicepat = require('../../../../helpers/sicepat');
 const idexpress = require('../../../../helpers/idexpress');
 const { idxServiceStatus } = require('../../../../constant/status');
+const jwtSelector = require('../../../../helpers/jwt-selector');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
+const {
+  Location,
+  Discount,
+  SellerDetail,
+  TransactionFee,
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
+    this.tax = tax;
     this.ninja = ninja;
     this.request = request;
     this.sicepat = sicepat;
     this.location = Location;
+    this.discount = Discount;
+    this.fee = TransactionFee;
+    this.seller = SellerDetail;
     this.idexpress = idexpress;
     this.converter = snakeCaseConverter;
     return this.process();
@@ -25,8 +36,11 @@ module.exports = class {
       try {
         let result = [];
         const { body } = this.request;
+        this.selectedFee = await this.fee.findOne();
+        this.selectedVat = { type: this.tax.vatType, value: this.tax.vat };
         this.origin = await this.location.findOne({ where: { id: body.origin } });
         this.destination = await this.location.findOne({ where: { id: body.destination } });
+        this.selectedDiscount = await this.discountCalculate();
         const serviceFee = await this.checkServiceFee();
 
         if (serviceFee.length > 0) {
@@ -112,6 +126,25 @@ module.exports = class {
     }
   }
 
+  async discountCalculate() {
+    try {
+      const selectedId = await jwtSelector({ request: this.request });
+      const seller = await this.seller.findOne({ where: { id: selectedId.id } });
+      const discount = await this.discount.findOne({ order: [['id', 'ASC']] });
+      const selectedDiscount = seller?.discount > 0
+        ? {
+          value: seller?.discount || 0,
+          type: seller?.discountType || '',
+        } : {
+          value: discount?.value || 0,
+          type: discount?.type || '',
+        };
+      return selectedDiscount;
+    } catch (error) {
+      throw new Error(error?.message || 'Something Wromh');
+    }
+  }
+
   async jneFee() {
     try {
       const { body } = this.request;
@@ -128,6 +161,25 @@ module.exports = class {
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
         );
 
+        let discountApplied = this.selectedDiscount.value;
+        if (this.selectedDiscount.type === 'PERCENTAGE') {
+          discountApplied = (
+            parseFloat(item.price) * parseFloat(this.selectedDiscount.value)
+          ) / 100;
+        }
+
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           serviceName: item.service_display,
@@ -138,6 +190,8 @@ module.exports = class {
           price: item.price,
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'JNE',
+          discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
@@ -163,6 +217,25 @@ module.exports = class {
           && parseFloat(body.goods_amount || 0) <= parseFloat(15000000)
         );
 
+        let discountApplied = this.selectedDiscount.value;
+        if (this.selectedDiscount.type === 'PERCENTAGE') {
+          discountApplied = (
+            parseFloat(item.tariff) * parseFloat(this.selectedDiscount.value)
+          ) / 100;
+        }
+
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.tariff)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.tariff)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           serviceName: `Sicepat ${item.service}`,
@@ -173,6 +246,8 @@ module.exports = class {
           price: item.tariff,
           priceFormatted: formatCurrency(item.tariff, 'Rp.'),
           type: 'SICEPAT',
+          discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
@@ -192,6 +267,25 @@ module.exports = class {
         service: 'Standard',
       });
 
+      let discountApplied = this.selectedDiscount.value;
+      if (this.selectedDiscount.type === 'PERCENTAGE') {
+        discountApplied = (
+          parseFloat(price) * parseFloat(this.selectedDiscount.value)
+        ) / 100;
+      }
+
+      let vatCalculated = this.selectedVat.value;
+      let codCalculated = this.selectedFee.codFee;
+      if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+        codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(price)) / 100;
+      }
+
+      if (this.selectedVat.type === 'PERCENTAGE') {
+        vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(price)) / 100;
+      }
+
+      const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
       return (price) ? [{
         price,
         serviceName: 'Ninja Reguler',
@@ -201,6 +295,8 @@ module.exports = class {
         estimationFormatted: '2 - 4 hari',
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
+        discount: discountApplied,
+        tax: taxCalculated,
       }] : [];
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -231,6 +327,25 @@ module.exports = class {
       const mapped = prices?.filter((item) => item.price)?.map((item) => {
         const rawEstimation = item.estimation.split(' hari');
 
+        let discountApplied = this.selectedDiscount.value;
+        if (this.selectedDiscount.type === 'PERCENTAGE') {
+          discountApplied = (
+            parseFloat(item.price) * parseFloat(this.selectedDiscount.value)
+          ) / 100;
+        }
+
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee.codFee;
+        if (this.selectedFee.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee.codFee) * parseFloat(item.price)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
         return {
           weight: body.weight,
           price: item.price,
@@ -240,6 +355,8 @@ module.exports = class {
           estimationFormatted: item.estimation,
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'IDEXPRESS',
+          discount: discountApplied,
+          tax: taxCalculated,
         };
       }) || [];
 
