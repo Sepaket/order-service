@@ -19,11 +19,11 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.address.count();
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
     const seller = await jwtSelector({ request: this.request });
+    const total = await this.address.count({ where: { sellerId: seller.id } });
 
     return new Promise((resolve, reject) => {
       try {
