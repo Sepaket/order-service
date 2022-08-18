@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const sicepat = require('../../../../helpers/sicepat');
 const { Order, OrderLog, sequelize } = require('../../../models');
 const orderStatus = require('../../../../constant/order-status');
@@ -6,6 +7,7 @@ module.exports = class {
   constructor({ request }) {
     this.sicepat = sicepat;
     this.request = request;
+    this.op = Sequelize.Op;
     this.order = Order;
     this.orderLog = OrderLog;
     return this.process();
@@ -14,11 +16,19 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        const { body } = this.request;
-        const canceled = await this.sicepat.cancel({ resi: body.resi });
+        // const { body } = this.request;
+        // const orders = await this.order.findAll({
+        //   where: { resi: body.resi },
+        // });
 
-        if (canceled?.status === '200') await this.insertLog();
-
+        // Promise.all(
+        //   orders.map(async (item) => {
+        //     const canceled = await this.sicepat.cancel({ resi: item.resi });
+        //     if (canceled?.status === '200') await this.insertLog();
+        //     else reject(canceled);
+        //   }),
+        // );
+        await this.insertLog();
         resolve(true);
       } catch (error) {
         reject(error);
