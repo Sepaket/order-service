@@ -74,7 +74,7 @@ const runner = cron.schedule('0 */1 * * *', async () => {
 
   try {
     const orders = await OrderBackground.findAll({
-      where: { isExecute: false || null },
+      where: { isExecute: false },
       limit: 100,
     });
 
