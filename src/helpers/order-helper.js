@@ -56,7 +56,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
     const { expedition, currentResi, id } = params;
-    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${await random({ min: 10000, max: 99999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
+    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${await random({ min: 100000, max: 999999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
     const jneResi = `${process.env.JNE_ORDER_PREFIX}${await random({ min: 10000, max: 99999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
     const currentResiString = currentResi.toString();
