@@ -1,5 +1,8 @@
+const moment = require('moment');
 const shortid = require('shortid-36');
+const { Sequelize } = require('sequelize');
 const jne = require('../../../../helpers/jne');
+const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const jneParameter = require('./order-parameter/jne');
 const sicepat = require('../../../../helpers/sicepat');
@@ -17,8 +20,10 @@ const {
   orderFailedLogger,
 } = require('../../../../helpers/order-helper');
 const {
+  Order,
   Seller,
   Location,
+  Discount,
   Insurance,
   sequelize,
   OrderBatch,
@@ -30,12 +35,16 @@ const {
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
+    this.tax = tax;
+    this.order = Order;
     this.ninja = ninja;
     this.seller = Seller;
+    this.op = Sequelize.Op;
     this.sicepat = sicepat;
     this.request = request;
     this.batch = OrderBatch;
     this.location = Location;
+    this.discount = Discount;
     this.fee = TransactionFee;
     this.insurance = Insurance;
     this.address = SellerAddress;
@@ -62,14 +71,23 @@ module.exports = class {
     try {
       const error = [];
       const result = [];
+      const querySuccess = [];
+      const queryrLogger = [];
       const { body } = this.request;
 
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
+      const locationIds = body.order_items.map((item) => item.receiver_location_id);
       const sellerId = await jwtSelector({ request: this.request });
       const trxFee = await this.fee.findOne();
 
+      let selectedDiscount = null;
       let batch = await this.batch.findOne({
         where: { id: body?.batch_id || 0, sellerId: sellerId.id },
+      });
+
+      const order = await this.order.findOne({
+        where: { expedition: 'SICEPAT' },
+        order: [['resi', 'DESC']],
       });
 
       const insurance = await this.insurance.findOne({
@@ -86,6 +104,41 @@ module.exports = class {
         include: [{ model: this.location, as: 'location' }],
       });
 
+      const destinationLocation = await this.location.findAll({
+        where: { id: locationIds },
+      });
+
+      const sellerDiscount = seller.sellerDetail.discount;
+      const sellerDiscountType = seller.discountType;
+      const globalDiscount = await this.discount.findOne({
+        where: {
+          [this.op.or]: {
+            minimumOrder: {
+              [this.op.gte]: 0,
+            },
+            maximumOrder: {
+              [this.op.lte]: body.order_items.length,
+            },
+          },
+        },
+      });
+
+      if (sellerDiscount && sellerDiscount !== 0) {
+        selectedDiscount = {
+          value: sellerDiscount || 0,
+          type: sellerDiscountType || '',
+        };
+      }
+
+      if (globalDiscount) {
+        selectedDiscount = {
+          value: globalDiscount?.value || 0,
+          type: globalDiscount?.type || '',
+        };
+      }
+
+      let calculatedCredit = seller.sellerDetail.credit;
+
       if (!batchConditon) {
         batch = await batchCreator({
           dbTransaction,
@@ -96,14 +149,19 @@ module.exports = class {
         });
       }
 
+      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '000000';
+      let sicepatResi = parseInt(currentResi, 10);
+
       const response = await Promise.all(
-        body.order_items.map(async (item) => {
+        body.order_items.map(async (item, index) => {
           let parameter = null;
-          const { credit } = seller.sellerDetail;
-          const resi = await resiMapper({ expedition: body.type });
+          sicepatResi += 1;
+          const resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+
           const origin = sellerLocation?.location;
-          const destination = await this.location.findOne({
-            where: { id: item.receiver_location_id },
+          const destination = destinationLocation?.find((location) => {
+            const locationId = locationIds.find((id) => id === location.id);
+            return location.id === locationId;
           });
 
           const shippingCharge = await shippingFee({
@@ -114,25 +172,81 @@ module.exports = class {
             serviceCode: body.service_code,
           });
 
+          let codValueCalculated = 0;
+          let vatCalculated = this.tax.vat;
+          let codFeeCalculated = trxFee?.codFee || 0;
+          let discountAmount = selectedDiscount?.value || 0;
+          let insuranceSelected = item.is_insurance
+            ? insurance?.insuranceValue || 0 : 0;
+
+          let shippingWithDiscount = parseFloat(shippingCharge)
+            + parseFloat(selectedDiscount?.value || 0);
+
+          if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
+            codFeeCalculated = (
+              parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
+            ) / 100;
+          }
+
+          if (this.tax.vatType === 'PERCENTAGE') {
+            vatCalculated = (
+              parseFloat(shippingCharge) * parseFloat(this.tax.vat)
+            ) / 100;
+          }
+
+          if (item.is_cod) {
+            codValueCalculated = codFeeCalculated + vatCalculated;
+          }
+
+          if (selectedDiscount?.type === 'PERCENTAGE') {
+            discountAmount = (
+              parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
+            ) / 100;
+
+            shippingWithDiscount = parseFloat(shippingCharge) - discountAmount;
+          }
+
+          if (item.is_insurance) {
+            if (insurance?.insuranceValueType === 'PERCENTAGE') {
+              if (item.is_cod) {
+                insuranceSelected = (
+                  parseFloat(insurance?.insuranceValue) * parseFloat(item.cod_value)
+                ) / 100;
+              } else {
+                insuranceSelected = (
+                  parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
+                ) / 100;
+              }
+            }
+          }
+
+          const shippingCalculated = parseFloat(shippingWithDiscount)
+          + parseFloat(codValueCalculated)
+          + parseFloat(insuranceSelected);
+
           const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
           const goodsAmount = !item.is_cod
             ? item.goods_amount
-            : parseFloat(item.cod_value) - (parseFloat(shippingFee || 0) + codFee);
+            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
 
+          calculatedCredit -= goodsAmount;
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          const creditCondition = (parseFloat(credit) >= parseFloat(goodsAmount));
+          const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
           const payload = {
+            codFeeAdmin: codValueCalculated,
+            discuontSelected: discountAmount,
+            shippingCalculated,
+            insuranceSelected,
             creditCondition,
             sellerLocation,
             shippingCharge,
             codCondition,
             goodsAmount,
             destination,
-            insurance,
             origin,
             seller,
             resi,
@@ -140,6 +254,7 @@ module.exports = class {
             ...body,
           };
 
+          const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
@@ -148,9 +263,10 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
-            await orderSuccessLogger({ ...parameter, type: body.type });
-            const order = await orderLogger({
+            querySuccess.push({ ...parameter, type: body.type });
+            queryrLogger.push({
               ...payload,
+              orderCode,
               batchId: batch.id,
             });
 
@@ -158,7 +274,7 @@ module.exports = class {
               ...payload,
               totalAmount,
               insurance,
-              order,
+              orderCode,
             });
 
             result.push(resultResponse);
@@ -167,6 +283,14 @@ module.exports = class {
           return error?.shift();
         }),
       );
+
+      if (querySuccess?.length > 0) {
+        await orderSuccessLogger(querySuccess);
+        await orderLogger({
+          items: queryrLogger,
+          sellerId: seller.id,
+        });
+      }
 
       const filtered = response?.filter((item) => item);
       const orderResponse = {
@@ -236,10 +360,8 @@ module.exports = class {
   responseMapper(payload) {
     return {
       resi: payload.resi,
-      order_id: payload.order.id,
       order: {
-        order_code: payload.order.orderCode,
-        order_id: payload.order.id,
+        order_code: payload.orderCode,
         service: payload.type,
         service_code: payload.service_code,
         weight: payload.weight,

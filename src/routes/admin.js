@@ -26,9 +26,6 @@ router.group('/profile', (route) => {
 
 router.group('/dashboard', (route) => {
   route.get('/cod-total', Authorization, DashboardController.codTotal);
-  route.get('/delivered', Authorization, DashboardController.delivered);
-  route.get('/non-delivered', Authorization, DashboardController.nonDelivered);
-  route.get('/problem', Authorization, DashboardController.problem);
 });
 
 router.group('/seller', (route) => {

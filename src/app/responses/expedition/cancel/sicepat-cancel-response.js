@@ -1,13 +1,21 @@
+const moment = require('moment');
+const shortid = require('shortid-36');
 const sicepat = require('../../../../helpers/sicepat');
-const { Order, OrderLog, sequelize } = require('../../../models');
 const orderStatus = require('../../../../constant/order-status');
+const {
+  Order,
+  OrderLog,
+  sequelize,
+  OrderCanceled,
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
+    this.order = Order;
     this.sicepat = sicepat;
     this.request = request;
-    this.order = Order;
     this.orderLog = OrderLog;
+    this.orderCanceled = OrderCanceled;
     return this.process();
   }
 
@@ -15,36 +23,68 @@ module.exports = class {
     return new Promise(async (resolve, reject) => {
       try {
         const { body } = this.request;
-        const canceled = await this.sicepat.cancel({ resi: body.resi });
+        this.orderIds = body.ids.map((item) => {
+          if (item.expedition === 'SICEPAT' && item.status !== orderStatus.CANCELED.text) return item.id;
+          return null;
+        }).filter((item) => item);
 
-        if (canceled?.status === '200') await this.insertLog();
+        if (this.orderIds.length < 1) {
+          resolve(null);
+          return;
+        }
 
-        resolve(true);
+        const orders = await this.order.findAll({
+          where: { id: this.orderIds, expedition: 'SICEPAT' },
+        });
+
+        const responseMap = orders.map((order) => ({
+          id: order.id,
+          resi: order.resi,
+          status: true,
+          message: 'OK',
+        }));
+
+        if (this.orderIds.length > 0) {
+          const payload = orders.map((item) => ({ resi: item.resi }));
+          await this.insertLog({ orders, payload });
+        }
+
+        resolve(responseMap);
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  async insertLog() {
-    const { body } = this.request;
+  async insertLog(params) {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const order = await this.order.findOne({ where: { resi: body.resi } });
+      const payloadLog = params.orders.map((item) => ({
+        previousStatus: item.status,
+        currentStatus: orderStatus.CANCELED.text,
+        orderId: item.id,
+      }));
+
+      const payloadCanceled = params.payload.map((item) => ({
+        id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        parameter: JSON.stringify(item),
+        expedition: 'SICEPAT',
+      }));
 
       await this.order.update(
         { status: orderStatus.CANCELED.text },
-        { where: { id: order.id } },
+        { where: { id: this.orderIds } },
         { transaction: dbTransaction },
       );
 
-      await this.orderLog.create(
-        {
-          previousStatus: order.status,
-          currentStatus: orderStatus.CANCELED.text,
-          orderId: order.id,
-        },
+      await this.orderLog.bulkCreate(
+        payloadLog,
+        { transaction: dbTransaction },
+      );
+
+      await this.orderCanceled.bulkCreate(
+        payloadCanceled,
         { transaction: dbTransaction },
       );
 

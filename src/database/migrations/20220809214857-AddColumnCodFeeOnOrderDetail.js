@@ -13,7 +13,7 @@ module.exports = {
   ]),
 
   down: async (queryInterface) => Promise.all([
-    queryInterface.removeColumn(table, 'cod_fee'),
-    queryInterface.removeColumn(table, 'cod_fee_type'),
+    queryInterface.removeColumn(table, 'cod_fee_admin'),
+    queryInterface.removeColumn(table, 'cod_fee_admin_type'),
   ]),
 };

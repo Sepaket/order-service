@@ -43,7 +43,7 @@ module.exports = class {
             'batchId',
             'weight',
             'volume',
-            'codFee',
+            'codFeeAdmin',
             'goodsPrice',
             'useInsurance',
             'insuranceAmount',
@@ -87,10 +87,7 @@ module.exports = class {
               required: true,
               attributes: [
                 ['id', 'discount_id'],
-                'discountSeller',
-                'discountSellerType',
-                'discountGlobal',
-                'discountGlobalType',
+                'value',
               ],
             },
             {
@@ -132,35 +129,16 @@ module.exports = class {
 
           const mapped = result?.map((item) => {
             const itemResponse = item;
-            const discountGlobal = item?.discount?.discountGlobalType === 'PERCENTAGE'
-              ? (parseFloat(item?.discount?.discountGlobal) / parseInt(100, 10))
-              : parseFloat(item?.discount?.discountGlobal);
-
-            const discountSeller = item?.discount?.discountSellerType === 'PERCENTAGE'
-              ? (parseFloat(item?.discount?.discountSeller) / parseInt(100, 10))
-              : parseFloat(item.discount?.discountSeller);
-
-            const discountValue = (parseInt(discountSeller, 10) !== 0)
-              ? {
-                value: discountGlobal,
-                type: item?.discount?.discountGlobalType,
-              } : {
-                value: discountSeller,
-                type: item?.discount?.discountSellerType,
-              };
-
-            const discountShipping = (discountValue.type === 'PERCENTAGE')
-              ? (parseFloat(item.shipping_charge) * parseFloat(discountValue.value)) / 100
-              : parseFloat(item.shipping_charge) - parseFloat(discountValue);
 
             itemResponse.order.goods_price = 0;
-            itemResponse.discount = {
-              shipping_discount: discountShipping,
-              discount_value: discountValue.value,
-              discount_type: discountValue.type,
-            };
+            // itemResponse.discount = {
+            //   // shipping_discount: discountShipping,
+            //   discount_value: item.discount.value,
+            //   // discount_type: discountValue.type,
+            // };
 
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
+            itemResponse.order.cod_fee = item.cod_fee_admin;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
             itemResponse.receiver_address = {
               ...this.converter.objectToSnakeCase(item?.receiver_address),
@@ -195,8 +173,8 @@ module.exports = class {
     const condition = {
       createdAt: {
         [this.op.between]: [
-          moment(`${body?.date_start} 23:59:59`).toISOString(),
-          moment(`${body?.date_end} 23:59:59`).toISOString(),
+          moment(`${body?.date_start}`).startOf('day').format(),
+          moment(`${body?.date_end}`).endOf('day').format(),
         ],
       },
     };

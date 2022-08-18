@@ -14,8 +14,5 @@ module.exports = {
     queryInterface.removeColumn(table, 'goods_price'),
   ]),
 
-  down: async (queryInterface) => Promise.all([
-    queryInterface.removeColumn(table, 'seller_received_amount'),
-    queryInterface.removeColumn(table, 'cod_fee'),
-  ]),
+  down: async () => Promise.all([]),
 };

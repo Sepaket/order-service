@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
-const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 
 // port load
@@ -27,11 +27,12 @@ const corsOptions = {
     'https://sepaket.co.id',
     'https://frontend.sepaket.co.id',
     'https://api.xendit.co/',
+    'http://localhost:4173', // For preview
   ],
 };
 
 trackingScheduler.start();
-createOrderScheduler.start();
+// createOrderScheduler.start();
 cleanerNinjaTokenScheduler.start();
 
 application.use(cors(corsOptions));

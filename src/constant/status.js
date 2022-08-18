@@ -84,10 +84,10 @@ const expeditionService = [
     name: 'Ninja',
     code: 'NINJA',
   },
-  {
-    name: 'IDexpress',
-    code: 'IDEXPRESS',
-  },
+  // {
+  //   name: 'IDexpress',
+  //   code: 'IDEXPRESS',
+  // },
 ];
 
 const paymentStatus = {

@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { Sequelize } = require('sequelize');
 const { OrderDetail, sequelize } = require('../../../models');
+const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
@@ -10,6 +11,7 @@ module.exports = class {
   }
 
   async process() {
+    const seller = await jwtSelector({ request: this.request });
     return new Promise((resolve, reject) => {
       try {
         const tempQuery = sequelize.dialect.queryGenerator.selectQuery('orders', {
@@ -23,6 +25,7 @@ module.exports = class {
             [sequelize.fn('count', sequelize.col('id')), 'count_cod'],
           ],
           where: {
+            seller_id: { [this.op.eq]: seller.id },
             order_id: {
               [this.op.in]: sequelize.literal(`(${tempQuery})`),
             },

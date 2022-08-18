@@ -8,12 +8,19 @@ const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat
 
 module.exports = async (request, response, next) => {
   try {
-    let result = null;
-    const order = await CancelValidator(request.body);
+    let result = [];
+    const orders = await CancelValidator(request.body);
 
-    if (order.resi.expedition === 'JNE') result = await new JneCancelResponse({ request });
-    if (order.resi.expedition === 'NINJA') result = await new NinjaCancelResponse({ request });
-    if (order.resi.expedition === 'SICEPAT') result = await new SicepatCancelResponse({ request });
+    request.body = orders;
+    const jneCancel = await new JneCancelResponse({ request });
+    const sicepatCancel = await new SicepatCancelResponse({ request });
+    const ninjaCancel = await new NinjaCancelResponse({ request });
+
+    result = result.concat(jneCancel);
+    result = result.concat(ninjaCancel);
+    result = result.concat(sicepatCancel);
+    result = result.filter((item) => item);
+    result = [...new Map(result.map((item) => [item.id, item])).values()];
 
     response.send({
       code: 200,

@@ -1,5 +1,6 @@
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
+const tax = require('../../../../constant/tax');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const {
@@ -13,6 +14,7 @@ const {
 
 module.exports = class {
   constructor({ request }) {
+    this.tax = tax;
     this.order = Order;
     this.op = Sequelize.Op;
     this.request = request;
@@ -156,8 +158,6 @@ module.exports = class {
           result.order_log = await this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(orderLogs)),
           );
-
-          delete result?.cod_fee;
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
