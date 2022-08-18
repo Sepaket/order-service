@@ -15,9 +15,9 @@ const validator = joi.object({
   email: joi.string().email().required().external((request) => isDuplicate(request)),
   password: joi.string()
     .min(6)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{6,}$/)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/)
     .message({
-      'string.pattern.base': 'password must include low character, capital character, special character, and number,',
+      'string.pattern.base': 'Password minimal 6 karakter, menggunakan min. 1 huruf kecil, 1 huruf kapital dan tanpa symbol',
     })
     .required(),
   password_confirmation: joi.ref('password'),

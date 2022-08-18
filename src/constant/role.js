@@ -1,41 +1,28 @@
-const roles = [
-  {
-    code: 'SUPER_ADMIN',
-    name: 'Super Admin',
-    permissions: [
-      'ALL',
-    ],
+const roles = {
+  SUPER_ADMIN: {
+    text: 'SUPERADMIN',
+    description: '',
   },
-  {
-    code: 'ADMIN',
-    name: 'Admin',
-    permissions: [
-      'ALL',
-    ],
+  STAFF: {
+    text: 'STAFF',
+    description: '',
   },
-  {
-    code: 'SELLER',
-    name: 'Seller',
-    permissions: [
-      'ALL',
-    ],
+  SELLER: {
+    text: 'SELLER',
+    description: '',
   },
-  {
-    code: 'FINANCE',
-    name: 'Finance',
-    permissions: [
-      'ALL',
-    ],
+  FINANCE: {
+    text: 'FINANCE',
+    description: '',
   },
-  {
-    code: 'DEVELOPER',
-    name: 'Developer',
-    permissions: [
-      'ALL',
-    ],
+  LAST_MILE: {
+    text: 'LAST_MILE',
+    description: '',
   },
-];
-
-module.exports = {
-  roles,
+  CONTROL_TOWER: {
+    text: 'CONTROL_TOWER',
+    description: '',
+  },
 };
+
+module.exports = roles;
