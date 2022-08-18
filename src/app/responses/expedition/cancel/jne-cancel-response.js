@@ -12,6 +12,7 @@ const {
   OrderDetail,
   OrderAddress,
   SellerAddress,
+  OrderCanceled,
   sequelize,
 } = require('../../../models');
 
@@ -27,6 +28,7 @@ module.exports = class {
     this.address = SellerAddress;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
+    this.orderCanceled = OrderCanceled;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -46,9 +48,19 @@ module.exports = class {
   async createOrder() {
     try {
       const { body } = this.request;
-      const order = await this.order.findOne({ where: { resi: body.resi } });
-      const orderAddress = await this.orderAddress.findOne({
-        where: { orderId: order.id },
+      this.orderIds = body.ids.map((item) => {
+        if (item.expedition === 'JNE' && item.status !== orderStatus.CANCELED.text) return item.id;
+        return null;
+      }).filter((item) => item);
+
+      if (this.orderIds.length < 1) return null;
+
+      const orders = await this.order.findAll({
+        where: { id: this.orderIds, expedition: 'JNE' },
+      });
+
+      const orderAddresses = await this.orderAddress.findAll({
+        where: { orderId: this.orderIds },
         include: [
           {
             model: this.location,
@@ -58,8 +70,8 @@ module.exports = class {
         ],
       });
 
-      const orderDetail = await this.orderDetail.findOne({
-        where: { orderId: order.id },
+      const orderDetails = await this.orderDetail.findAll({
+        where: { orderId: this.orderIds },
         include: [
           {
             model: this.seller,
@@ -81,44 +93,67 @@ module.exports = class {
         ],
       });
 
-      const payload = {
-        order,
-        orderDetail,
-        orderAddress,
-      };
+      const payload = orders.map((item) => {
+        const orderDetail = orderDetails.find((detail) => detail.orderId === item.id);
+        const orderAddress = orderAddresses.find((address) => address.orderId === item.id);
 
-      if (!orderDetail || !orderAddress) throw new Error('This order has incomplete data');
-      const parameter = await this.paramsMapper({ payload });
-      const paramFormatted = await this.caseConverter({ parameter });
-      const canceled = await this.jne.cancel(paramFormatted);
+        return {
+          order: item,
+          orderDetail,
+          orderAddress,
+        };
+      });
 
-      if (canceled[0]?.status) await this.insertLog();
+      const responseMap = orders.map((order) => ({
+        id: order.id,
+        resi: order.resi,
+        status: true,
+        message: 'OK',
+      }));
 
-      return true;
+      if (this.orderIds.length > 0) {
+        const parameter = await this.paramsMapper({ payload });
+        await this.insertLog({
+          payload: parameter,
+          orders,
+        });
+      }
+
+      return responseMap;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
 
-  async insertLog() {
-    const { body } = this.request;
+  async insertLog(params) {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const order = await this.order.findOne({ where: { resi: body.resi } });
+      const payloadLog = params.orders.map((item) => ({
+        previousStatus: item.status,
+        currentStatus: orderStatus.CANCELED.text,
+        orderId: item.id,
+      }));
+
+      const payloadCanceled = params.payload.map((item) => ({
+        id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        parameter: JSON.stringify(item),
+        expedition: 'JNE',
+      }));
 
       await this.order.update(
         { status: orderStatus.CANCELED.text },
-        { where: { id: order.id } },
+        { where: { id: { [this.op.in]: this.orderIds } } },
         { transaction: dbTransaction },
       );
 
-      await this.orderLog.create(
-        {
-          previousStatus: order.status,
-          currentStatus: orderStatus.CANCELED.text,
-          orderId: order.id,
-        },
+      await this.orderLog.bulkCreate(
+        payloadLog,
+        { transaction: dbTransaction },
+      );
+
+      await this.orderCanceled.bulkCreate(
+        payloadCanceled,
         { transaction: dbTransaction },
       );
 
@@ -129,19 +164,22 @@ module.exports = class {
     }
   }
 
-  async caseConverter({ parameter }) {
-    // eslint-disable-next-line no-unused-vars
-    const { body } = this.request;
+  // eslint-disable-next-line class-methods-use-this
+  async paramsMapper({ payload }) {
+    const mapped = payload.map((item) => {
+      const parameter = this.parameterHandler({ payload: item });
 
-    return Object.keys(parameter).reduce((accumulator, key) => {
-      accumulator[key.toUpperCase()] = parameter[key];
-      return accumulator;
-    }, {});
+      return Object.keys(parameter).reduce((accumulator, key) => {
+        accumulator[key.toUpperCase()] = parameter[key];
+        return accumulator;
+      }, {});
+    });
+
+    return mapped;
   }
 
-  async paramsMapper({ payload }) {
-    const { body } = this.request;
-
+  // eslint-disable-next-line class-methods-use-this
+  parameterHandler({ payload }) {
     return {
       pickup_name: payload.orderDetail.seller.name,
       pickup_date: payload.order.orderDate.split('-').reverse().join('-'),
@@ -185,7 +223,7 @@ module.exports = class {
       type: 'DROP',
       cod_flag: payload.order.isCod ? 'YES' : 'NO',
       cod_amount: payload?.orderDetail.goodsPrice,
-      awb: body.resi,
+      awb: `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`,
     };
   }
 };
