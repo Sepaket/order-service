@@ -1,5 +1,6 @@
 require('dotenv').config();
 const moment = require('moment');
+const random = require('random-number');
 const shortid = require('shortid-36');
 const profitHandler = require('./profit-seller');
 const orderStatus = require('../constant/order-status');
@@ -55,9 +56,9 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
     const { expedition, id } = params;
+    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${await random({ min: 100, max: 999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
+    const jneResi = `${process.env.JNE_ORDER_PREFIX}${await random({ min: 100, max: 999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
     const sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}${moment().format('mmss')}${id.length > 1 ? id : `0${id}`}`;
-    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
-    const jneResi = `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`;
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'NINJA') resi = ninjaResi;
     if (expedition === 'JNE') resi = jneResi;
