@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
-const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 
 // port load
@@ -32,7 +32,7 @@ const corsOptions = {
 };
 
 trackingScheduler.start();
-createOrderScheduler.start();
+// createOrderScheduler.start();
 cleanerNinjaTokenScheduler.start();
 
 application.use(cors(corsOptions));

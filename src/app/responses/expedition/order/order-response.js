@@ -20,6 +20,7 @@ const {
   orderFailedLogger,
 } = require('../../../../helpers/order-helper');
 const {
+  Order,
   Seller,
   Location,
   Discount,
@@ -35,6 +36,7 @@ module.exports = class {
   constructor({ request }) {
     this.jne = jne;
     this.tax = tax;
+    this.order = Order;
     this.ninja = ninja;
     this.seller = Seller;
     this.op = Sequelize.Op;
@@ -81,6 +83,11 @@ module.exports = class {
       let selectedDiscount = null;
       let batch = await this.batch.findOne({
         where: { id: body?.batch_id || 0, sellerId: sellerId.id },
+      });
+
+      const order = await this.order.findOne({
+        where: { expedition: 'SICEPAT' },
+        order: [['resi', 'DESC']],
       });
 
       const insurance = await this.insurance.findOne({
@@ -142,10 +149,15 @@ module.exports = class {
         });
       }
 
+      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '000000';
+      let sicepatResi = parseInt(currentResi, 10);
+
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           let parameter = null;
-          const resi = await resiMapper({ expedition: body.type, id: `${index}` });
+          sicepatResi += 1;
+          const resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             const locationId = locationIds.find((id) => id === location.id);

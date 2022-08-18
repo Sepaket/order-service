@@ -1,5 +1,6 @@
 require('dotenv').config();
 const moment = require('moment');
+const random = require('random-number');
 const shortid = require('shortid-36');
 const profitHandler = require('./profit-seller');
 const orderStatus = require('../constant/order-status');
@@ -54,10 +55,16 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
 const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
-    const { expedition, id } = params;
-    const sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}${moment().format('mmss')}${id.length > 1 ? id : `0${id}`}`;
-    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${shortid.generate()}`;
-    const jneResi = `${process.env.JNE_ORDER_PREFIX}${shortid.generate()}`;
+    const { expedition, currentResi, id } = params;
+    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${await random({ min: 10000, max: 99999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
+    const jneResi = `${process.env.JNE_ORDER_PREFIX}${await random({ min: 10000, max: 99999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
+    let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
+    const currentResiString = currentResi.toString();
+    if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`0000${currentResi}`}`;
+    if (currentResiString.length === 2) sicepatResi = `${sicepatResi}${`000${currentResi}`}`;
+    if (currentResiString.length === 3) sicepatResi = `${sicepatResi}${`00${currentResi}`}`;
+    if (currentResiString.length === 4) sicepatResi = `${sicepatResi}${`0${currentResi}`}`;
+    if (currentResiString.length === 5) sicepatResi = `${sicepatResi}${currentResi}`;
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'NINJA') resi = ninjaResi;
     if (expedition === 'JNE') resi = jneResi;
