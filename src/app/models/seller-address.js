@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     hideInResi: {
-      type: DataTypes.STRING,
+      type: DataTypes.BOOLEAN,
     },
     locationId: {
       type: DataTypes.INTEGER,

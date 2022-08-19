@@ -137,7 +137,7 @@ module.exports = class {
         };
       }
 
-      let calculatedCredit = seller.sellerDetail.credit;
+      let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
       if (!batchConditon) {
         batch = await batchCreator({
@@ -224,12 +224,12 @@ module.exports = class {
           + parseFloat(codValueCalculated)
           + parseFloat(insuranceSelected);
 
-          const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
+          const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
           const goodsAmount = !item.is_cod
-            ? item.goods_amount
-            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
+            ? parseFloat(item.goods_amount)
+            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
-          calculatedCredit -= goodsAmount;
+          if (!item.is_cod) calculatedCredit -= parseFloat(goodsAmount);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
           const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
           const totalAmount = item?.is_cod
@@ -357,6 +357,7 @@ module.exports = class {
     return result;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
     return {
       resi: payload.resi,
@@ -387,8 +388,8 @@ module.exports = class {
       sender: {
         name: payload.receiver_name,
         phone: payload.receiver_phone,
-        hide_address: this.sellerAddress?.hideInResi,
-        address: this.sellerAddress?.address || '',
+        hide_address: payload?.sellerLocation?.hideInResi || false,
+        address: payload?.sellerLocation?.address || '',
         address_note: '',
         location: payload.origin || null,
       },

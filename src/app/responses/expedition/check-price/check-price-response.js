@@ -340,6 +340,7 @@ module.exports = class {
 
       return (price) ? [{
         price,
+        weight: body.weight,
         serviceName: 'Ninja Reguler',
         serviceCode: 'Standard',
         estimation: '2 - 4',
