@@ -174,6 +174,7 @@ const orderQueryAddress = async (payload) => {
     receiverAddress: item.receiver_address,
     receiverAddressNote: item.receiver_address_note,
     receiverLocationId: item.receiver_location_id,
+    hideInResi: item.sellerLocation.hideInResi,
   }));
 
   return mapped;
