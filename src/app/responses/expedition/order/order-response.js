@@ -224,10 +224,10 @@ module.exports = class {
           + parseFloat(codValueCalculated)
           + parseFloat(insuranceSelected);
 
-          const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
+          const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
           const goodsAmount = !item.is_cod
-            ? item.goods_amount
-            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
+            ? parseFloat(item.goods_amount)
+            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
           if (!item.is_cod) calculatedCredit -= parseFloat(goodsAmount);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
