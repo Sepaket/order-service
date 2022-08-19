@@ -357,6 +357,7 @@ module.exports = class {
     return result;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
     return {
       resi: payload.resi,
@@ -387,8 +388,8 @@ module.exports = class {
       sender: {
         name: payload.receiver_name,
         phone: payload.receiver_phone,
-        hide_address: this.sellerAddress?.hideInResi,
-        address: this.sellerAddress?.address || '',
+        hide_address: payload?.sellerLocation?.hideInResi || false,
+        address: payload?.sellerLocation?.address || '',
         address_note: '',
         location: payload.origin || null,
       },
