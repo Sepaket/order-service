@@ -257,9 +257,9 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       previousStatus: orderStatus.WAITING_PICKUP.text,
     }));
 
-    let calculatedCredit = seller.credit;
+    let calculatedCredit = parseFloat(seller.credit);
     params.items?.map((item) => {
-      if (item.is_cod) calculatedCredit -= item.goodsAmount;
+      if (!item.is_cod) calculatedCredit -= parseFloat(item.goodsAmount);
       return calculatedCredit;
     });
 

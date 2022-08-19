@@ -137,7 +137,7 @@ module.exports = class {
         };
       }
 
-      let calculatedCredit = seller.sellerDetail.credit;
+      let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
       if (!batchConditon) {
         batch = await batchCreator({
@@ -229,7 +229,7 @@ module.exports = class {
             ? item.goods_amount
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
 
-          calculatedCredit -= goodsAmount;
+          if (!item.is_cod) calculatedCredit -= parseFloat(goodsAmount);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
           const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
           const totalAmount = item?.is_cod
