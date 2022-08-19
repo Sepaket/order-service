@@ -27,7 +27,12 @@ module.exports = class {
         ],
       }).then((credential) => {
         if (!credential) return reject(httpErrors(400, 'Email not found'));
-        if (!credential.isNew) return reject(httpErrors(400, 'Maaf, sistem tengah mengalami pembaruan. Harap reset password kamu'));
+        if (!credential.isNew) {
+          return reject(
+            httpErrors(400, 'Maaf, sistem tengah mengalami pembaruan. Harap reset password kamu, Silahkan klik tautan "Lupa Kata Sandi"'),
+          );
+        }
+
         if (!credential.isVerified) return reject(httpErrors(400, 'Please activate your email first'));
 
         // check password match
