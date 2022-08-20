@@ -149,8 +149,8 @@ module.exports = class {
         });
       }
 
-      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '000000';
-      let sicepatResi = parseInt(currentResi, 10);
+      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '00000';
+      let sicepatResi = currentResi === '99999' ? parseInt('00000', 10) : parseInt(currentResi, 10);
 
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
