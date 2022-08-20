@@ -1,4 +1,3 @@
-const moment = require('moment');
 const shortid = require('shortid-36');
 
 const parameterHandler = ({ payload }) => ({
@@ -14,7 +13,7 @@ const parameterHandler = ({ payload }) => ({
   pickup_vechile: payload.should_pickup_with,
   branch: payload?.origin?.jneOriginCode || '',
   cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
-  order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
+  order_id: `${shortid.generate()}${shortid.generate()}`.slice(0, 15),
   shipper_name: payload.sender_name || '',
   shipper_addr1: payload?.sellerLocation?.address?.slice(0, 80) || '',
   shipper_city: payload?.origin?.city || '',
