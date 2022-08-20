@@ -161,6 +161,7 @@ const orderQueryDetail = async (payload) => {
     sellerId: item.seller.id,
     sellerAddressId: item.sellerLocation?.id,
     weight: item.weight,
+    volume: item.should_pickup_with,
     totalItem: item.goods_qty,
     notes: item.notes,
     goodsContent: item.goods_content,
@@ -168,7 +169,7 @@ const orderQueryDetail = async (payload) => {
     codFee: item.is_cod ? item.cod_value : 0.00,
     shippingCharge: item.shippingCalculated,
     useInsurance: item.is_insurance,
-    sellerReceivedAmount: calculateFee[idx],
+    sellerReceivedAmount: item.is_cod ? calculateFee[idx] : 0,
     insuranceAmount: item.is_insurance ? item?.insuranceSelected || 0 : 0,
     isTrouble: false,
     codFeeAdmin: item.codFeeAdmin || 0,
@@ -259,7 +260,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 
     let calculatedCredit = parseFloat(seller.credit);
     params.items?.map((item) => {
-      if (!item.is_cod) calculatedCredit -= parseFloat(item.goodsAmount);
+      if (!item.is_cod) calculatedCredit -= parseFloat(item.shippingCalculated);
       return calculatedCredit;
     });
 

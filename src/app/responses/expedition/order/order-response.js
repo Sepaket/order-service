@@ -149,8 +149,8 @@ module.exports = class {
         });
       }
 
-      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '000000';
-      let sicepatResi = parseInt(currentResi, 10);
+      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '00000';
+      let sicepatResi = currentResi === '99999' ? parseInt('00000', 10) : parseInt(currentResi, 10);
 
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
@@ -220,18 +220,26 @@ module.exports = class {
             }
           }
 
-          const shippingCalculated = parseFloat(shippingWithDiscount)
-          + parseFloat(codValueCalculated)
-          + parseFloat(insuranceSelected);
+          let shippingCalculated = 0;
+          if (item.is_cod) {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(codValueCalculated)
+            + parseFloat(insuranceSelected);
+          } else {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(vatCalculated)
+            + parseFloat(insuranceSelected);
+          }
 
           const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
           const goodsAmount = !item.is_cod
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
-
-          if (!item.is_cod) calculatedCredit -= parseFloat(goodsAmount);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
+          const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
+
+          if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
+
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));

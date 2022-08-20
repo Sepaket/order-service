@@ -8,6 +8,7 @@ const OrderResponse = require('../../responses/expedition/order/order-response')
 const OrderDraft = require('../../responses/expedition/order/order-draft-response');
 const BulkOrderResponse = require('../../responses/expedition/order/bulk-order-response');
 const TransactionFeeResponse = require('../../responses/expedition/order/transaction-fee-response');
+const NinjaCallbackResponse = require('../../responses/expedition/order/ninja-callback-response');
 
 module.exports = {
   commonOrder: async (request, response, next) => {
@@ -61,6 +62,20 @@ module.exports = {
       await OrderDraftValidator(request);
 
       const result = await new OrderDraft({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  ninjaCallback: async (request, response, next) => {
+    try {
+      const result = await new NinjaCallbackResponse({ request });
 
       response.send({
         code: 200,

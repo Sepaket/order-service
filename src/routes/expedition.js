@@ -30,6 +30,7 @@ router.group('/order', (route) => {
   route.post('/bulk', Authorization, OrderController.bulkOrder);
   route.get('/transaction-fee', Authorization, OrderController.transactionFee);
   route.get('/draft/:batch_id', Authorization, OrderController.draftOrder);
+  route.post('/ninja/callback', OrderController.ninjaCallback);
 });
 
 router.group('/tracking', (route) => {

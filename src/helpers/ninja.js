@@ -122,7 +122,7 @@ const tracking = (payload) => new Promise(async (resolve) => {
   });
 });
 
-const cancel = (payload) => new Promise(async (resolve, reject) => {
+const cancel = (payload) => new Promise(async (resolve) => {
   const { resi } = payload;
   const token = await localToken() || await tokenization();
 
@@ -130,10 +130,16 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  }).then((response) => {
-    resolve(response?.data);
+  }).then(() => {
+    resolve({
+      status: true,
+      message: 'OK',
+    });
   }).catch(async (error) => {
-    reject(new Error(`NINJA: ${error?.response?.data?.data?.message || error?.message}`));
+    resolve({
+      status: false,
+      message: error?.response?.data?.data?.message,
+    });
   });
 });
 
