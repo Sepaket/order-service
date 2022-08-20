@@ -19,7 +19,7 @@ const port = process.env.APP_PORT || 6000;
 
 // errror tracing global
 Sentry.init({
-  dsn: process.emv.SENTRY_DSN,
+  dsn: process.emv.SENTRY_DSN || '',
   tracesSampleRate: 1.0,
   integrations: [
     new Sentry.Integrations.Http({ tracing: true }),
