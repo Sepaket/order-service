@@ -161,6 +161,7 @@ const orderQueryDetail = async (payload) => {
     sellerId: item.seller.id,
     sellerAddressId: item.sellerLocation?.id,
     weight: item.weight,
+    volume: item.should_pickup_with,
     totalItem: item.goods_qty,
     notes: item.notes,
     goodsContent: item.goods_content,

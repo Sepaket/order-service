@@ -3,14 +3,14 @@ const sicepat = require('../helpers/sicepat');
 const ninja = require('../helpers/ninja');
 const jne = require('../helpers/jne');
 const errorCatcher = require('../helpers/error-catcher');
-const { OrderBackground } = require('../app/models');
+const { OrderCanceled } = require('../app/models');
 
 const sicepatExecutor = async (payload) => {
   try {
-    const created = await sicepat.createOrder(JSON.parse(payload.parameter));
+    const canceled = await sicepat.cancel(JSON.parse(payload.parameter));
 
-    if (created.status) {
-      await OrderBackground.update(
+    if (canceled.status) {
+      await OrderCanceled.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
@@ -18,8 +18,8 @@ const sicepatExecutor = async (payload) => {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
-        subject: 'CREATE ORDER',
-        ...created,
+        subject: 'CANCEL',
+        ...canceled,
       });
     }
   } catch (error) {
@@ -29,10 +29,9 @@ const sicepatExecutor = async (payload) => {
 
 const jneExecutor = async (payload) => {
   try {
-    const created = await jne.createOrder(JSON.parse(payload.parameter));
-
-    if (created.status) {
-      await OrderBackground.update(
+    const canceled = await jne.cancel(JSON.parse(payload.parameter));
+    if (canceled.status) {
+      await OrderCanceled.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
@@ -40,8 +39,8 @@ const jneExecutor = async (payload) => {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
-        subject: 'CREATE ORDER',
-        ...created,
+        subject: 'CANCEL',
+        ...canceled,
       });
     }
   } catch (error) {
@@ -51,10 +50,10 @@ const jneExecutor = async (payload) => {
 
 const ninjaExecutor = async (payload) => {
   try {
-    const created = await ninja.createOrder(JSON.parse(payload.parameter));
+    const canceled = await ninja.cancel(JSON.parse(payload.parameter));
 
-    if (created.status) {
-      await OrderBackground.update(
+    if (canceled.status) {
+      await OrderCanceled.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
@@ -62,8 +61,8 @@ const ninjaExecutor = async (payload) => {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
-        subject: 'CREATE ORDER',
-        ...created,
+        subject: 'CANCEL',
+        ...canceled,
       });
     }
   } catch (error) {
@@ -73,10 +72,10 @@ const ninjaExecutor = async (payload) => {
 
 const runner = cron.schedule('0 */1 * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('order scheduler run');
+  console.info('cancel scheduler run');
 
   try {
-    const orders = await OrderBackground.findAll({
+    const orders = await OrderCanceled.findAll({
       where: { isExecute: false },
       limit: 100,
     });
