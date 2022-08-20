@@ -1,7 +1,9 @@
 require('dotenv').config();
-const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const express = require('express');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
 const application = express();
 const bodyParser = require('body-parser');
@@ -14,6 +16,16 @@ const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-schedule
 
 // port load
 const port = process.env.APP_PORT || 6000;
+
+// errror tracing global
+Sentry.init({
+  dsn: process.emv.SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    new Tracing.Integrations.Express({ application }),
+  ],
+});
 
 // routes load
 const adminRoute = require('./src/routes/admin');
@@ -28,7 +40,6 @@ const corsOptions = {
     'https://sepaket.co.id',
     'https://frontend.sepaket.co.id',
     'https://api.xendit.co/',
-    'http://localhost:4173', // For preview
   ],
 };
 
@@ -38,6 +49,8 @@ cancelOrderScheduler.start();
 cleanerNinjaTokenScheduler.start();
 
 application.use(cors(corsOptions));
+application.use(Sentry.Handlers.requestHandler());
+application.use(Sentry.Handlers.tracingHandler());
 application.use(bodyParser.urlencoded({ extended: true }));
 application.use(bodyParser.json({ limit: 1024102420, type: 'application/json' }));
 application.listen(port);
@@ -47,6 +60,7 @@ application.use('/api/v1/seller', sellerRoute);
 application.use('/api/v1/general', generalRoute);
 application.use('/api/v1/expedition', expeditionRoute);
 
+application.use(Sentry.Handlers.errorHandler());
 application.use(express.static(path.join(__dirname)));
 application.use(errorHandler);
 
