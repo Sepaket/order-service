@@ -1,6 +1,5 @@
 const cron = require('node-cron');
 const jne = require('./jne-tracking');
-// const ninja = require('./ninja-tracking');
 const sicepat = require('./sicepat-tracking');
 
 // every 3 hour
@@ -11,7 +10,6 @@ const runner = cron.schedule('0 */3 * * *', async () => {
   try {
     await jne.tracking();
     await sicepat.tracking();
-    // await ninja.tracking();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);
