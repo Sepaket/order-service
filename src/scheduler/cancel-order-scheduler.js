@@ -70,7 +70,7 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('0 */1 * * *', async () => {
+const runner = cron.schedule('30 */1 * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('cancel scheduler run');
 
