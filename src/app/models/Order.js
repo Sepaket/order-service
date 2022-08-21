@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     resi: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: false,
+      unique: true,
     },
     expedition: {
       type: DataTypes.STRING,
