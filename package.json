@@ -68,7 +68,6 @@
     "redis": "^4.1.0",
     "sequelize": "^6.20.1",
     "shortid-36": "^0.1.2",
-    "utf8": "^3.0.0",
     "xendit-node": "^1.21.5"
   },
   "devDependencies": {
