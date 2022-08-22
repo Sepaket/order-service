@@ -71,6 +71,7 @@ module.exports = class {
                 'isCod',
                 'status',
                 'updatedAt',
+                'createdAt',
               ],
             },
             {
@@ -172,6 +173,15 @@ module.exports = class {
               moment(`${query?.date_end}`).endOf('day').format(),
             ],
           },
+        },
+      };
+    }
+
+    if (query?.type) {
+      condition = {
+        ...condition,
+        [this.op.and]: {
+          is_cod: query.type === 'cod',
         },
       };
     }
