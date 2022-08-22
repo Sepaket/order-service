@@ -42,7 +42,7 @@ module.exports = class {
 
     try {
       const { body } = this.request;
-      const resi = body?.tracking_ref_no || body?.tracking_id.split(`${process.env.NINJA_ORDER_PREFIX}C`).pop();
+      const resi = body?.tracking_ref_no || body?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({ where: { resi } });
 
       if (!order) {
