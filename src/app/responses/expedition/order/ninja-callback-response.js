@@ -2,7 +2,6 @@ const httpErrors = require('http-errors');
 const { Order, sequelize, OrderLog } = require('../../../models');
 const ninjaStatus = require('../../../../constant/ninja-status');
 const orderStatus = require('../../../../constant/order-status');
-const errorCatcher = require('../../../../helpers/error-catcher');
 
 module.exports = class {
   constructor({ request }) {
@@ -43,33 +42,27 @@ module.exports = class {
 
     try {
       const { body } = this.request;
-      const resi = body?.tracking_ref_no || body?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
+      const converted = JSON.parse(body);
+      const resi = converted?.tracking_ref_no || converted?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({ where: { resi } });
-
-      await errorCatcher({
-        id: 'test123',
-        expedition: 'NINJA',
-        subject: 'DEBUG NINJA CALLBACK',
-        message: `${body?.tracking_ref_no} & order id: ${order?.id || 'null'}` || '',
-      });
 
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
 
-      const currentStatus = this.getLastStatus(body.status.toLowerCase());
+      const currentStatus = this.getLastStatus(converted.status.toLowerCase());
 
       await this.log.create({
         orderId: order.id,
         previousStatus: order?.status,
         currentStatus,
-        note: body?.comments || body.status,
+        note: converted?.comments || converted.status,
       });
 
       await this.order.update(
         {
           status: currentStatus,
-          pod_status: body.status,
+          pod_status: converted.status,
         },
         { where: { id: order.id } },
         { transaction: dbTransaction },
@@ -78,12 +71,6 @@ module.exports = class {
       await dbTransaction.commit();
       return true;
     } catch (error) {
-      await errorCatcher({
-        id: 'test123',
-        expedition: 'NINJA',
-        subject: 'DEBUG NINJA CALLBACK ERROR',
-        message: error.message,
-      });
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
