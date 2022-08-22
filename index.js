@@ -53,6 +53,7 @@ application.use(Sentry.Handlers.requestHandler());
 application.use(Sentry.Handlers.tracingHandler());
 application.use(bodyParser.urlencoded({ extended: true }));
 application.use(bodyParser.json({ limit: 1024102420, type: 'application/json' }));
+application.use(express.json({ type: ['text/*', '*/json'] }));
 application.listen(port);
 
 application.use('/api/v1/admin', adminRoute);
