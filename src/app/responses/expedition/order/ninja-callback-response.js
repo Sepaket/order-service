@@ -2,6 +2,7 @@ const httpErrors = require('http-errors');
 const { Order, sequelize, OrderLog } = require('../../../models');
 const ninjaStatus = require('../../../../constant/ninja-status');
 const orderStatus = require('../../../../constant/order-status');
+const errorCatcher = require('../../../../helpers/error-catcher');
 
 module.exports = class {
   constructor({ request }) {
@@ -45,6 +46,13 @@ module.exports = class {
       const resi = body?.tracking_ref_no || body?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({ where: { resi } });
 
+      await errorCatcher({
+        id: 'test123',
+        expedition: 'NINJA',
+        subject: 'DEBUG NINJA CALLBACK',
+        message: `${body?.tracking_ref_no} & order id: ${order?.id || 'null'}` || '',
+      });
+
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
@@ -70,6 +78,12 @@ module.exports = class {
       await dbTransaction.commit();
       return true;
     } catch (error) {
+      await errorCatcher({
+        id: 'test123',
+        expedition: 'NINJA',
+        subject: 'DEBUG NINJA CALLBACK ERROR',
+        message: error.message,
+      });
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
