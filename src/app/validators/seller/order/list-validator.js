@@ -6,6 +6,7 @@ const validator = joi.object({
   keyword: joi.string().allow('', null),
   batch_id: joi.number().min(1).allow(null),
   date_start: joi.date().allow(null),
+  type: joi.string().valid('cod', 'non-cod').allow(null, ''),
   date_end: joi.any().when('date_start', {
     is: joi.exist(),
     then: joi.date().required(),

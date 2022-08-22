@@ -180,6 +180,15 @@ module.exports = class {
       };
     }
 
+    if (query?.type) {
+      condition = {
+        ...condition,
+        [this.op.and]: {
+          is_cod: query.type === 'cod',
+        },
+      };
+    }
+
     return condition;
   }
 };
