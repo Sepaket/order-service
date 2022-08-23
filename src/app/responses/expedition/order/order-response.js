@@ -209,8 +209,12 @@ module.exports = class {
           if (item.is_insurance) {
             if (insurance?.insuranceValueType === 'PERCENTAGE') {
               if (item.is_cod) {
+                const goodsAmountInsurance = (
+                  parseFloat(item.cod_value) - parseFloat(shippingCharge)
+                );
+
                 insuranceSelected = (
-                  parseFloat(insurance?.insuranceValue) * parseFloat(item.cod_value)
+                  parseFloat(insurance?.insuranceValue) * parseFloat(goodsAmountInsurance)
                 ) / 100;
               } else {
                 insuranceSelected = (
@@ -377,7 +381,7 @@ module.exports = class {
         goods_content: payload.goods_content,
         goods_qty: payload.goods_qty,
         goods_notes: payload.notes,
-        insurance_amount: payload.is_insurance ? payload.insurance?.insuranceValue || 0 : 0,
+        insurance_amount: payload.is_insurance ? payload.insuranceSelected || 0 : 0,
         is_cod: payload.is_cod,
         total_amount: {
           raw: payload.totalAmount,
