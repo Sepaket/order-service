@@ -70,7 +70,7 @@ module.exports = class {
         parseFloat(currentSaldo.credit) + parseFloat(order.detail.sellerReceivedAmount)
       );
 
-      if (converted.status.toLowerCase() === 'completed') {
+      if (converted.status.toLowerCase() === 'completed' && order.isCod) {
         await this.seller.update(
           { credit: parseFloat(calculatedCredit) },
           { where: { sellerId: order.detail.sellerId } },
