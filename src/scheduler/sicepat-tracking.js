@@ -66,10 +66,6 @@ const tracking = async () => {
         if (track?.sicepat?.status?.code === 200) {
           const trackingStatus = track?.sicepat?.result?.last_status;
           const currentStatus = getLastStatus(trackingStatus?.status || '');
-          const revertCredit = (
-            (currentStatus === orderStatus.CANCELED.text && item.isCod)
-            || (currentStatus === orderStatus.RETURN_TO_SELLER.text && item.isCod)
-          );
 
           trackHistories.push({
             orderId: item.id,
@@ -86,14 +82,14 @@ const tracking = async () => {
             { where: { resi: item.resi } },
           );
 
-          if (revertCredit) {
+          if (trackingStatus?.status === 'DELIVERED') {
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
             });
 
             const calculated = (
-              parseFloat(currentCredit.credit) + parseFloat(orderDetail.goodsPrice)
+              parseFloat(currentCredit.credit) + parseFloat(orderDetail.sellerReceivedAmount)
             );
 
             await SellerDetail.update(

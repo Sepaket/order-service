@@ -1,7 +1,13 @@
 const httpErrors = require('http-errors');
-const { Order, sequelize, OrderLog } = require('../../../models');
 const ninjaStatus = require('../../../../constant/ninja-status');
 const orderStatus = require('../../../../constant/order-status');
+const {
+  Order,
+  sequelize,
+  OrderLog,
+  OrderDetail,
+  SellerDetail,
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
@@ -9,6 +15,8 @@ module.exports = class {
     this.log = OrderLog;
     this.request = request;
     this.status = ninjaStatus;
+    this.seller = SellerDetail;
+    this.orderDetail = OrderDetail;
     return this.process();
   }
 
@@ -41,16 +49,34 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const { body } = this.request;
-      const converted = JSON.parse(body);
+      const { body, headers } = this.request;
+      const converted = (headers['content-type'] !== 'application/json') ? JSON.parse(body) : body;
       const resi = converted?.tracking_ref_no || converted?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
-      const order = await this.order.findOne({ where: { resi } });
+      const order = await this.order.findOne({
+        where: { resi },
+        include: [{ model: this.orderDetail, as: 'detail' }],
+      });
 
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
 
       const currentStatus = this.getLastStatus(converted.status.toLowerCase());
+      const currentSaldo = await this.seller.findOne({
+        where: { sellerId: order.detail.sellerId },
+      });
+
+      const calculatedCredit = (
+        parseFloat(currentSaldo.credit) + parseFloat(order.detail.sellerReceivedAmount)
+      );
+
+      if (converted.status.toLowerCase() === 'completed') {
+        await this.seller.update(
+          { credit: parseFloat(calculatedCredit) },
+          { where: { sellerId: order.detail.sellerId } },
+          { transaction: dbTransaction },
+        );
+      }
 
       await this.log.create({
         orderId: order.id,
