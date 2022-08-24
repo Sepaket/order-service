@@ -398,8 +398,8 @@ module.exports = class {
         sub_district: payload.sub_district,
       },
       sender: {
-        name: payload.receiver_name,
-        phone: payload.receiver_phone,
+        name: payload.sellerLocation.picName,
+        phone: payload.sellerLocation.picPhoneNumber,
         hide_address: payload?.sellerLocation?.hideInResi || false,
         address: payload?.sellerLocation?.address || '',
         address_note: '',
