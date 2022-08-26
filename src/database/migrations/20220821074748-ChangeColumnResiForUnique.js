@@ -16,9 +16,7 @@ module.exports = {
     queryInterface.changeColumn(table, 'resi', {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: true,
-    }).then(() => [
-      queryInterface.addIndex(table, { fields: ['resi'], name: 'resi_order_idx' }),
-    ]),
+      unique: false,
+    }),
   ]),
 };
