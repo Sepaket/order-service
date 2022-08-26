@@ -313,6 +313,7 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
 
       return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        resi: item.resi,
         expedition: item.type,
         parameter: JSON.stringify(payload),
       };

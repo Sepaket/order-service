@@ -275,7 +275,11 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
-            querySuccess.push({ ...parameter, type: body.type });
+            querySuccess.push({
+              ...parameter,
+              resi,
+              type: body.type,
+            });
             queryrLogger.push({
               ...payload,
               orderCode,

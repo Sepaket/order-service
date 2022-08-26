@@ -82,6 +82,7 @@ module.exports = class {
         orderId: order.id,
         previousStatus: order?.status,
         currentStatus,
+        podStatus: converted?.status || '',
         note: converted?.comments || converted.status,
       });
 

@@ -1,12 +1,9 @@
-const moment = require('moment');
-const shortid = require('shortid-36');
 const sicepat = require('../../../../helpers/sicepat');
 const orderStatus = require('../../../../constant/order-status');
 const {
   Order,
   OrderLog,
   sequelize,
-  OrderCanceled,
 } = require('../../../models');
 
 module.exports = class {
@@ -15,7 +12,6 @@ module.exports = class {
     this.sicepat = sicepat;
     this.request = request;
     this.orderLog = OrderLog;
-    this.orderCanceled = OrderCanceled;
     return this.process();
   }
 
@@ -24,7 +20,7 @@ module.exports = class {
       try {
         const { body } = this.request;
         this.orderIds = body.ids.map((item) => {
-          if (item.expedition === 'NINJA' && item.status !== orderStatus.CANCELED.text) return item.id;
+          if (item.expedition === 'NINJA' && item.status === orderStatus.WAITING_PICKUP.text) return item.id;
           return null;
         }).filter((item) => item);
 
@@ -66,12 +62,6 @@ module.exports = class {
         orderId: item.id,
       }));
 
-      const payloadCanceled = params.payload.map((item) => ({
-        id: `${shortid.generate()}${moment().format('HHmmss')}`,
-        parameter: JSON.stringify(item),
-        expedition: 'NINJA',
-      }));
-
       await this.order.update(
         { status: orderStatus.CANCELED.text },
         { where: { id: this.orderIds } },
@@ -80,11 +70,6 @@ module.exports = class {
 
       await this.orderLog.bulkCreate(
         payloadLog,
-        { transaction: dbTransaction },
-      );
-
-      await this.orderCanceled.bulkCreate(
-        payloadCanceled,
         { transaction: dbTransaction },
       );
 

@@ -71,6 +71,7 @@ const tracking = async () => {
             orderId: item.id,
             note: trackingStatus?.city || trackingStatus?.receiver_name,
             previousStatus: item.status,
+            podStatus: trackingStatus?.status,
             currentStatus,
           });
 
@@ -109,6 +110,7 @@ const tracking = async () => {
           where: {
             orderId: item?.orderId,
             currentStatus: item?.currentStatus,
+            podStatus: item?.podStatus,
             note: item?.note || '',
           },
         });
@@ -118,6 +120,7 @@ const tracking = async () => {
             orderId: item?.orderId,
             previousStatus: item?.previousStatus,
             currentStatus: item?.currentStatus,
+            podStatus: item?.podStatus,
             note: item?.note || '',
           });
         }
