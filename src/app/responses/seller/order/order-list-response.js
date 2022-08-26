@@ -165,17 +165,11 @@ module.exports = class {
       };
     }
 
-    if (query?.status && query?.date_start && query?.date_end) {
+    if (query?.status) {
       condition = {
         ...condition,
         [this.op.and]: {
           status: query.status,
-          createdAt: {
-            [this.op.between]: [
-              moment(`${query?.date_start}`).startOf('day').format(),
-              moment(`${query?.date_end}`).endOf('day').format(),
-            ],
-          },
         },
       };
     }
@@ -185,6 +179,20 @@ module.exports = class {
         ...condition,
         [this.op.and]: {
           is_cod: query.type === 'cod',
+        },
+      };
+    }
+
+    if (query?.date_start || query?.date_end) {
+      condition = {
+        ...condition,
+        [this.op.and]: {
+          createdAt: {
+            [this.op.between]: [
+              moment(`${query?.date_start}`).startOf('day').format(),
+              moment(`${query?.date_end}`).endOf('day').format(),
+            ],
+          },
         },
       };
     }
