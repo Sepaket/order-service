@@ -18,6 +18,7 @@ const sicepatExecutor = async (payload) => {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
+        subject: 'CREATE ORDER',
         ...created,
       });
     }
@@ -32,13 +33,14 @@ const jneExecutor = async (payload) => {
 
     if (created.status) {
       await OrderBackground.update(
-        { isExecute: true || null },
+        { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
+        subject: 'CREATE ORDER',
         ...created,
       });
     }
@@ -53,13 +55,14 @@ const ninjaExecutor = async (payload) => {
 
     if (created.status) {
       await OrderBackground.update(
-        { isExecute: true || null },
+        { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
+        subject: 'CREATE ORDER',
         ...created,
       });
     }

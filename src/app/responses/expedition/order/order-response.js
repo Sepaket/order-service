@@ -137,7 +137,7 @@ module.exports = class {
         };
       }
 
-      let calculatedCredit = seller.sellerDetail.credit;
+      let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
       if (!batchConditon) {
         batch = await batchCreator({
@@ -149,8 +149,8 @@ module.exports = class {
         });
       }
 
-      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '000000';
-      let sicepatResi = parseInt(currentResi, 10);
+      const currentResi = order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '00000';
+      let sicepatResi = currentResi === '99999' ? parseInt('00000', 10) : parseInt(currentResi, 10);
 
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
@@ -209,8 +209,12 @@ module.exports = class {
           if (item.is_insurance) {
             if (insurance?.insuranceValueType === 'PERCENTAGE') {
               if (item.is_cod) {
+                const goodsAmountInsurance = (
+                  parseFloat(item.cod_value) - parseFloat(shippingCharge)
+                );
+
                 insuranceSelected = (
-                  parseFloat(insurance?.insuranceValue) * parseFloat(item.cod_value)
+                  parseFloat(insurance?.insuranceValue) * parseFloat(goodsAmountInsurance)
                 ) / 100;
               } else {
                 insuranceSelected = (
@@ -220,18 +224,26 @@ module.exports = class {
             }
           }
 
-          const shippingCalculated = parseFloat(shippingWithDiscount)
-          + parseFloat(codValueCalculated)
-          + parseFloat(insuranceSelected);
+          let shippingCalculated = 0;
+          if (item.is_cod) {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(codValueCalculated)
+            + parseFloat(insuranceSelected);
+          } else {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(vatCalculated)
+            + parseFloat(insuranceSelected);
+          }
 
-          const codFee = (parseFloat(trxFee?.codFee) * parseFloat(shippingCharge)) / 100;
+          const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
           const goodsAmount = !item.is_cod
-            ? item.goods_amount
-            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + codFee);
-
-          calculatedCredit -= goodsAmount;
+            ? parseFloat(item.goods_amount)
+            : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          const creditCondition = (parseFloat(calculatedCredit) >= parseFloat(goodsAmount));
+          const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
+
+          if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
+
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
@@ -263,7 +275,11 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
-            querySuccess.push({ ...parameter, type: body.type });
+            querySuccess.push({
+              ...parameter,
+              resi,
+              type: body.type,
+            });
             queryrLogger.push({
               ...payload,
               orderCode,
@@ -357,6 +373,7 @@ module.exports = class {
     return result;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
     return {
       resi: payload.resi,
@@ -368,7 +385,7 @@ module.exports = class {
         goods_content: payload.goods_content,
         goods_qty: payload.goods_qty,
         goods_notes: payload.notes,
-        insurance_amount: payload.is_insurance ? payload.insurance?.insuranceValue || 0 : 0,
+        insurance_amount: payload.is_insurance ? payload.insuranceSelected || 0 : 0,
         is_cod: payload.is_cod,
         total_amount: {
           raw: payload.totalAmount,
@@ -385,10 +402,10 @@ module.exports = class {
         sub_district: payload.sub_district,
       },
       sender: {
-        name: payload.receiver_name,
-        phone: payload.receiver_phone,
-        hide_address: this.sellerAddress?.hideInResi,
-        address: this.sellerAddress?.address || '',
+        name: payload.sellerLocation.picName,
+        phone: payload.sellerLocation.picPhoneNumber,
+        hide_address: payload?.sellerLocation?.hideInResi || false,
+        address: payload?.sellerLocation?.address || '',
         address_note: '',
         location: payload.origin || null,
       },

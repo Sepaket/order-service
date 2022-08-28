@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    resi: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   };
 
   return sequelize.define('OrderBackground', schema, {

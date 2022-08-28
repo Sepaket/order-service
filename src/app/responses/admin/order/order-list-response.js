@@ -71,6 +71,7 @@ module.exports = class {
                 'isCod',
                 'status',
                 'updatedAt',
+                'createdAt',
               ],
             },
             {
@@ -151,28 +152,28 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
-    let condition = {};
+    const condition = {};
 
     if (query?.keyword) {
-      condition = {
-        [this.op.or]: {
-          resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-        },
+      condition[this.op.or] = {
+        resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
       };
     }
 
     if (query?.status) {
-      condition = {
-        ...condition,
-        [this.op.and]: {
-          status: query.status,
-          createdAt: {
-            [this.op.between]: [
-              moment(`${query?.date_start}`).startOf('day').format(),
-              moment(`${query?.date_end}`).endOf('day').format(),
-            ],
-          },
-        },
+      condition.status = query.status;
+    }
+
+    if (query?.type) {
+      condition.is_cod = query.type === 'cod';
+    }
+
+    if (query?.date_start || query?.date_end) {
+      condition.createdAt = {
+        [this.op.between]: [
+          moment(`${query?.date_start}`).startOf('day').format(),
+          moment(`${query?.date_end}`).endOf('day').format(),
+        ],
       };
     }
 

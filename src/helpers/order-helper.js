@@ -56,8 +56,20 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
     const { expedition, currentResi, id } = params;
-    const ninjaResi = `${process.env.NINJA_ORDER_PREFIX}${await random({ min: 100000, max: 999999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
-    const jneResi = `${process.env.JNE_ORDER_PREFIX}${await random({ min: 10000, max: 99999, integer: true })}${id.length > 1 ? id : `0${id}`}`;
+    const ninjaResi = `
+      ${process.env.NINJA_ORDER_PREFIX}
+      ${await random({ min: 100000, max: 999999, integer: true })}
+      ${moment().format('DDMM')}
+      ${id.length > 1 ? id : `0${id}`}
+    `;
+
+    const jneResi = `
+      ${process.env.JNE_ORDER_PREFIX}
+      ${await random({ min: 10000, max: 99999, integer: true })}
+      ${moment().format('DDMM')}
+      ${id.length > 1 ? id : `0${id}`}
+    `;
+
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
     const currentResiString = currentResi.toString();
     if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`0000${currentResi}`}`;
@@ -65,9 +77,10 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (currentResiString.length === 3) sicepatResi = `${sicepatResi}${`00${currentResi}`}`;
     if (currentResiString.length === 4) sicepatResi = `${sicepatResi}${`0${currentResi}`}`;
     if (currentResiString.length === 5) sicepatResi = `${sicepatResi}${currentResi}`;
+
     if (expedition === 'SICEPAT') resi = sicepatResi;
-    if (expedition === 'NINJA') resi = ninjaResi;
-    if (expedition === 'JNE') resi = jneResi;
+    if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
+    if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     resolve(resi);
   } catch (error) {
     reject(error);
@@ -148,6 +161,7 @@ const orderQueryDetail = async (payload) => {
     sellerId: item.seller.id,
     sellerAddressId: item.sellerLocation?.id,
     weight: item.weight,
+    volume: item.should_pickup_with,
     totalItem: item.goods_qty,
     notes: item.notes,
     goodsContent: item.goods_content,
@@ -155,7 +169,7 @@ const orderQueryDetail = async (payload) => {
     codFee: item.is_cod ? item.cod_value : 0.00,
     shippingCharge: item.shippingCalculated,
     useInsurance: item.is_insurance,
-    sellerReceivedAmount: calculateFee[idx],
+    sellerReceivedAmount: item.is_cod ? calculateFee[idx] : 0,
     insuranceAmount: item.is_insurance ? item?.insuranceSelected || 0 : 0,
     isTrouble: false,
     codFeeAdmin: item.codFeeAdmin || 0,
@@ -174,6 +188,7 @@ const orderQueryAddress = async (payload) => {
     receiverAddress: item.receiver_address,
     receiverAddressNote: item.receiver_address_note,
     receiverLocationId: item.receiver_location_id,
+    hideInResi: item.sellerLocation.hideInResi,
   }));
 
   return mapped;
@@ -243,9 +258,9 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       previousStatus: orderStatus.WAITING_PICKUP.text,
     }));
 
-    let calculatedCredit = seller.credit;
+    let calculatedCredit = parseFloat(seller.credit);
     params.items?.map((item) => {
-      if (item.is_cod) calculatedCredit -= item.goodsAmount;
+      if (!item.is_cod) calculatedCredit -= parseFloat(item.shippingCalculated);
       return calculatedCredit;
     });
 
@@ -298,6 +313,7 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
 
       return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
+        resi: item.resi,
         expedition: item.type,
         parameter: JSON.stringify(payload),
       };

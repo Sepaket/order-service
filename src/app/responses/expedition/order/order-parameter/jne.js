@@ -1,4 +1,3 @@
-const moment = require('moment');
 const shortid = require('shortid-36');
 
 const parameterHandler = ({ payload }) => ({
@@ -10,11 +9,11 @@ const parameterHandler = ({ payload }) => ({
   pickup_address: payload?.sellerLocation?.address || '',
   pickup_district: payload?.origin?.district || '',
   pickup_city: payload?.origin?.city || '',
-  pickup_service: 'Domestic',
+  pickup_service: 'REG',
   pickup_vechile: payload.should_pickup_with,
   branch: payload?.origin?.jneOriginCode || '',
   cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
-  order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
+  order_id: `${shortid.generate()}${shortid.generate()}`.slice(0, 15),
   shipper_name: payload.sender_name || '',
   shipper_addr1: payload?.sellerLocation?.address?.slice(0, 80) || '',
   shipper_city: payload?.origin?.city || '',
@@ -39,10 +38,10 @@ const parameterHandler = ({ payload }) => ({
   goods_desc: payload.goods_content,
   goods_amount: payload.goodsAmount,
   insurance_flag: payload.is_insurance ? 'Y' : 'N',
-  special_ins: '',
+  special_ins: payload.notes,
   merchant_id: payload.seller.id,
   type: 'PICKUP',
-  cod_flag: payload.is_cod ? 'YES' : 'NO',
+  cod_flag: payload.is_cod ? 'Y' : 'N',
   cod_amount: payload?.is_cod ? payload?.cod_value : 0,
   awb: payload.resi,
 });
