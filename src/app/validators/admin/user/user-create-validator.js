@@ -15,7 +15,7 @@ const validator = joi.object({
   email: joi.string().email().required().external((request) => isDuplicate(request)),
   password: joi.string().min(6).required(),
   role: joi.string().required()
-    .valid('SUPER_ADMIN', 'STAFF', 'SELLER', 'FINANCE', 'LAST_MILE', 'CONTROL_TOWER'),
+    .valid('SUPERADMIN', 'STAFF', 'SELLER', 'FINANCE', 'LAST_MILE', 'CONTROL_TOWER'),
 });
 
 module.exports = (object) => validator.validateAsync(object, {
