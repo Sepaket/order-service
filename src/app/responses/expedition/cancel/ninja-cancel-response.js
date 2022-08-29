@@ -4,6 +4,7 @@ const {
   Order,
   OrderLog,
   sequelize,
+  OrderBackground,
 } = require('../../../models');
 
 module.exports = class {
@@ -12,6 +13,7 @@ module.exports = class {
     this.sicepat = sicepat;
     this.request = request;
     this.orderLog = OrderLog;
+    this.background = OrderBackground;
     return this.process();
   }
 
@@ -32,6 +34,8 @@ module.exports = class {
         const orders = await this.order.findAll({
           where: { id: this.orderIds, expedition: 'NINJA' },
         });
+
+        this.resies = orders.map((item) => item.resi);
 
         const responseMap = orders.map((order) => ({
           id: order.id,
@@ -70,6 +74,12 @@ module.exports = class {
 
       await this.orderLog.bulkCreate(
         payloadLog,
+        { transaction: dbTransaction },
+      );
+
+      await this.background.update(
+        { isExecute: true },
+        { where: { resi: this.resies } },
         { transaction: dbTransaction },
       );
 
