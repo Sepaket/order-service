@@ -170,7 +170,7 @@ module.exports = class {
             weight: item.weight,
             expedition: body.type,
             serviceCode: body.service_code,
-          });
+          }) || 1;
 
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;

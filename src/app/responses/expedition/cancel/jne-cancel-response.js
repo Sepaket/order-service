@@ -59,51 +59,6 @@ module.exports = class {
 
       this.resies = orders.map((item) => item.resi);
 
-      const orderAddresses = await this.orderAddress.findAll({
-        where: { orderId: this.orderIds },
-        include: [
-          {
-            model: this.location,
-            as: 'location',
-            required: false,
-          },
-        ],
-      });
-
-      const orderDetails = await this.orderDetail.findAll({
-        where: { orderId: this.orderIds },
-        include: [
-          {
-            model: this.seller,
-            as: 'seller',
-            required: true,
-          },
-          {
-            model: this.address,
-            as: 'sellerAddress',
-            required: true,
-            include: [
-              {
-                model: this.location,
-                as: 'location',
-                required: false,
-              },
-            ],
-          },
-        ],
-      });
-
-      const payload = orders.map((item) => {
-        const orderDetail = orderDetails.find((detail) => detail.orderId === item.id);
-        const orderAddress = orderAddresses.find((address) => address.orderId === item.id);
-
-        return {
-          order: item,
-          orderDetail,
-          orderAddress,
-        };
-      });
-
       const responseMap = orders.map((order) => ({
         id: order.id,
         resi: order.resi,
@@ -111,13 +66,7 @@ module.exports = class {
         message: 'OK',
       }));
 
-      if (this.orderIds.length > 0) {
-        const parameter = await this.paramsMapper({ payload });
-        await this.insertLog({
-          payload: parameter,
-          orders,
-        });
-      }
+      if (this.orderIds.length > 0) await this.insertLog({ orders });
 
       return responseMap;
     } catch (error) {
@@ -157,19 +106,5 @@ module.exports = class {
       await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
     }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  async paramsMapper({ payload }) {
-    const mapped = payload.map((item) => {
-      const parameter = this.parameterHandler({ payload: item });
-
-      return Object.keys(parameter).reduce((accumulator, key) => {
-        accumulator[key.toUpperCase()] = parameter[key];
-        return accumulator;
-      }, {});
-    });
-
-    return mapped;
   }
 };
