@@ -105,7 +105,11 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
         weight,
       });
 
-      const service = await prices?.find((item) => item.service_code === serviceCode);
+      const service = await prices?.find((item) => {
+        if (item.service_code === 'CTC19' && serviceCode === 'REG19') return item;
+        return item.service_code === serviceCode;
+      });
+
       price = service?.price || 0;
     }
 
