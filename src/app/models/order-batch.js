@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
     model.OrderBatch.belongsTo(model.Seller, {
       as: 'seller',
     });
+
+    model.OrderBatch.hasMany(model.OrderDetail, {
+      as: 'orderDetail',
+      foreignKey: 'batchId',
+    });
   };
 
   return Batch;
