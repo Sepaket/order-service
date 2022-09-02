@@ -1,7 +1,7 @@
 const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { OrderBatch, Seller } = require('../../../models');
+const { OrderBatch, OrderDetail, Seller } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 
 module.exports = class {
@@ -19,7 +19,7 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.batch.count();
+    const total = await this.batch.count({ where: { ...search } });
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
@@ -46,6 +46,12 @@ module.exports = class {
                 ['id', 'seller_id'],
                 'name',
               ],
+            },
+            {
+              model: OrderDetail,
+              as: 'orderDetail',
+              required: true,
+              attributes: ['id'],
             },
           ],
           where: { ...search },
