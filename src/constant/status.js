@@ -25,6 +25,8 @@ const ninjaServiceStatus = [
 ];
 
 const jneServiceStatus = [
+  { code: 'CTCSPS', name: 'JNE CTCSPS', type: 'JNE' },
+  { code: 'CTCYES', name: 'JNE CTCYES', type: 'JNE' },
   { code: 'YES19', name: 'JNE YES', type: 'JNE' },
   { code: 'REG19', name: 'JNE REG', type: 'JNE' },
   { code: 'OKE19', name: 'JNE OKE', type: 'JNE' },

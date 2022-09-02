@@ -162,7 +162,7 @@ module.exports = class {
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
         const codCondition = (
-          item.service_code === 'REG19'
+          (item.service_code === 'REG19' || item.service_code === 'CTC19')
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
         );
 
@@ -201,8 +201,8 @@ module.exports = class {
 
         return {
           weight: body.weight,
-          serviceName: item.service_display,
-          serviceCode: item.service_code,
+          serviceName: item.service_display === 'CTC' ? 'JNE REG' : item.service_display,
+          serviceCode: item.service_code === 'CTC19' ? 'REG19' : item.service_code,
           availableCod: codCondition,
           estimation: `${item.etd_from} - ${item.etd_thru}`,
           estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
