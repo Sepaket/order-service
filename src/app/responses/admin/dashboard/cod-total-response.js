@@ -47,7 +47,7 @@ module.exports = class {
     };
 
     if (query.type === 'total-cod') {
-      condition.status = { [this.op.notIn]: ['CANCEL', 'RETURN_TO_SELLER'] };
+      condition.status = { [this.op.notIn]: ['CANCELED', 'RETURN_TO_SELLER'] };
     }
 
     if (query.type === 'delivered') {
