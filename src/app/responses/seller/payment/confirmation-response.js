@@ -49,7 +49,7 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
-      if (body.status === 'PAID') {
+      if (['PAID', 'COMPLETED'].includes(body.status)) {
         if (credit.withdraw && credit.withdraw !== null) {
           await this.sellerDetail.update(
             { credit: parseFloat(seller?.credit || 0) - parseFloat(body.amount) },
