@@ -94,7 +94,7 @@ const createOrder = (payload) => new Promise((resolve) => {
     }).catch((error) => {
       resolve({
         status: false,
-        message: error?.data?.reason || error?.message || 'Something Wrong',
+        message: error?.response?.data?.reason || error?.message || 'Something Wrong',
       });
     });
   } catch (error) {
