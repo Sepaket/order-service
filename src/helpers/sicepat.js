@@ -82,7 +82,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
   }).catch((error) => {
     resolve({
       status: false,
-      message: error?.data?.error_message || error?.message || 'Something Wrong',
+      message: error?.response?.data?.error_message || error?.message || 'Something Wrong',
     });
   });
 });
