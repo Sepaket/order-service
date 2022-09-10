@@ -38,7 +38,7 @@ const parameterHandler = ({ payload }) => ({
   goods_desc: payload.goods_content,
   goods_amount: payload.goodsAmount,
   insurance_flag: payload.is_insurance ? 'Y' : 'N',
-  special_ins: payload.notes,
+  special_ins: payload.notes || 'FRAGILE',
   merchant_id: payload.seller.id,
   type: 'PICKUP',
   cod_flag: payload.is_cod ? 'Y' : 'N',
