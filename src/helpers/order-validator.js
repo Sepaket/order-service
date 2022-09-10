@@ -41,6 +41,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     if (await required(payload?.goods_category)) error.push({ message: 'Jenis pengiriman harus diisi' });
     if (await required(payload?.goods_qty)) error.push({ message: 'Jumlah/pcs harus diisi' });
     if (await required(payload?.is_insurance)) error.push({ message: 'Asuransi harus diisi 1 atau 0' });
+    if (payload?.goods_qty?.toString()?.length > 5) error.push({ message: 'Jumlah/pcs maksimum 5 digit' });
     if (payload?.goods_content?.length >= 50) error.push({ message: 'Isi paket maximal 50 karakter' });
     if (payload?.receiver_address?.length >= 80) error.push({ message: 'Alamat tujuan maximal 80 karakter' });
     if (payload?.receiver_address_note?.length >= 20) error.push({ message: 'Patokan alamat tujuan maximal 20 karakter' });
