@@ -8,6 +8,7 @@ const NotificationDetailValidator = require('../../validators/admin/notification
 const NotificationResponse = require('../../responses/admin/notification/notification-list-response');
 const NotificationCreateResponse = require('../../responses/admin/notification/notification-create-response');
 const NotificationUpdateResponse = require('../../responses/admin/notification/notification-update-response');
+const NotificationDetailResponse = require('../../responses/admin/notification/notification-detail-response');
 
 module.exports = {
   index: async (request, response, next) => {
@@ -47,7 +48,24 @@ module.exports = {
       await NotificationDetailValidator(request.params);
       await NotificationUpdateValidator(request.body);
 
-      const result = await new NotificationUpdateResponse({ request });
+      await new NotificationUpdateResponse({ request });
+      const result = await new NotificationDetailResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  detail: async (request, response, next) => {
+    try {
+      await NotificationDetailValidator(request.params);
+
+      const result = await new NotificationDetailResponse({ request });
 
       response.send({
         code: 200,
