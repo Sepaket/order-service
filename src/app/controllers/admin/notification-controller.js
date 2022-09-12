@@ -9,6 +9,7 @@ const NotificationResponse = require('../../responses/admin/notification/notific
 const NotificationCreateResponse = require('../../responses/admin/notification/notification-create-response');
 const NotificationUpdateResponse = require('../../responses/admin/notification/notification-update-response');
 const NotificationDetailResponse = require('../../responses/admin/notification/notification-detail-response');
+const NotificationDeleteResponse = require('../../responses/admin/notification/notification-delete-response');
 
 module.exports = {
   index: async (request, response, next) => {
@@ -66,6 +67,22 @@ module.exports = {
       await NotificationDetailValidator(request.params);
 
       const result = await new NotificationDetailResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  delete: async (request, response, next) => {
+    try {
+      await NotificationDetailValidator(request.params);
+
+      const result = await new NotificationDeleteResponse({ request });
 
       response.send({
         code: 200,
