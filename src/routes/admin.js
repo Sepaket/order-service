@@ -82,6 +82,7 @@ router.group('/order', (route) => {
 router.group('/notification', (route) => {
   route.get('/', Authorization, NotificationController.index);
   route.post('/', Authorization, NotificationController.create);
+  route.post('/:id', Authorization, NotificationController.update);
 });
 
 // method not allowed when method request http is failure
