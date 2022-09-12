@@ -157,6 +157,18 @@ module.exports = class {
           let parameter = null;
           sicepatResi += 1;
           const resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+          const checkResiUndone = await this.order.findOne({
+            where: {
+              resi,
+              expedition: body.type,
+              status: { [this.op.notIn]: ['DELIVERED', 'RETURN_TO_SELLER'] },
+            },
+          });
+
+          if (checkResiUndone) {
+            const created = await this.createOrder();
+            return created;
+          }
 
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
