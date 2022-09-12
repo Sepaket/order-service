@@ -1,9 +1,9 @@
 // validator
-const NotificationReadValidator = require('../../validators/seller/payment/withdraw-validator');
+const NotificationReadValidator = require('../../validators/seller/notification/read-validator');
 
 // responses
 const NotificationResponse = require('../../responses/seller/notification/notification-list-response');
-const WithdrawResponse = require('../../responses/seller/payment/withdraw-response');
+const NotificationReadResponse = require('../../responses/seller/notification/notification-read-response');
 
 module.exports = {
   index: async (request, response, next) => {
@@ -22,9 +22,9 @@ module.exports = {
 
   read: async (request, response, next) => {
     try {
-      await NotificationReadValidator(request.body);
+      await NotificationReadValidator(request.params);
 
-      const result = await new WithdrawResponse({ request });
+      const result = await new NotificationReadResponse({ request });
 
       response.send({
         code: 200,

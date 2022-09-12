@@ -77,6 +77,7 @@ router.group('/payment', (route) => {
 
 router.group('/notification', (route) => {
   route.get('/', Authorization, NotificationController.index);
+  route.get('/:id', Authorization, NotificationController.read);
 });
 
 // method not allowed when method request http is failure
