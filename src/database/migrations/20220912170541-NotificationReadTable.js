@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => Promise.all([
     queryInterface.createTable(table, {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         primaryKey: true,
         allowNull: false,
       },

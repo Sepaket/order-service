@@ -44,7 +44,7 @@ module.exports = class {
 
           const mapped = result?.map((item) => ({
             ...item,
-            message: `${item.substring(0, 10)}...`,
+            message: `${item.message.substring(0, 10)}...`,
           }));
 
           if (mapped.length > 0) {

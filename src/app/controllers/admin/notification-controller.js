@@ -1,13 +1,10 @@
 // validators
 const NotificationListValidator = require('../../validators/admin/notification/list-validator');
-const SellerCreateValidator = require('../../validators/admin/seller/seller-create-validator');
-const SellerDeleteValidator = require('../../validators/admin/seller/seller-delete-validator');
+const NotificationCreateValidator = require('../../validators/admin/notification/create-validator');
 
 // responses
 const NotificationResponse = require('../../responses/admin/notification/notification-list-response');
-const SellerDetailResponse = require('../../responses/admin/seller/seller-detail-response');
-const SellerCreateResponse = require('../../responses/admin/seller/seller-create-response');
-const SellerDeleteResponse = require('../../responses/admin/seller/seller-delete-response');
+const NotificationCreateResponse = require('../../responses/admin/notification/notification-create-response');
 
 module.exports = {
   index: async (request, response, next) => {
@@ -26,40 +23,11 @@ module.exports = {
     }
   },
 
-  detail: async (request, response, next) => {
-    try {
-      const result = await new SellerDetailResponse({ request });
-
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-
   create: async (request, response, next) => {
     try {
-      await SellerCreateValidator(request.body);
+      await NotificationCreateValidator(request.body);
 
-      const result = await new SellerCreateResponse({ request });
-
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  delete: async (request, response, next) => {
-    try {
-      await SellerDeleteValidator(request.params);
-      const result = await new SellerDeleteResponse({ request });
+      const result = await new NotificationCreateResponse({ request });
 
       response.send({
         code: 200,
