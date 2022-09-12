@@ -65,7 +65,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
 
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${await random({ min: 1, max: 5, integer: true })}
+      ${await random({ min: 100000, max: 999999, integer: true })}
       ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
       ${id.length > 1 ? id : `0${id}`}
     `;
