@@ -13,29 +13,29 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    start_date: {
+    startDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    end_date: {
+    endDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    is_draft: {
+    isDraft: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'faqs',
+    tableName: 'notifications',
   });
 
   Notification.associate = (model) => {
