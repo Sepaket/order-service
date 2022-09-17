@@ -13,9 +13,9 @@ services:
     ports:
       - 5432:3111
     environment:
-      POSTGRES_DB: sepaket
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: "aDmin123~"
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./db-data:/var/lib/postgresql/data
   adminer:

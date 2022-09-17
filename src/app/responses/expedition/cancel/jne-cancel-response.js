@@ -1,33 +1,23 @@
-const { Sequelize } = require('sequelize');
 const jne = require('../../../../helpers/jne');
 const orderStatus = require('../../../../constant/order-status');
-const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const {
-  Location,
-  Seller,
   Order,
   OrderLog,
-  OrderDetail,
-  OrderAddress,
-  SellerAddress,
-  OrderBackground,
   sequelize,
+  OrderDetail,
+  SellerDetail,
+  OrderBackground,
 } = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
     this.order = Order;
-    this.seller = Seller;
-    this.op = Sequelize.Op;
     this.request = request;
-    this.location = Location;
     this.orderLog = OrderLog;
-    this.address = SellerAddress;
     this.orderDetail = OrderDetail;
-    this.orderAddress = OrderAddress;
+    this.sellerDetail = SellerDetail;
     this.background = OrderBackground;
-    this.converter = snakeCaseConverter;
     return this.process();
   }
 
@@ -55,6 +45,11 @@ module.exports = class {
 
       const orders = await this.order.findAll({
         where: { id: this.orderIds, expedition: 'JNE' },
+      });
+
+      this.orderNotCod = await this.order.findAll({
+        where: { id: this.orderIds, isCod: false },
+        include: [{ model: this.orderDetail, as: 'detail', required: true }],
       });
 
       this.resies = orders.map((item) => item.resi);
@@ -86,13 +81,13 @@ module.exports = class {
 
       await this.order.update(
         { status: orderStatus.CANCELED.text },
-        { where: { id: { [this.op.in]: this.orderIds } } },
+        { where: { id: this.orderIds } },
         { transaction: dbTransaction },
       );
 
       await this.background.update(
         { isExecute: true },
-        { where: { resi: { [this.op.in]: this.resies } } },
+        { where: { resi: this.resies } },
         { transaction: dbTransaction },
       );
 
@@ -100,6 +95,38 @@ module.exports = class {
         payloadLog,
         { transaction: dbTransaction },
       );
+
+      if (this.orderNotCod.length > 0) {
+        const orders = this.orderNotCod;
+        const credits = orders.map((item) => ({
+          charge: item.detail.shippingCharge,
+          sellerId: item.detail.sellerId,
+        }));
+
+        const sellerId = orders.map((item) => item.detail.sellerId);
+        const sellers = await this.sellerDetail.findAll({ where: { sellerId } });
+        const mapped = sellers.map((seller) => {
+          const charges = credits
+            .filter((item) => item.sellerId === seller.sellerId)
+            .map((item) => item.charge)
+            .reduce((total, item) => parseFloat(item) + parseFloat(total), parseFloat(0));
+
+          return {
+            id: seller.sellerId,
+            credit: parseFloat(charges) + parseFloat(seller.credit),
+          };
+        });
+
+        await Promise.all(
+          mapped.map(async (item) => {
+            await this.sellerDetail.update(
+              { credit: item.credit },
+              { where: { sellerId: item.id } },
+              { transaction: dbTransaction },
+            );
+          }),
+        );
+      }
 
       await dbTransaction.commit();
     } catch (error) {
