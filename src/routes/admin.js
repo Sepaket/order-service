@@ -15,6 +15,7 @@ const TrackingController = require('../app/controllers/admin/order-tracking-cont
 const BalanceController = require('../app/controllers/admin/balance-controller');
 const OrderController = require('../app/controllers/admin/order-controller');
 const DashboardController = require('../app/controllers/admin/dashboard-controller');
+const TicketController = require('../app/controllers/admin/ticket-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -76,6 +77,13 @@ router.group('/order', (route) => {
   route.post('/export', Authorization, OrderController.export);
   route.post('/print', Authorization, OrderController.print);
   route.get('/:id', Authorization, OrderController.detail);
+});
+
+router.group('/ticket', (route) => {
+  route.get('/', Authorization, TicketController.index);
+  route.get('/:id', Authorization, TicketController.detail);
+  route.post('/:id', Authorization, TicketController.comment);
+  // route.get('/:id/:status', Authorization, TicketController.);
 });
 
 // method not allowed when method request http is failure
