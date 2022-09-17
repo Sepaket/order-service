@@ -78,6 +78,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
+    model.Order.hasOne(model.Ticket, {
+      as: 'ticket',
+      foreignKey: 'orderId',
+    });
+
     model.Order.hasMany(model.OrderLog, {
       as: 'statuses',
       foreignKey: 'orderId',

@@ -6,16 +6,20 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    seller_id: {
+    sellerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    order_id: {
+    orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     title: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    message: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     category: {
@@ -38,16 +42,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deleted_at: {
+    deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
     },
@@ -62,6 +66,16 @@ module.exports = (sequelize, DataTypes) => {
     charset: 'utf8',
     tableName: 'tickets',
   });
+
+  Ticket.associate = (model) => {
+    model.Ticket.belongsTo(model.Order, {
+      as: 'order',
+    });
+
+    model.Ticket.belongsTo(model.Seller, {
+      as: 'seller',
+    });
+  };
 
   return Ticket;
 };

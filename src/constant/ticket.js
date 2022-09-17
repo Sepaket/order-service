@@ -27,18 +27,18 @@ const priority = {
   LOW: 'LOW',
 };
 
-const category = [
-  { content: 'Stuck Progress' },
-  { content: 'Request Redelivery' },
-  { content: 'Request Update Status' },
-  { content: 'Request Takeself' },
-  { content: 'Request Return' },
-  { content: 'Fake Status' },
-  { content: 'Damage/Lost' },
+const categories = [
+  { id: 1, content: 'Stuck Progress' },
+  { id: 2, content: 'Request Redelivery' },
+  { id: 3, content: 'Request Update Status' },
+  { id: 4, content: 'Request Takeself' },
+  { id: 5, content: 'Request Return' },
+  { id: 6, content: 'Fake Status' },
+  { id: 7, content: 'Damage/Lost' },
 ];
 
 module.exports = {
   status,
   priority,
-  category,
+  categories,
 };
