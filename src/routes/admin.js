@@ -16,6 +16,7 @@ const BalanceController = require('../app/controllers/admin/balance-controller')
 const OrderController = require('../app/controllers/admin/order-controller');
 const DashboardController = require('../app/controllers/admin/dashboard-controller');
 const TicketController = require('../app/controllers/admin/ticket-controller');
+const NotificationController = require('../app/controllers/admin/notification-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -77,6 +78,14 @@ router.group('/order', (route) => {
   route.post('/export', Authorization, OrderController.export);
   route.post('/print', Authorization, OrderController.print);
   route.get('/:id', Authorization, OrderController.detail);
+});
+
+router.group('/notification', (route) => {
+  route.get('/', Authorization, NotificationController.index);
+  route.post('/', Authorization, NotificationController.create);
+  route.post('/:id', Authorization, NotificationController.update);
+  route.get('/:id', Authorization, NotificationController.detail);
+  route.delete('/:id', Authorization, NotificationController.delete);
 });
 
 router.group('/ticket', (route) => {

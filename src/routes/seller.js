@@ -12,6 +12,7 @@ const OrderController = require('../app/controllers/seller/order-controller');
 const ReportController = require('../app/controllers/seller/report-controller');
 const PaymentController = require('../app/controllers/seller/payment-controller');
 const DashboardController = require('../app/controllers/seller/dashboard-controller');
+const NotificationController = require('../app/controllers/seller/notification-controller');
 const TicketController = require('../app/controllers/seller/ticket-controller');
 
 router.group('/auth', (route) => {
@@ -73,6 +74,11 @@ router.group('/payment', (route) => {
   route.post('/callback', PaymentController.callback);
   route.get('/history', Authorization, PaymentController.history);
   route.get('/summary', Authorization, PaymentController.summary);
+});
+
+router.group('/notification', (route) => {
+  route.get('/', Authorization, NotificationController.index);
+  route.get('/:id', Authorization, NotificationController.read);
 });
 
 router.group('/ticket', (route) => {
