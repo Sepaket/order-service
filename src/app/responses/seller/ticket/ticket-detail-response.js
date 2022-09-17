@@ -27,6 +27,7 @@ module.exports = class {
           'priority',
           'file',
           'comment',
+          'status',
           'createdAt',
         ],
         where: {

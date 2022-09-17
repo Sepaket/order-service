@@ -26,6 +26,7 @@ module.exports = class {
           'file',
           'comment',
           'createdAt',
+          'status',
         ],
         where: { id: params.id },
         include: [

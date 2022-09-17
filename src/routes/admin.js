@@ -83,7 +83,7 @@ router.group('/ticket', (route) => {
   route.get('/', Authorization, TicketController.index);
   route.get('/:id', Authorization, TicketController.detail);
   route.post('/:id', Authorization, TicketController.comment);
-  // route.get('/:id/:status', Authorization, TicketController.);
+  route.get('/:id/:status', Authorization, TicketController.update);
 });
 
 // method not allowed when method request http is failure
