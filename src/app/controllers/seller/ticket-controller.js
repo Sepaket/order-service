@@ -61,7 +61,7 @@ module.exports = {
 
   comment: async (request, response, next) => {
     try {
-      await TicketCommentValidator(request);
+      await TicketCommentValidator(request.body);
       await TicketDetailValidator(request);
 
       await new TicketCommentResponse({ request });
