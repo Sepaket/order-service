@@ -35,6 +35,7 @@ module.exports = class {
     return {
       title: body.title,
       message: body.message,
+      type: body.type,
       isDraft: body.is_draft,
       startDate: body.start_date,
       endDate: body.end_date,

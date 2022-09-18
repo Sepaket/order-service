@@ -24,6 +24,9 @@ module.exports = class {
             ['id', 'notification_id'],
             'title',
             'message',
+            'type',
+            'startDate',
+            'endDate',
           ],
         }).then(async (response) => {
           const result = await this.converter.arrayToSnakeCase(

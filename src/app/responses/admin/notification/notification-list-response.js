@@ -29,6 +29,7 @@ module.exports = class {
             ['id', 'notification_id'],
             'title',
             'message',
+            'type',
             'startDate',
             'endDate',
             'isDraft',
