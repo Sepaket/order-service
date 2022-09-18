@@ -1,15 +1,15 @@
-const moment = require('moment');
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { OrderBatch, OrderDetail, Seller } = require('../../../models');
+const { Ticket, Order } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
-    this.seller = Seller;
     this.op = Sequelize.Op;
     this.request = request;
-    this.batch = OrderBatch;
+    this.ticket = Ticket;
+    this.order = Order;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -19,42 +19,37 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
-    const total = await this.batch.count({ where: { ...search } });
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
+    const seller = await jwtSelector({ request: this.request });
+    const total = await this.ticket.count({ where: { sellerId: seller.id } });
 
     return new Promise((resolve, reject) => {
       try {
-        this.batch.findAll({
+        this.ticket.findAll({
           attributes: [
-            ['id', 'batch_id'],
-            'expedition',
-            'batchCode',
-            'totalOrder',
-            'totalOrderProcessed',
-            'totalOrderSent',
-            'totalOrderProblem',
+            ['id', 'ticket_id'],
+            'title',
+            'category',
+            'priority',
+            'status',
+            'message',
+            'file',
             'createdAt',
           ],
           include: [
             {
-              model: this.seller,
-              as: 'seller',
+              model: this.order,
+              as: 'order',
               required: true,
               attributes: [
-                ['id', 'seller_id'],
-                'name',
+                ['id', 'order_id'],
+                'resi',
               ],
             },
-            {
-              model: OrderDetail,
-              as: 'orderDetail',
-              required: true,
-              attributes: ['id'],
-            },
           ],
-          where: { ...search },
+          where: { ...search, sellerId: seller.id },
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
@@ -79,7 +74,7 @@ module.exports = class {
                 data: [],
                 meta: {
                   total,
-                  total_result: result.length,
+                  total_result: 0,
                   limit: parseInt(query.limit, 10) || limit,
                   page: parseInt(query.page, 10) || (offset + 1),
                 },
@@ -97,19 +92,13 @@ module.exports = class {
     const { query } = this.request;
     const condition = {
       [this.op.or]: {
-        batchCode: { [this.op.substring]: query?.keyword || '' },
+        title: { [this.op.substring]: query?.keyword || '' },
+        category: { [this.op.substring]: query?.keyword || '' },
+        message: { [this.op.substring]: query?.keyword || '' },
+        status: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
       },
     };
 
-    if (query?.date_start && query?.date_end) {
-      condition.createdAt = {
-        [this.op.between]: [
-          moment(`${query?.date_start}`).startOf('day').format(),
-          moment(`${query?.date_end}`).endOf('day').format(),
-        ],
-      };
-    }
-
-    return (query?.date_start || query?.keyword) ? condition : {};
+    return condition;
   }
 };
