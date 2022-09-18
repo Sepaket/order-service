@@ -85,7 +85,9 @@ const tracking = async () => {
             { where: { resi: item.resi } },
           );
 
-          if (currentStatus === 'DELIVERED' && item.isCod) {
+          const log = await OrderLog.findAll({ where: { orderId: item.id, currentStatus: 'DELIVERED' } });
+
+          if (trackingStatus?.code === 'DELIVERED' && item.isCod && log.length > 0 && log.length < 2) {
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
