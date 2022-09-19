@@ -1,12 +1,15 @@
 const moment = require('moment');
 const httpErrors = require('http-errors');
-const { NotificationRead, sequelize } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
+const { NotificationRead, Notification, sequelize } = require('../../../models');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 
 module.exports = class {
   constructor({ request }) {
     this.request = request;
     this.reader = NotificationRead;
+    this.notification = Notification;
+    this.converter = snakeCaseConverter;
     return this.process();
   }
 
@@ -14,6 +17,7 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
+      const { params } = this.request;
       this.seller = await jwtSelector({ request: this.request });
       const parameterMapper = await this.mapper();
 
@@ -22,8 +26,25 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
+      const notification = await this.notification.findOne({
+        attributes: [
+          ['id', 'notification_id'],
+          'title',
+          'message',
+          'type',
+          'startDate',
+          'endDate',
+          'isDraft',
+        ],
+        where: { id: params.id },
+      });
+
+      const result = this.converter.objectToSnakeCase(
+        JSON.parse(JSON.stringify(notification)),
+      );
+
       await dbTransaction.commit();
-      return true;
+      return result;
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
