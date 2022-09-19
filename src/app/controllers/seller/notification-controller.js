@@ -1,9 +1,9 @@
 // validator
-const NotificationReadValidator = require('../../validators/seller/notification/read-validator');
+const NotificationDetailValidator = require('../../validators/seller/notification/detail-validator');
 
 // responses
 const NotificationResponse = require('../../responses/seller/notification/notification-list-response');
-const NotificationReadResponse = require('../../responses/seller/notification/notification-read-response');
+const NotificationDetailResponse = require('../../responses/seller/notification/notification-detail-response');
 
 module.exports = {
   index: async (request, response, next) => {
@@ -22,9 +22,9 @@ module.exports = {
 
   read: async (request, response, next) => {
     try {
-      await NotificationReadValidator(request.params);
+      await NotificationDetailValidator(request.params);
 
-      const result = await new NotificationReadResponse({ request });
+      const result = await new NotificationDetailResponse({ request });
 
       response.send({
         code: 200,
