@@ -46,7 +46,7 @@ module.exports = class {
           }) || [];
 
           if (filtered.length > 0) {
-            resolve(result);
+            resolve(filtered);
           } else {
             reject(httpErrors(404, 'No Data Found', { data: [] }));
           }
