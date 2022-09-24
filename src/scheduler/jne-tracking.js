@@ -85,17 +85,16 @@ const tracking = async () => {
             { where: { resi: item.resi } },
           );
 
-          const log = await OrderLog.findAll({ where: { orderId: item.id, currentStatus: 'DELIVERED' } });
+          const log = await OrderLog.findAll({ where: { orderId: item.id } });
 
-          if (trackingStatus?.code === 'DELIVERED' && item.isCod && log.length > 0 && log.length < 2) {
+          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0 && log.length < 2) {
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
             });
 
-            const calculated = (
-              parseFloat(currentCredit.credit) + parseFloat(orderDetail.sellerReceivedAmount)
-            );
+            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
+            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
 
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
