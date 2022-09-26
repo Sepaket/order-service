@@ -6,9 +6,9 @@ ENV NODE_ENV=development
 
 WORKDIR /home/express/sepaket
 
-COPY ["package.json", "package-lock.json*", "./"]
+COPY ["package.json", "./"]
 
-RUN npm install
+RUN npm install --production --no-optional
 
 COPY . .
 
