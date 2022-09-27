@@ -12,7 +12,10 @@ const isDuplicate = async (request) => new Promise((resolve, reject) => {
 
 const isExist = async ({ params, identifier }) => new Promise((resolve, reject) => {
   SellerDetail.findOne({
-    where: { [`${identifier}`]: params },
+    where: {
+      [`${identifier}`]: params,
+      deletedAt: null,
+    },
   }).then((result) => {
     if (!result) reject(new Error(`This ${identifier.split('_').join(' ')} does not exist`));
     else resolve(true);
@@ -35,7 +38,6 @@ const validator = joi.object({
   phone: joi.number().min(10).required(),
   referal_code: joi
     .string()
-    .email()
     .required()
     .external((request) => isExist({ params: request, identifier: 'referalCode' })),
 });
