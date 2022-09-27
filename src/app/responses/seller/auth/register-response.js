@@ -1,14 +1,20 @@
 const httpErrors = require('http-errors');
 const shortid = require('shortid-36');
-const { Seller, SellerDetail, sequelize } = require('../../../models');
 const hash = require('../../../../helpers/hash');
 const sender = require('../../../../helpers/email-sender');
 const { setRedisData } = require('../../../../helpers/redis');
+const {
+  Seller,
+  sequelize,
+  SellerDetail,
+  SellerReferal,
+} = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.seller = Seller;
     this.sellerDetail = SellerDetail;
+    this.sellerReferal = SellerReferal;
     this.request = request;
     return this.process();
   }
@@ -32,6 +38,21 @@ module.exports = class {
         },
         { transaction: dbTransaction },
       );
+
+      if (body.referal_code) {
+        const parrent = await this.sellerDetail.findOne({
+          where: { referalCode: body.referal_code },
+        });
+
+        await this.sellerReferal.create(
+          {
+            sellerId: parrent.sellerId,
+            memberId: seller.id,
+            referalCode: body.referal_code,
+          },
+          { transaction: dbTransaction },
+        );
+      }
 
       await this.send();
 

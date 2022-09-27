@@ -1,4 +1,4 @@
-const table = 'tickets';
+const table = 'seller_referals';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => Promise.all([
@@ -16,6 +16,7 @@ module.exports = {
       member_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        comment: 'get this id from seller register with referal code',
       },
       referal_code: {
         type: Sequelize.STRING,
@@ -35,6 +36,9 @@ module.exports = {
         allowNull: true,
       },
     }).then(() => [
+      queryInterface.addIndex(table, { fields: ['seller_id'], name: `seller_id_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['member_id'], name: `member_id_${table}_idx` }),
+      queryInterface.addIndex(table, { fields: ['referal_code'], name: `referal_code_${table}_idx` }),
     ]),
   ]),
 
