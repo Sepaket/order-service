@@ -19,7 +19,7 @@ module.exports = class {
         const prevComment = ticket?.comment;
         const comments = [];
 
-        if (ticket) comments.push(...prevComment);
+        if (ticket?.comment) comments.push(...prevComment);
         comments.push(parameter);
 
         const payload = comments.filter((item) => item);
