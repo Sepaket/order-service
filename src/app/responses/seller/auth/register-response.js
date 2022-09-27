@@ -17,6 +17,7 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
+      const { body } = this.request;
       const parameterMapper = await this.mapper();
 
       const seller = await this.seller.create(
@@ -25,7 +26,10 @@ module.exports = class {
       );
 
       await this.sellerDetail.create(
-        { sellerId: seller.id },
+        {
+          sellerId: seller.id,
+          referalCode: body.referal_code,
+        },
         { transaction: dbTransaction },
       );
 
