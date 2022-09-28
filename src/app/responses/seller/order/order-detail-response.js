@@ -133,6 +133,7 @@ module.exports = class {
           );
 
           const orderLogs = await this.orderLog.findAll({
+            order: [['id', 'ASC']],
             where: { orderId: result.order_id },
           });
 
