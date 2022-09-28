@@ -1,7 +1,7 @@
 const joi = require('joi');
 
 const validator = joi.object({
-  photo: joi.string().required(),
+  photo: joi.string().allow('', null),
   name: joi.string().required(),
   email: joi.string().email().required(),
   phone: joi.number().min(10).required(),
