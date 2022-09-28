@@ -17,6 +17,7 @@ const OrderController = require('../app/controllers/admin/order-controller');
 const DashboardController = require('../app/controllers/admin/dashboard-controller');
 const TicketController = require('../app/controllers/admin/ticket-controller');
 const NotificationController = require('../app/controllers/admin/notification-controller');
+const ReferalController = require('../app/controllers/admin/referal-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -93,6 +94,11 @@ router.group('/ticket', (route) => {
   route.get('/:id', Authorization, TicketController.detail);
   route.post('/:id', Authorization, TicketController.comment);
   route.get('/:id/:status', Authorization, TicketController.update);
+});
+
+router.group('/referal', (route) => {
+  route.get('/', Authorization, ReferalController.index);
+  route.get('/:id', Authorization, ReferalController.detail);
 });
 
 // method not allowed when method request http is failure
