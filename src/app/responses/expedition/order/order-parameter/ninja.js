@@ -34,6 +34,7 @@ const paramsMapper = ({ payload }) => ({
   },
   parcel_job: {
     is_pickup_required: true,
+    cash_on_delivery: payload?.is_cod ? parseFloat(payload?.cod_value || 0) : null,
     pickup_service_type: 'Scheduled',
     pickup_service_level: payload.service_code,
     pickup_date: payload.pickup_date,

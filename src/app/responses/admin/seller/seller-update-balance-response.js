@@ -17,8 +17,11 @@ module.exports = class {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      await this.sellerDetail.update(
-        { credit: sequelize.literal(`coalesce(credit,0) + ${body.amount}`) },
+      const seller = await this.sellerDetail.findOne({ where: { sellerId: body.seller_id } });
+      const newCredit = (parseFloat(seller.credit) || 0) + (parseFloat(body.amount) || 0);
+
+      await seller.update(
+        { credit: parseFloat(newCredit) },
         {
           where: { sellerId: body.seller_id },
           transaction: dbTransaction,

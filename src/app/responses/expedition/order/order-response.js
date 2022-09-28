@@ -150,10 +150,10 @@ module.exports = class {
       }
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
-        ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '00000'
-        : '00000';
+        ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
+        : '0000';
 
-      let sicepatResi = currentResi === '99999' ? parseInt('00000', 10) : parseInt(currentResi, 10);
+      let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           let parameter = null;

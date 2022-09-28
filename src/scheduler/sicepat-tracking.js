@@ -89,9 +89,8 @@ const tracking = async () => {
               where: { sellerId: orderDetail.sellerId },
             });
 
-            const calculated = (
-              parseFloat(currentCredit.credit) + parseFloat(orderDetail.sellerReceivedAmount)
-            );
+            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
+            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
 
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
