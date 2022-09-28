@@ -10,6 +10,7 @@ const LocationController = require('../app/controllers/general/location-controll
 const FaqConrtoller = require('../app/controllers/general/faq-controller');
 const UploadController = require('../app/controllers/general/upload-controller');
 const BankController = require('../app/controllers/general/bank-controller');
+const TicketCategory = require('../app/controllers/general/ticket-category-controller');
 
 router.group('/location', (route) => {
   route.get('/', LocationController.index);
@@ -24,6 +25,11 @@ router.group('/faq', (route) => {
 router.group('/bank', (route) => {
   route.get('/', BankController.index);
   route.get('/:id', BankController.detail);
+});
+
+router.group('/ticket-category', (route) => {
+  route.get('/', TicketCategory.index);
+  route.get('/:id', TicketCategory.detail);
 });
 
 router.group('/upload', (route) => {
