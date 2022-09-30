@@ -1,6 +1,6 @@
 {
   "name": "sepaket-api",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "sepaket api",
   "main": "index.js",
   "scripts": {
