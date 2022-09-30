@@ -10,6 +10,10 @@ services:
   sepaket_api:
     build: .
     env_file: .env
+    volumes:
+      - ./public/file:/home/express/sepaket/public/file
+      - /home/express/sepaket/public/file/seller
+      - /home/express/sepaket/public/file/admin
     ports:
       - 3000:3000
     command: "npm run start"
