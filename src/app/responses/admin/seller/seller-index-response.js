@@ -51,12 +51,20 @@ module.exports = class {
           JSON.parse(JSON.stringify(response)),
         );
 
-        if (result.length > 0) {
+        const mapped = result.map((item) => ({
+          ...item,
+          seller_detail: {
+            ...item.seller_detail,
+            credit: (parseFloat(item.seller_detail.credit) || 0),
+          },
+        }));
+
+        if (mapped.length > 0) {
           resolve({
-            data: result,
+            data: mapped,
             meta: {
               total,
-              total_result: result.length,
+              total_result: mapped.length,
               limit: parseInt(query.limit, 10) || limit,
               page: parseInt(query.page, 10) || (offset + 1),
             },
@@ -67,7 +75,7 @@ module.exports = class {
               data: [],
               meta: {
                 total,
-                total_result: result.length,
+                total_result: 0,
                 limit: parseInt(query.limit, 10) || limit,
                 page: parseInt(query.page, 10) || (offset + 1),
               },
