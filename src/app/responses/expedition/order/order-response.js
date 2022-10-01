@@ -86,8 +86,8 @@ module.exports = class {
       });
 
       const order = await this.order.findOne({
+        order: [['id', 'DESC']],
         where: { expedition: 'SICEPAT' },
-        order: [['resi', 'DESC']],
       });
 
       const insurance = await this.insurance.findOne({
@@ -158,7 +158,7 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
           let parameter = null;
           sicepatResi += 1;
-          const resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+          let resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           const checkResiUndone = await this.order.findOne({
             where: {
               resi,
@@ -166,10 +166,9 @@ module.exports = class {
               status: { [this.op.notIn]: ['DELIVERED', 'RETURN_TO_SELLER'] },
             },
           });
-
           if (checkResiUndone) {
-            const created = await this.createOrder();
-            return created;
+            sicepatResi += 1;
+            resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           }
 
           const origin = sellerLocation?.location;
