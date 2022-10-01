@@ -42,8 +42,7 @@ module.exports = class {
       });
 
       const externalId = `Sepaket-${shortid.generate()}${latestCredit?.id || 1}`;
-
-      if (seller.credit < 10000) throw new Error('Saldo anda tidak mencukupi untuk melakukan penarikan dana');
+      if (seller.credit < parseFloat(body.amount)) throw new Error('Saldo anda tidak mencukupi untuk melakukan penarikan dana');
       if (parseFloat(body.amount) < parseFloat(10000)) throw new Error('Minimal penarikan 10.000');
       if (!seller.bankId || !bank) throw new Error('Harap perbarui informasi bank anda');
 
