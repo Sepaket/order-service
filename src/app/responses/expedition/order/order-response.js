@@ -166,6 +166,7 @@ module.exports = class {
               status: { [this.op.notIn]: ['DELIVERED', 'RETURN_TO_SELLER'] },
             },
           });
+
           if (checkResiUndone) {
             sicepatResi += 1;
             resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
