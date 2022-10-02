@@ -6,45 +6,40 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    batchId: {
+    sellerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    orderCode: {
+    orderId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    resi: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: false,
-    },
-    expedition: {
-      type: DataTypes.STRING,
+    message: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    serviceCode: {
+    category: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    isCod: {
-      type: DataTypes.BOOLEAN,
+    priority: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    orderDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    orderTime: {
-      type: DataTypes.TIME,
-      allowNull: false,
+    file: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     status: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    pod_status: {
-      type: DataTypes.STRING,
+    comment: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
     createdAt: {
@@ -62,32 +57,25 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  const Order = sequelize.define('Order', schema, {
+  const Ticket = sequelize.define('Ticket', schema, {
     timestamps: true,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB',
     charset: 'utf8',
-    tableName: 'orders',
+    tableName: 'tickets',
   });
 
-  Order.associate = (model) => {
-    model.Order.hasOne(model.OrderDetail, {
-      as: 'detail',
-      foreignKey: 'orderId',
+  Ticket.associate = (model) => {
+    model.Ticket.belongsTo(model.Order, {
+      as: 'order',
     });
 
-    model.Order.hasOne(model.Ticket, {
-      as: 'ticket',
-      foreignKey: 'orderId',
-    });
-
-    model.Order.hasMany(model.OrderLog, {
-      as: 'statuses',
-      foreignKey: 'orderId',
+    model.Ticket.belongsTo(model.Seller, {
+      as: 'seller',
     });
   };
 
-  return Order;
+  return Ticket;
 };
