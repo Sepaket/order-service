@@ -37,6 +37,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     if (await required(payload?.receiver_phone)) error.push({ message: 'No. Telepon tujuan harus diisi' });
     if (await required(payload?.receiver_address)) error.push({ message: 'Alamat tujuan harus diisi' });
     if (await required(payload?.receiver_location_id)) error.push({ message: 'Alamat Detail tujuan harus diisi' });
+    if (await required(payload?.sellerLocation)) error.push({ message: 'Alamat Anda tidak ada di database' });
     if (await required(payload?.goods_content)) error.push({ message: 'Isi paket harus diisi' });
     if (await required(payload?.goods_category)) error.push({ message: 'Jenis pengiriman harus diisi' });
     if (await required(payload?.goods_qty)) error.push({ message: 'Jumlah/pcs harus diisi' });
