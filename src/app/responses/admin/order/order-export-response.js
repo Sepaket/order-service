@@ -193,7 +193,7 @@ module.exports = class {
     const condition = {};
 
     if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
-    if (body?.creteadAt && body?.createdAt !== '') {
+    if (body?.date_start && body?.date_start !== '') {
       condition.createdAt = {
         [this.op.between]: [
           moment(`${body?.date_start}`).startOf('day').format(),
