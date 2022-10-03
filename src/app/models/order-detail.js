@@ -138,6 +138,12 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
+
+    model.OrderDetail.belongsTo(model.OrderBatch, {
+      as: 'batch',
+      targetKey: 'id',
+      foreignKey: 'batchId',
+    });
   };
 
   return OrderDetail;
