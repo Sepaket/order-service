@@ -128,7 +128,35 @@ module.exports = class {
           const mapped = result?.map((item) => {
             const itemResponse = item;
 
-            itemResponse.order.goods_price = 0;
+            let vatCalculated = item?.tax?.vatTax;
+            if (item?.tax && item?.tax?.vatType === 'PERCENTAGE') {
+              vatCalculated = (
+                parseFloat(item?.shipping_charge)
+                * parseFloat(item?.tax?.vatTax)
+              ) / 100;
+            }
+
+            const codFeeCalculated = parseFloat(vatCalculated) + parseFloat(item.cod_fee_admin);
+            const shippingDiscount = (
+              parseFloat(item.shipping_charge) - parseFloat(item.discount.value)
+            );
+            let shippingChargeTotal = (
+              parseFloat(shippingDiscount)
+              + parseFloat(vatCalculated)
+              + parseFloat(item.insurance_amount)
+            );
+
+            if (item.order.isCod) {
+              shippingChargeTotal = (
+                parseFloat(shippingDiscount)
+                + parseFloat(codFeeCalculated)
+                + parseFloat(item.insurance_amount)
+              );
+            }
+
+            itemResponse.shipping_charge_discount = Number(shippingDiscount).toFixed(2);
+            itemResponse.shipping_charge_total = Number(shippingChargeTotal).toFixed(2);
+            itemResponse.cod_fee_calculated = Number(codFeeCalculated).toFixed(2);
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
             itemResponse.order.cod_fee = item.cod_fee_admin;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
