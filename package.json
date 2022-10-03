@@ -17,7 +17,8 @@
     "seed": "npx sequelize-cli db:seed:all",
     "seed:undo": "npx sequelize-cli db:seed:undo",
     "seed:undo:all": "npx sequelize-cli db:seed:undo:all",
-    "reset:db": "npm run migrate:undo:all && npm run migrate && npm run seed"
+    "reset:db": "npm run migrate:undo:all && npm run migrate && npm run seed",
+    "db:sync": "npx sequelize-cli db:seed --seed 20220928122416-FixSyncSeeder.js"
   },
   "husky": {
     "hooks": {

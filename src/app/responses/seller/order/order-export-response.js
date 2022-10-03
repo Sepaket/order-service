@@ -163,16 +163,17 @@ module.exports = class {
 
   querySearch() {
     const { body } = this.request;
-    const condition = {
-      createdAt: {
+    const condition = {};
+
+    if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
+    if (body?.date_start && body?.date_start !== '') {
+      condition.createdAt = {
         [this.op.between]: [
           moment(`${body?.date_start}`).startOf('day').format(),
           moment(`${body?.date_end}`).endOf('day').format(),
         ],
-      },
-    };
-
-    if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
+      };
+    }
 
     return condition;
   }
