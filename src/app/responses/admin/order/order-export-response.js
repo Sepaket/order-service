@@ -7,6 +7,7 @@ const {
   Location,
   OrderLog,
   OrderTax,
+  OrderBatch,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -18,6 +19,7 @@ module.exports = class {
     this.order = Order;
     this.op = Sequelize.Op;
     this.request = request;
+    this.batch = OrderBatch;
     this.location = Location;
     this.orderLog = OrderLog;
     this.orderTax = OrderTax;
@@ -49,6 +51,14 @@ module.exports = class {
             'sellerReceivedAmount',
           ],
           include: [
+            {
+              model: this.batch,
+              as: 'batch',
+              required: true,
+              attributes: [
+                'batch_code',
+              ],
+            },
             {
               model: this.order,
               as: 'order',
@@ -128,7 +138,35 @@ module.exports = class {
           const mapped = result?.map((item) => {
             const itemResponse = item;
 
-            itemResponse.order.goods_price = 0;
+            let vatCalculated = item?.tax?.vatTax;
+            if (item?.tax && item?.tax?.vatType === 'PERCENTAGE') {
+              vatCalculated = (
+                parseFloat(item?.shipping_charge)
+                * parseFloat(item?.tax?.vatTax)
+              ) / 100;
+            }
+
+            const codFeeCalculated = parseFloat(vatCalculated) + parseFloat(item.cod_fee_admin);
+            const shippingDiscount = (
+              parseFloat(item.shipping_charge) - parseFloat(item.discount.value)
+            );
+            let shippingChargeTotal = (
+              parseFloat(shippingDiscount)
+              + parseFloat(vatCalculated)
+              + parseFloat(item.insurance_amount)
+            );
+
+            if (item.order.isCod) {
+              shippingChargeTotal = (
+                parseFloat(shippingDiscount)
+                + parseFloat(codFeeCalculated)
+                + parseFloat(item.insurance_amount)
+              );
+            }
+
+            itemResponse.shipping_charge_discount = Number(shippingDiscount).toFixed(2);
+            itemResponse.shipping_charge_total = Number(shippingChargeTotal).toFixed(2);
+            itemResponse.cod_fee_calculated = Number(codFeeCalculated).toFixed(2);
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
             itemResponse.order.cod_fee = item.cod_fee_admin;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
@@ -162,14 +200,17 @@ module.exports = class {
 
   querySearch() {
     const { body } = this.request;
-    const condition = {
-      createdAt: {
+    const condition = {};
+
+    if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
+    if (body?.date_start && body?.date_start !== '') {
+      condition.createdAt = {
         [this.op.between]: [
           moment(`${body?.date_start}`).startOf('day').format(),
           moment(`${body?.date_end}`).endOf('day').format(),
         ],
-      },
-    };
+      };
+    }
 
     return condition;
   }
