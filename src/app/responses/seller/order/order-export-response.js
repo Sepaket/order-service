@@ -8,6 +8,7 @@ const {
   Location,
   OrderLog,
   OrderTax,
+  OrderBatch,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -19,6 +20,7 @@ module.exports = class {
     this.order = Order;
     this.op = Sequelize.Op;
     this.request = request;
+    this.batch = OrderBatch;
     this.location = Location;
     this.orderLog = OrderLog;
     this.orderTax = OrderTax;
@@ -51,6 +53,14 @@ module.exports = class {
             'sellerReceivedAmount',
           ],
           include: [
+            {
+              model: this.batch,
+              as: 'batch',
+              required: true,
+              attributes: [
+                'batch_code',
+              ],
+            },
             {
               model: this.order,
               as: 'order',
