@@ -130,13 +130,6 @@ module.exports = class {
           const mapped = result?.map((item) => {
             const itemResponse = item;
 
-            itemResponse.order.goods_price = 0;
-            // itemResponse.discount = {
-            //   // shipping_discount: discountShipping,
-            //   discount_value: item.discount.value,
-            //   // discount_type: discountValue.type,
-            // };
-
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
             itemResponse.order.cod_fee = item.cod_fee_admin;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
