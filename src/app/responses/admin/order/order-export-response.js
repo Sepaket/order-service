@@ -199,7 +199,7 @@ module.exports = class {
       },
     };
 
-    if (body.batch_id || body.batch_id !== '') condition.batch_id = body.batch_id;
+    if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
 
     return condition;
   }
