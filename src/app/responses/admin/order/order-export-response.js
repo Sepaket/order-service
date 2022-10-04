@@ -43,6 +43,7 @@ module.exports = class {
             'batchId',
             'weight',
             'volume',
+            'codFee',
             'codFeeAdmin',
             'goodsPrice',
             'useInsurance',
@@ -166,14 +167,16 @@ module.exports = class {
 
             itemResponse.shipping_charge_discount = Number(shippingDiscount).toFixed(2);
             itemResponse.shipping_charge_total = Number(shippingChargeTotal).toFixed(2);
-            itemResponse.cod_fee_calculated = Number(codFeeCalculated).toFixed(2);
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
-            itemResponse.order.cod_fee = item.cod_fee_admin;
+            itemResponse.tax.vat_calculated = Number(vatCalculated).toFixed(2);
+            itemResponse.cod_value = item.cod_fee || 0;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
             itemResponse.receiver_address = {
               ...this.converter.objectToSnakeCase(item?.receiver_address),
               location: this.converter.objectToSnakeCase(item?.receiver_address?.location) || null,
             };
+
+            delete itemResponse.cod_fee;
 
             return itemResponse;
           }) || [];
