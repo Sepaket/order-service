@@ -116,13 +116,13 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
     receipt_number: payload.resi,
   }).then((response) => {
     if (response?.data?.status !== '200') {
-      reject(new Error(response?.data?.error_message || 'Something Wrong'));
+      reject(new Error(`Sicepat: ${response?.data?.error_message || 'Something Wrong'}`));
       return;
     }
 
     resolve(response?.data);
   }).catch((error) => {
-    reject(new Error(error?.response?.data?.error_message || 'Something Wrong'));
+    reject(new Error(`Sicepat: ${error?.response?.data?.error_message || 'Something Wrong'}`));
   });
 });
 
