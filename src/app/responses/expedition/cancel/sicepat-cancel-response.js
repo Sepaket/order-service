@@ -24,71 +24,49 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        const { body } = this.request;
-        this.orderIds = body.ids.map((item) => {
-          if (item.expedition === 'SICEPAT' && item.status === orderStatus.WAITING_PICKUP.text) return item.id;
-          return null;
-        }).filter((item) => item);
+        const { params } = this.request;
 
-        if (this.orderIds.length < 1) {
-          resolve(null);
-          return;
-        }
-
-        const orders = await this.order.findAll({
-          where: { id: this.orderIds, expedition: 'SICEPAT' },
-        });
-
-        this.orderNotCod = await this.order.findAll({
-          where: { id: this.orderIds, isCod: false },
+        const order = await this.order.findOne({
+          where: { id: params.id, expedition: 'SICEPAT' },
           include: [{ model: this.orderDetail, as: 'detail', required: true }],
         });
 
-        this.resies = orders.map((item) => item.resi);
+        const cancelExternal = await this.sicepat.cancel({ resi: order.resi });
 
-        const responseMap = orders.map((order) => ({
-          id: order.id,
-          resi: order.resi,
-          status: true,
-          message: 'OK',
-        }));
+        if (!cancelExternal.status) throw new Error(cancelExternal.message);
 
-        if (this.orderIds.length > 0) {
-          const payload = orders.map((item) => ({ resi: item.resi }));
-          await this.insertLog({ orders, payload });
-        }
+        this.insertLog(order);
 
-        resolve(responseMap);
+        resolve(true);
       } catch (error) {
         reject(error);
       }
     });
   }
 
-  async insertLog(params) {
+  async insertLog(order) {
     const dbTransaction = await sequelize.transaction();
 
     try {
-      const payloadLog = params.orders.map((item) => ({
-        previousStatus: item.status,
-        currentStatus: orderStatus.CANCELED.text,
-        orderId: item.id,
-      }));
-
       await this.order.update(
         { status: orderStatus.CANCELED.text },
-        { where: { id: this.orderIds } },
+        { where: { id: order.id } },
         { transaction: dbTransaction },
       );
 
-      await this.orderLog.bulkCreate(
-        payloadLog,
+      await this.orderLog.create(
+        {
+          orderId: order.id,
+          previousStatus: order.status,
+          currentStatus: orderStatus.CANCELED.text,
+          note: 'Paket Dibatalkan oleh Penjual',
+        },
         { transaction: dbTransaction },
       );
 
       await this.background.update(
         { isExecute: true },
-        { where: { resi: this.resies } },
+        { where: { resi: order.resi } },
         { transaction: dbTransaction },
       );
 
