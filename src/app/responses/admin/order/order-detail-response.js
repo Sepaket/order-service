@@ -1,5 +1,6 @@
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
+const tax = require('../../../../constant/tax');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const {
   Order,
@@ -8,15 +9,18 @@ const {
   Location,
   OrderLog,
   OrderAddress,
+  OrderDiscount,
 } = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
+    this.tax = tax;
     this.order = Order;
     this.op = Sequelize.Op;
     this.request = request;
     this.location = Location;
     this.orderLog = OrderLog;
+    this.discount = OrderDiscount;
     this.orderDetail = OrderDetail;
     this.orderAddress = OrderAddress;
     this.sellerAddress = SellerAddress;
@@ -60,6 +64,14 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
                 'status',
+              ],
+            },
+            {
+              model: this.discount,
+              as: 'discount',
+              required: true,
+              attributes: [
+                'value',
               ],
             },
             {
@@ -154,6 +166,31 @@ module.exports = class {
           result.order_log = await this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(orderLogs)),
           );
+
+          let vatCalculated = this.tax.vat;
+
+          if (this.tax.vatType === 'PERCENTAGE') {
+            vatCalculated = (
+              parseFloat(result.shipping_charge) * parseFloat(this.tax.vat)
+            ) / 100;
+          }
+
+          const codFeeAdmin = result.cod_fee_admin;
+          const insureanceAmount = result.insurance_amount;
+          let shippingCalculated = result.shipping_charge;
+          const shippingWithDiscount = result.shipping_charge - result?.discount?.value;
+
+          if (result?.order?.is_cod) {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(codFeeAdmin)
+            + parseFloat(insureanceAmount);
+          } else {
+            shippingCalculated = parseFloat(shippingWithDiscount)
+            + parseFloat(vatCalculated)
+            + parseFloat(insureanceAmount);
+          }
+
+          result.shipping_charge = parseFloat(shippingCalculated);
 
           delete result?.cod_fee;
 
