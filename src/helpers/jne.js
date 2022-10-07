@@ -125,41 +125,31 @@ const tracking = (payload) => new Promise((resolve, reject) => {
   }
 });
 
-const cancel = (payload) => new Promise((resolve) => {
-  try {
-    axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, qs.stringify({
-      username: process.env.JNE_USERNAME,
-      api_key: process.env.JNE_APIKEY,
-      ...payload,
-    }), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }).then((response) => {
-      if (!response?.data?.detail) {
-        resolve({
-          status: false,
-          message: response?.data?.error?.reason || 'Something Wrong',
-        });
-        return;
-      }
+const cancel = (payload) => new Promise((resolve, reject) => {
+  const { resi, pic } = payload;
+  axios.post(`${process.env.JNE_BASE_URL_CANCEL}/order/cancel`, qs.stringify({
+    username: process.env.JNE_USERNAME,
+    api_key: process.env.JNE_APIKEY,
+    cnote_no: resi,
+    pic_cancel: pic,
+    reason_cancel: 'Penjual ingin membatalkannya',
+  }), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  }).then((response) => {
+    if (!response?.data?.status) {
+      reject(new Error(response?.data?.reason || 'Something Wrong'));
+      return;
+    }
 
-      resolve({
-        status: true,
-        message: 'OK',
-      });
-    }).catch((error) => {
-      resolve({
-        status: false,
-        message: error?.response?.data?.error?.reason || error?.message || 'Something Wrong',
-      });
-    });
-  } catch (error) {
     resolve({
-      status: false,
-      message: error?.message,
+      status: true,
+      message: 'OK',
     });
-  }
+  }).catch((error) => {
+    reject(new Error(error?.response?.data?.error?.reason || error?.message || 'Something Wrong'));
+  });
 });
 
 const caseConverter = ({ parameter }) => {
