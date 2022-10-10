@@ -71,13 +71,13 @@ module.exports = class {
       );
 
       if (!order.isCod) {
-        const shippingCharge = order?.detail?.shippingCharge;
+        const shippingCalculated = order?.detail?.shippingCalculated;
         const seller = await this.sellerDetail.findOne({
           where: { sellerId: order.detail.sellerId },
         });
 
         const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
-        const credit = parseFloat(creditValue) + parseFloat(shippingCharge);
+        const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
 
         await this.sellerDetail.update(
           { credit },
