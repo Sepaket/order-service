@@ -122,7 +122,7 @@ const tracking = (payload) => new Promise(async (resolve) => {
   });
 });
 
-const cancel = (payload) => new Promise(async (resolve) => {
+const cancel = (payload) => new Promise(async (resolve, reject) => {
   const { resi } = payload;
   const token = await localToken() || await tokenization();
 
@@ -136,10 +136,7 @@ const cancel = (payload) => new Promise(async (resolve) => {
       message: 'OK',
     });
   }).catch(async (error) => {
-    resolve({
-      status: false,
-      message: error?.response?.data?.data?.message,
-    });
+    reject(new Error(`Ninja: ${error?.response?.data?.data?.message}`));
   });
 });
 

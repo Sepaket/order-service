@@ -110,25 +110,19 @@ const tracking = (payload) => new Promise(async (resolve) => {
   });
 });
 
-const cancel = (payload) => new Promise(async (resolve) => {
+const cancel = (payload) => new Promise(async (resolve, reject) => {
   axios.post(`${process.env.SICEPAT_BASE_URL_PICKUP}/partner/cancelpickup`, {
     auth_key: process.env.SICEPAT_APIKEY_PICKUP,
     receipt_number: payload.resi,
   }).then((response) => {
     if (response?.data?.status !== '200') {
-      resolve({
-        status: false,
-        message: response?.data?.error_message || 'Something Wrong',
-      });
+      reject(new Error(`Sicepat: ${response?.data?.error_message || 'Something Wrong'}`));
       return;
     }
 
     resolve(response?.data);
   }).catch((error) => {
-    resolve({
-      status: false,
-      message: error?.message,
-    });
+    reject(new Error(`Sicepat: ${error?.response?.data?.error_message || 'Something Wrong'}`));
   });
 });
 
