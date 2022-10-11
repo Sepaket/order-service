@@ -41,6 +41,7 @@ module.exports = class {
           },
         }).then(async (response) => {
           const statuses = await this.orderLog.findAll({
+            order: [['id', 'ASC']],
             attributes: [
               ['id', 'status_id'],
               'note',

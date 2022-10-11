@@ -86,8 +86,8 @@ module.exports = class {
       });
 
       const order = await this.order.findOne({
+        order: [['id', 'DESC']],
         where: { expedition: 'SICEPAT' },
-        order: [['resi', 'DESC']],
       });
 
       const insurance = await this.insurance.findOne({
@@ -150,15 +150,15 @@ module.exports = class {
       }
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
-        ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '00000'
-        : '00000';
+        ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
+        : '0000';
 
-      let sicepatResi = currentResi === '99999' ? parseInt('00000', 10) : parseInt(currentResi, 10);
+      let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           let parameter = null;
           sicepatResi += 1;
-          const resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+          let resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           const checkResiUndone = await this.order.findOne({
             where: {
               resi,
@@ -168,8 +168,8 @@ module.exports = class {
           });
 
           if (checkResiUndone) {
-            const created = await this.createOrder();
-            return created;
+            sicepatResi += 1;
+            resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           }
 
           const origin = sellerLocation?.location;
@@ -390,38 +390,38 @@ module.exports = class {
   // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
     return {
-      resi: payload.resi,
+      resi: payload?.resi,
       order: {
-        order_code: payload.orderCode,
-        service: payload.type,
-        service_code: payload.service_code,
-        weight: payload.weight,
-        goods_content: payload.goods_content,
-        goods_qty: payload.goods_qty,
-        goods_notes: payload.notes,
-        insurance_amount: payload.is_insurance ? payload.insuranceSelected || 0 : 0,
-        is_cod: payload.is_cod,
+        order_code: payload?.orderCode,
+        service: payload?.type,
+        service_code: payload?.service_code,
+        weight: payload?.weight,
+        goods_content: payload?.goods_content,
+        goods_qty: payload?.goods_qty,
+        goods_notes: payload?.notes,
+        insurance_amount: payload?.is_insurance ? payload?.insuranceSelected || 0 : 0,
+        is_cod: payload?.is_cod,
         total_amount: {
-          raw: payload.totalAmount,
-          formatted: formatCurrency(payload.totalAmount, 'Rp.'),
+          raw: payload?.totalAmount,
+          formatted: formatCurrency(payload?.totalAmount, 'Rp.'),
         },
       },
       receiver: {
-        name: payload.receiver_name,
-        phone: payload.receiver_phone,
-        address: payload.receiver_address,
-        address_note: payload.receiver_address_note,
-        location: payload.destination || null,
-        postal_code: payload.postal_code,
-        sub_district: payload.sub_district,
+        name: payload?.receiver_name,
+        phone: payload?.receiver_phone,
+        address: payload?.receiver_address,
+        address_note: payload?.receiver_address_note,
+        location: payload?.destination || null,
+        postal_code: payload?.postal_code,
+        sub_district: payload?.sub_district,
       },
       sender: {
-        name: payload.sellerLocation.picName,
-        phone: payload.sellerLocation.picPhoneNumber,
+        name: payload?.sellerLocation?.picName || '',
+        phone: payload?.sellerLocation?.picPhoneNumber || '',
         hide_address: payload?.sellerLocation?.hideInResi || false,
         address: payload?.sellerLocation?.address || '',
         address_note: '',
-        location: payload.origin || null,
+        location: payload?.origin || null,
       },
     };
   }

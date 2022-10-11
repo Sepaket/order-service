@@ -8,6 +8,7 @@ const Tracing = require('@sentry/tracing');
 const application = express();
 const bodyParser = require('body-parser');
 
+const batchScheduler = require('./src/scheduler/batch-scheduler');
 const errorHandler = require('./src/app/middlewares/errorHandler');
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
@@ -42,6 +43,7 @@ const corsOptions = {
   ],
 };
 
+batchScheduler.start();
 trackingScheduler.start();
 createOrderScheduler.start();
 cleanerNinjaTokenScheduler.start();

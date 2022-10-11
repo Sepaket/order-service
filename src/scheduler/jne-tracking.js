@@ -66,10 +66,6 @@ const tracking = async () => {
         if (!track?.error) {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
-          const revertCredit = (
-            (currentStatus === orderStatus.CANCELED.text)
-            || (currentStatus === orderStatus.RETURN_TO_SELLER.text)
-          );
 
           track?.history?.forEach((historical) => {
             trackHistories.push({
@@ -89,15 +85,16 @@ const tracking = async () => {
             { where: { resi: item.resi } },
           );
 
-          if (revertCredit) {
+          const log = await OrderLog.findAll({ where: { orderId: item.id } });
+
+          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0 && log.length < 2) {
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
             });
 
-            const calculated = (
-              parseFloat(currentCredit.credit) + parseFloat(orderDetail.goodsPrice)
-            );
+            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
+            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
 
             await SellerDetail.update(
               { credit: parseFloat(calculated) },

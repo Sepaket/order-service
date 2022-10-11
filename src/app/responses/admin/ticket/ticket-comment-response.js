@@ -1,25 +1,27 @@
 const moment = require('moment-timezone');
-const { Ticket } = require('../../../models');
+const { Ticket, Admin } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 
 module.exports = class {
   constructor({ request }) {
     this.request = request;
     this.ticket = Ticket;
+    this.admin = Admin;
     return this.process();
   }
 
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        this.admin = await jwtSelector({ request: this.request });
+        this.adminId = await jwtSelector({ request: this.request });
+        this.adminData = await this.admin.findOne({ where: { id: this.adminId.id } });
         const { params } = this.request;
         const parameter = this.parameterMapper();
         const ticket = await this.ticket.findOne({ where: { id: params.id } });
         const prevComment = ticket?.comment;
         const comments = [];
 
-        if (ticket) comments.push(...prevComment);
+        if (ticket?.comment) comments.push(...prevComment);
         comments.push(parameter);
 
         const payload = comments.filter((item) => item);
@@ -40,11 +42,15 @@ module.exports = class {
     const { body } = this.request;
 
     return {
-      id: this.admin?.id,
+      id: this.adminId?.id,
       message: body.message,
       file: body.file,
       type: 'ADMIN',
       commentAt: moment().tz('Asia/Jakarta').format('DD MMM, YYYY - HH:mm'),
+      author: {
+        name: this.adminData.name,
+        photo: '',
+      },
     };
   }
 };

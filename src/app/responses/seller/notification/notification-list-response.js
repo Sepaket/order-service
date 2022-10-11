@@ -24,6 +24,9 @@ module.exports = class {
             ['id', 'notification_id'],
             'title',
             'message',
+            'type',
+            'startDate',
+            'endDate',
           ],
         }).then(async (response) => {
           const result = await this.converter.arrayToSnakeCase(
@@ -43,7 +46,7 @@ module.exports = class {
           }) || [];
 
           if (filtered.length > 0) {
-            resolve(result);
+            resolve(filtered);
           } else {
             reject(httpErrors(404, 'No Data Found', { data: [] }));
           }

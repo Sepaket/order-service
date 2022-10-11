@@ -1,12 +1,13 @@
 const httpErrors = require('http-errors');
 const { Sequelize } = require('sequelize');
-const { Ticket, Order } = require('../../../models');
+const { Ticket, Order, Seller } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 
 module.exports = class {
   constructor({ request }) {
     this.op = Sequelize.Op;
     this.request = request;
+    this.seller = Seller;
     this.ticket = Ticket;
     this.order = Order;
     this.converter = snakeCaseConverter;
@@ -44,6 +45,14 @@ module.exports = class {
               attributes: [
                 ['id', 'order_id'],
                 'resi',
+              ],
+            },
+            {
+              model: this.seller,
+              as: 'seller',
+              required: true,
+              attributes: [
+                'name',
               ],
             },
           ],

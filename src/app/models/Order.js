@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    pod_status: {
+    podStatus: {
       type: DataTypes.STRING,
       allowNull: true,
     },

@@ -38,7 +38,7 @@ router.group('/tracking', (route) => {
 });
 
 router.group('/cancel', (route) => {
-  route.post('/', Authorization, CancelController);
+  route.get('/:id', Authorization, CancelController);
 });
 
 // method not allowed when method request http is failure

@@ -83,6 +83,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    shippingCalculated: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -137,6 +141,12 @@ module.exports = (sequelize, DataTypes) => {
       as: 'discount',
       targetKey: 'orderId',
       foreignKey: 'orderId',
+    });
+
+    model.OrderDetail.belongsTo(model.OrderBatch, {
+      as: 'batch',
+      targetKey: 'id',
+      foreignKey: 'batchId',
     });
   };
 

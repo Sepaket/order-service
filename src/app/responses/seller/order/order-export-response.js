@@ -8,6 +8,7 @@ const {
   Location,
   OrderLog,
   OrderTax,
+  OrderBatch,
   OrderDetail,
   OrderAddress,
   SellerAddress,
@@ -19,6 +20,7 @@ module.exports = class {
     this.order = Order;
     this.op = Sequelize.Op;
     this.request = request;
+    this.batch = OrderBatch;
     this.location = Location;
     this.orderLog = OrderLog;
     this.orderTax = OrderTax;
@@ -51,6 +53,14 @@ module.exports = class {
             'sellerReceivedAmount',
           ],
           include: [
+            {
+              model: this.batch,
+              as: 'batch',
+              required: true,
+              attributes: [
+                'batch_code',
+              ],
+            },
             {
               model: this.order,
               as: 'order',
@@ -130,13 +140,6 @@ module.exports = class {
           const mapped = result?.map((item) => {
             const itemResponse = item;
 
-            itemResponse.order.goods_price = 0;
-            // itemResponse.discount = {
-            //   // shipping_discount: discountShipping,
-            //   discount_value: item.discount.value,
-            //   // discount_type: discountValue.type,
-            // };
-
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
             itemResponse.order.cod_fee = item.cod_fee_admin;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
@@ -170,14 +173,17 @@ module.exports = class {
 
   querySearch() {
     const { body } = this.request;
-    const condition = {
-      createdAt: {
+    const condition = {};
+
+    if (body?.batch_id && body?.batch_id !== '') condition.batch_id = body?.batch_id || '';
+    if (body?.date_start && body?.date_start !== '') {
+      condition.createdAt = {
         [this.op.between]: [
           moment(`${body?.date_start}`).startOf('day').format(),
           moment(`${body?.date_end}`).endOf('day').format(),
         ],
-      },
-    };
+      };
+    }
 
     return condition;
   }
