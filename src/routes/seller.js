@@ -14,6 +14,7 @@ const PaymentController = require('../app/controllers/seller/payment-controller'
 const DashboardController = require('../app/controllers/seller/dashboard-controller');
 const NotificationController = require('../app/controllers/seller/notification-controller');
 const TicketController = require('../app/controllers/seller/ticket-controller');
+const MemberController = require('../app/controllers/seller/member-controller');
 
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
@@ -43,6 +44,11 @@ router.group('/address', (route) => {
   route.post('/:id', Authorization, AddressController.update);
   route.delete('/:id', Authorization, AddressController.delete);
   route.get('/toggle-hide/:id', Authorization, AddressController.toggleHide);
+});
+
+router.group('/member', (route) => {
+  route.get('/info', Authorization, MemberController.info);
+  route.get('/transaction', Authorization, MemberController.transaction);
 });
 
 router.group('/order', (route) => {

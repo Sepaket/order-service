@@ -8,11 +8,13 @@ const {
   sequelize,
   SellerDetail,
   SellerReferal,
+  TransactionFee,
 } = require('../../../models');
 
 module.exports = class {
   constructor({ request }) {
     this.seller = Seller;
+    this.fee = TransactionFee;
     this.sellerDetail = SellerDetail;
     this.sellerReferal = SellerReferal;
     this.request = request;
@@ -25,6 +27,7 @@ module.exports = class {
     try {
       const { body } = this.request;
       const parameterMapper = await this.mapper();
+      const fee = await this.fee.findOne({ order: [['id', 'DESC']] });
 
       const seller = await this.seller.create(
         { ...parameterMapper },
@@ -34,12 +37,18 @@ module.exports = class {
       await this.sellerDetail.create(
         {
           sellerId: seller.id,
-          referalCode: body.referal_code,
+          rateReferal: body.referal_code !== ''
+            ? parseFloat(fee.rateReferal) : parseFloat(0),
+          rateReferalType: body.referal_code !== ''
+            ? fee.rateReferalType : null,
+          referalCode: body.referal_code !== ''
+            ? body.referal_code
+            : `${shortid.generate()}${seller.id}`,
         },
         { transaction: dbTransaction },
       );
 
-      if (body.referal_code) {
+      if (body.referal_code !== '') {
         const parrent = await this.sellerDetail.findOne({
           where: { referalCode: body.referal_code },
         });

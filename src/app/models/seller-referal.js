@@ -44,5 +44,11 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'seller_referals',
   });
 
+  SellerReferal.associate = (model) => {
+    model.SellerReferal.belongsTo(model.Seller, {
+      as: 'seller',
+    });
+  };
+
   return SellerReferal;
 };

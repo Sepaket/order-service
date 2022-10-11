@@ -90,6 +90,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'ticket',
       foreignKey: 'sellerId',
     });
+
+    model.Seller.hasMany(model.SellerReferal, {
+      as: 'memberReferal',
+      foreignKey: 'sellerId',
+    });
   };
 
   return Seller;
