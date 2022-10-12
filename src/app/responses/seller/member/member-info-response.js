@@ -14,6 +14,7 @@ module.exports = class {
       try {
         const user = await jwtSelector({ request: this.request });
         const total = await this.totalMember(user.id);
+
         resolve({
           total_member: total,
           credit_referal: 1000,
