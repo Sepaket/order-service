@@ -159,15 +159,12 @@ module.exports = class {
           let parameter = null;
           sicepatResi += 1;
           let resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
-          const checkResiUndone = await this.order.findOne({
-            where: {
-              resi,
-              expedition: body.type,
-              status: { [this.op.notIn]: ['DELIVERED', 'RETURN_TO_SELLER'] },
-            },
+
+          const resiIsExist = await this.order.findOne({
+            where: { resi, expedition: body.type },
           });
 
-          if (checkResiUndone) {
+          if (resiIsExist) {
             sicepatResi += 1;
             resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           }
