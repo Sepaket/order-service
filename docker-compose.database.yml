@@ -11,7 +11,7 @@ services:
     image: postgres:14
     container_name: sepaket_postgres
     ports:
-      - 5432:3111
+      - 3111:5432
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
