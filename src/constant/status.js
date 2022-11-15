@@ -22,6 +22,7 @@ const idxServiceStatus = [
 const ninjaServiceStatus = [
   // only standard for indonesia region
   { code: 'Standard', name: 'Ninja Standard', type: 'NINJA' },
+  { code: 'Standard', name: 'Ninja COD', type: 'NINJA' },
 ];
 
 const jneServiceStatus = [
