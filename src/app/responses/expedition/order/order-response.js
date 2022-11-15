@@ -67,7 +67,6 @@ module.exports = class {
 
   async createOrder() {
     const dbTransaction = await sequelize.transaction();
-
     try {
       const error = [];
       const result = [];
@@ -89,6 +88,7 @@ module.exports = class {
         order: [['id', 'DESC']],
         where: { expedition: 'SICEPAT' },
       });
+
 
       const insurance = await this.insurance.findOne({
         where: { expedition: body.type },
@@ -154,17 +154,18 @@ module.exports = class {
         : '0000';
 
       let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
+
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           let parameter = null;
           sicepatResi += 1;
           let resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
-
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
 
           if (resiIsExist) {
+
             sicepatResi += 1;
             resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           }
@@ -251,6 +252,7 @@ module.exports = class {
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
 
           if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
@@ -258,6 +260,7 @@ module.exports = class {
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
+
 
           const payload = {
             codFeeAdmin: codValueCalculated,
@@ -276,7 +279,10 @@ module.exports = class {
             ...item,
             ...body,
           };
-
+          // console.log(resi);
+          console.log("===PAYLOAD START===");
+          // console.log(payload);
+          console.log("===PAYLOAD END===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
@@ -374,12 +380,24 @@ module.exports = class {
     }
   }
 
-  codValidator() {
+  codServiceCodeTransformer() {
+    console.log("masuk codTransformer - reno");
     let result;
     const { body } = this.request;
-    if (body.type === 'JNE') result = (body.service_code === 'REG19');
-    if (body.type === 'SICEPAT') result = (body.service_code === 'SIUNT');
-    if (body.type === 'NINJA') result = (body.service_code === 'Standard');
+    if (body.type === 'JNE') body.service_code = 'REG19';
+    if (body.type === 'SICEPAT') body.service_code = 'SIUNT';
+    if (body.type === 'NINJA') body.service_code = 'Standard';
+
+    return true;
+  }
+
+  codValidator() {
+    // console.log("masuk codValidator - reno");
+    let result;
+    const { body } = this.request;
+    if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
+    if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
+    if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
 
     return result;
   }

@@ -3,6 +3,7 @@ node_modules
 
 # file
 .env.local
+.env
 package-lock.json
 *.http
 

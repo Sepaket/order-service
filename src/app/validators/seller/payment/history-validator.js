@@ -15,30 +15,40 @@ const validator = joi.object({
     then: joi.date().required(),
     otherwise: joi.allow('', null),
   }),
-  month_start: joi.any().when('filter_by', {
-    is: 'MONTH_RANGE',
-    // then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-    then: joi.date().required(),
+  month: joi.any().when('filter_by', {
+    is: 'MONTH',
+    then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
     otherwise: joi.allow('', null),
   }),
-  month_end: joi.any().when('month_start', {
-    is: joi.exist(),
-    // then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-    then: joi.date().required(),
+  year: joi.any().when('filter_by', {
+    is: 'YEAR',
+    then: joi.number().required().min(2020),
     otherwise: joi.allow('', null),
   }),
-  year_start: joi.any().when('filter_by', {
-    is: 'YEAR_RANGE',
-    // then: joi.number().required().min(2020),
-    then: joi.date().required(),
-    otherwise: joi.allow('', null),
-  }),
-  year_end: joi.any().when('year_start', {
-    is: joi.exist(),
-    // then: joi.number().required().min(2020),
-    then: joi.date().required(),
-    otherwise: joi.allow('', null),
-  }),
+  // month_start: joi.any().when('filter_by', {
+  //   is: 'MONTH_RANGE',
+  //   // then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+  //   then: joi.date().required(),
+  //   otherwise: joi.allow('', null),
+  // }),
+  // month_end: joi.any().when('month_start', {
+  //   is: joi.exist(),
+  //   // then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+  //   then: joi.date().required(),
+  //   otherwise: joi.allow('', null),
+  // }),
+  // year_start: joi.any().when('filter_by', {
+  //   is: 'YEAR_RANGE',
+  //   // then: joi.number().required().min(2020),
+  //   then: joi.date().required(),
+  //   otherwise: joi.allow('', null),
+  // }),
+  // year_end: joi.any().when('year_start', {
+  //   is: joi.exist(),
+  //   // then: joi.number().required().min(2020),
+  //   then: joi.date().required(),
+  //   otherwise: joi.allow('', null),
+  // }),
 });
 
 module.exports = (object) => validator.validateAsync(object, {

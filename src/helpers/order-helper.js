@@ -62,14 +62,30 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
       ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
       ${id.length > 1 ? id : `0${id}`}
     `;
+    /*
+    reno
+    untuk generation jneResi :
+    JNE PREFIX
+    timestamp di potong sampai 8 digit
+    random 3 karakter
+    id
 
-    const jneResi = `
+
+    const jneResi-deprecated = `
       ${process.env.JNE_ORDER_PREFIX}
       ${await random({ min: 10000, max: 99999, integer: true })}
       ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
       ${id.length > 1 ? id : `0${id}`}
     `;
+*/
+    const jneResi = `
+      ${process.env.JNE_ORDER_PREFIX}
+      ${(moment().unix()).toString().substring(1)}
+      ${await random({ min: 10, max: 99, integer: true })}
+      ${id.length > 1 ? id : `0${id}`}
+    `;
 
+    // console.log('jneResi : ' + jneResi);
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
     const currentResiString = currentResi.toString();
     if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`000${currentResi}`}`;
@@ -80,6 +96,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
+    // console.log('resi : ' + resi);
     resolve(resi);
   } catch (error) {
     reject(error);

@@ -16,13 +16,16 @@ module.exports = {
       await CommonOrderValidator(request);
 
       const result = await new OrderResponse({ request });
-
+      // console.log(result);
+      // console.log(result.logs.failed_log.errors);
+      // console.log('result : ' + result);
       response.send({
         code: 200,
         message: 'OK',
         data: result,
       });
     } catch (error) {
+      console.log("error - validator - reno");
       next(error);
     }
   },
