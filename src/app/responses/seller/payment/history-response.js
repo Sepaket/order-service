@@ -102,8 +102,8 @@ module.exports = class {
       filtered = {
         updatedAt: {
           [this.op.between]: [
-            moment(query.month_start, 'M').startOf('month').format(),
-            moment(query.month_end, 'M').endOf('month').format(),
+            moment(query.month, 'M').startOf('month').format(),
+            moment(query.month, 'M').endOf('month').format(),
           ],
         },
       };
@@ -113,8 +113,8 @@ module.exports = class {
       filtered = {
         updatedAt: {
           [this.op.between]: [
-            moment(query.year_start, 'YYYY').startOf('year').format(),
-            moment(query.year_end, 'YYYY').endOf('year').format(),
+            moment(query.year, 'YYYY').startOf('year').format(),
+            moment(query.year, 'YYYY').endOf('year').format(),
           ],
         },
       };
