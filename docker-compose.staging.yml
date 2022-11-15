@@ -9,7 +9,7 @@ networks:
 services:
   sepaket_api:
     build: .
-    env_file: .env
+    env_file: .env.local
     volumes:
       - ./public/file:/home/express/sepaket/public/file
       - /home/express/sepaket/public/file/seller

@@ -30,7 +30,7 @@ module.exports = {
   bulkOrder: async (request, response, next) => {
     try {
       await BulkOrderValidator(request);
-
+      console.log("after bulk order validator");
       const result = await new BulkOrderResponse({ request });
 
       response.send({

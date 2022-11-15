@@ -2,7 +2,7 @@
 node_modules
 
 # file
-.env
+.env.local
 package-lock.json
 *.http
 
