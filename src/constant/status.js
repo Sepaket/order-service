@@ -34,6 +34,7 @@ const jneServiceStatus = [
   { code: 'JTR<150', name: 'JNE JTR<150', type: 'JNE' },
   { code: 'JTR250', name: 'JNE JTR250', type: 'JNE' },
   { code: 'JTR18', name: 'JNE JTR', type: 'JNE' },
+  { code: 'REG19', name: 'JNE COD', type: 'JNE' },
 ];
 
 const sicepatServiceStatus = [
@@ -43,6 +44,7 @@ const sicepatServiceStatus = [
   { code: 'GOKIL', name: 'Sicepat GOKIL', type: 'SICEPAT' },
   { code: 'SDS', name: 'Sicepat SAMEDAY', type: 'SICEPAT' },
   { code: 'KEPO', name: 'Sicepat KEPO', type: 'SICEPAT' },
+  { code: 'SIUNT', name: 'Sicepat COD', type: 'SICEPAT' },
 ];
 
 const serviceCode = {
