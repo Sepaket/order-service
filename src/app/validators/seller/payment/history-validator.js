@@ -15,16 +15,16 @@ const validator = joi.object({
     then: joi.date().required(),
     otherwise: joi.allow('', null),
   }),
-  month: joi.any().when('filter_by', {
-    is: 'MONTH',
-    then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-    otherwise: joi.allow('', null),
-  }),
-  year: joi.any().when('filter_by', {
-    is: 'YEAR',
-    then: joi.number().required().min(2020),
-    otherwise: joi.allow('', null),
-  }),
+  // month: joi.any().when('filter_by', {
+  //   is: 'MONTH',
+  //   then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+  //   otherwise: joi.allow('', null),
+  // }),
+  // year: joi.any().when('filter_by', {
+  //   is: 'YEAR',
+  //   then: joi.number().required().min(2020),
+  //   otherwise: joi.allow('', null),
+  // }),
   // month_start: joi.any().when('filter_by', {
   //   is: 'MONTH_RANGE',
   //   // then: joi.number().required().valid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),

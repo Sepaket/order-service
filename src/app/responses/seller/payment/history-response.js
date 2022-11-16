@@ -99,22 +99,28 @@ module.exports = class {
     }
 
     if (query.filter_by === 'MONTH') {
+      console.log("filder by month");
       filtered = {
         updatedAt: {
           [this.op.between]: [
-            moment(query.month, 'M').startOf('month').format(),
-            moment(query.month, 'M').endOf('month').format(),
+            // moment(query.date_start, 'M').startOf('month').format(),
+            // moment(query.date_start, 'M').endOf('month').format(),
+            moment(query.date_start).startOf('month').format(),
+            moment(query.date_end).endOf('month').format(),
           ],
         },
       };
     }
 
     if (query.filter_by === 'YEAR') {
+      console.log("filder by YEAR");
       filtered = {
         updatedAt: {
           [this.op.between]: [
-            moment(query.year, 'YYYY').startOf('year').format(),
-            moment(query.year, 'YYYY').endOf('year').format(),
+            moment(query.date_start).startOf('year').format(),
+            moment(query.date_start).endOf('year').format(),
+            // moment(query.date_start, 'YYYY').startOf('year').format(),
+            // moment(query.date_start, 'YYYY').endOf('year').format(),
           ],
         },
       };

@@ -23,7 +23,7 @@ const fileValidator = async () => new Promise((resolve, reject) => {
   let addressCheck = true;
   const fileName = body.file.split('/public/');
   // reject(new Error('This file code does not exist'));
-  const minLength = 10;
+  const minLength = 1;
   console.log('file validator');
   // console.log(fileName);
   if (!fileName[1]) reject(new Error('This filename does not exist'));
