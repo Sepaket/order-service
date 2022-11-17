@@ -98,8 +98,8 @@ const validator = joi.object({
     .min(1)
     .required()
     .external((req) => isExist({ params: req, identifier: 'id', model: SellerAddress })),
-  file: joi.string().required()
-    .external(() => fileValidator()),
+  file: joi.string().required(),
+  // .external(() => fileValidator()),
 });
 
 module.exports = (object) => {

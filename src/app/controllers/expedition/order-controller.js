@@ -33,16 +33,22 @@ module.exports = {
     bulkOrder: async (request, response, next) => {
     try {
       // console.log(request);
-      console.log("Before bulk validator");
+      // console.log("Before bulk validator");
       await BulkOrderValidator(request);
-      console.log("after bulk order validator");
-      const result = await new BulkOrderResponse({ request });
+      // console.log("after bulk order validator");
 
-
+      var success = '';
+      var [result, successCount, failCount] = await new BulkOrderResponse({ request });
+      // console.log(result);
+      //if result ada error kirim return
       response.send({
         code: 200,
         message: 'OK',
         data: result,
+        info : {
+          success : successCount,
+          fail : failCount,
+        },
       });
     } catch (error) {
       next(error);
