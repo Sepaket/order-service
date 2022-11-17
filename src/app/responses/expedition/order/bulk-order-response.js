@@ -68,11 +68,13 @@ module.exports = class {
       const result = [];
       const dataOrders = await excelReader(`public/${fileName[1]}`);
       var errorFlag = false;
+      var errorMsgArray = [];
       var failCount = 0;
       var successCount = 0;
       await Promise.all(
         dataOrders?.map(async (item, index) => {
           errorFlag = false;
+          errorMsgArray = [];
           if (index !== 0) {
             const excelData = {
               receiverName: item[0],
@@ -123,9 +125,12 @@ module.exports = class {
             var errorMessage = '';
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
+              errorMsgArray.push({receiverAddress : errorMessage});
               errorFlag = true;
             } else if (receiverAddress.length > maxLength) {
               errorMessage = 'Address is too long';
+              // errorMsgArray.push(errorMessage);
+              errorMsgArray.push({receiverAddress : errorMessage});
               errorFlag = true;
             }
             if (errorFlag) {
@@ -134,7 +139,7 @@ module.exports = class {
               successCount++;
             }
             result.push({
-              error: errorMessage,
+              error: errorMsgArray,
               receiver_name: excelData?.receiverName || '',
               receiver_phone: excelData?.receiverPhone || '',
               receiver_location: {
