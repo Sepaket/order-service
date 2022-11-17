@@ -122,7 +122,7 @@ module.exports = class {
     }
   }
 
-  async totalTransaction({ selector }) {
+  async totalTransaction({ selector, status }) {
     try {
       let condition = {};
       if (selector === 'topup') {
@@ -144,6 +144,7 @@ module.exports = class {
       const credit = await this.credit.count({
         where: {
           sellerId: this.sellerId,
+          status : status,
           ...condition,
           ...this.search,
         },
@@ -155,11 +156,12 @@ module.exports = class {
     }
   }
 
-  async totalCredit({ selector }) {
+  async totalCredit({ selector, status }) {
     try {
       const credit = await this.credit.sum(`${selector}`, {
         where: {
           sellerId: this.sellerId,
+          status : status,
           ...this.search,
         },
       });
