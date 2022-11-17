@@ -125,12 +125,16 @@ module.exports = class {
             var errorMessage = '';
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
+              console.log(errorMessage);
               errorMsgArray.push({receiverAddress : errorMessage});
+              console.log(receiverAddress.length);
               errorFlag = true;
             } else if (receiverAddress.length > maxLength) {
               errorMessage = 'Address is too long';
               // errorMsgArray.push(errorMessage);
+              console.log(errorMessage);
               errorMsgArray.push({receiverAddress : errorMessage});
+              console.log(receiverAddress.length);
               errorFlag = true;
             }
             if (errorFlag) {

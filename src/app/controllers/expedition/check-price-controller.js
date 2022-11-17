@@ -9,7 +9,7 @@ module.exports = async (request, response, next) => {
     await CheckPriceValidator(request.body);
 
     const result = await new CheckPriceResponse({ request });
-
+console.log(result.data);
     response.send({
       code: 200,
       message: 'OK',

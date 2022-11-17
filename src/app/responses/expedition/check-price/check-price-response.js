@@ -15,6 +15,8 @@ const {
   TransactionFee,
 } = require('../../../models');
 
+
+
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
@@ -150,6 +152,7 @@ module.exports = class {
     }
   }
 
+
   async jneFee() {
     try {
       const { body } = this.request;
@@ -216,7 +219,8 @@ module.exports = class {
           total_non_cod: totalCalculatedNcod,
         };
       }) || [];
-      console.log(mapped.data.data);
+      // console.log((mapped.data).length);
+
       return mapped;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
