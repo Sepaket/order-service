@@ -73,8 +73,7 @@ module.exports = class {
       var successCount = 0;
       await Promise.all(
         dataOrders?.map(async (item, index) => {
-          errorFlag = false;
-          errorMsgArray = [];
+
           if (index !== 0) {
             const excelData = {
               receiverName: item[0],
@@ -123,6 +122,8 @@ module.exports = class {
             const minLength = 10;
             const maxLength = 80;
             var errorMessage = '';
+            errorFlag = false;
+            errorMsgArray = [];
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
@@ -138,6 +139,7 @@ module.exports = class {
               errorFlag = true;
             }
             if (errorFlag) {
+              console.log(receiverAddress);
               failCount++;
             } else {
               successCount++;
