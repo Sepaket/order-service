@@ -216,7 +216,7 @@ module.exports = class {
           total_non_cod: totalCalculatedNcod,
         };
       }) || [];
-
+      console.log(mapped.data.data);
       return mapped;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');

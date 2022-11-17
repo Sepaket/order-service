@@ -23,7 +23,8 @@ const fileValidator = async () => new Promise((resolve, reject) => {
   let addressCheck = true;
   const fileName = body.file.split('/public/');
   // reject(new Error('This file code does not exist'));
-  const minLength = 1;
+  const minLength = 10;
+  const maxLength = 80;
   console.log('file validator');
   // console.log(fileName);
   if (!fileName[1]) reject(new Error('This filename does not exist'));
@@ -53,14 +54,20 @@ const fileValidator = async () => new Promise((resolve, reject) => {
         // console.log(excelData.receiverAddress.length);
         if (excelData.receiverAddress.length < minLength) {
           // console.log("address too short");
-          addressCheck = false;
-        }
-
-        if (!addressCheck) {
           reject(new Error('Address is too short'));
+          addressCheck = false;
+        } else if (excelData.receiverAddress.length > maxLength){
+          reject(new Error('Address is too long'));
+          addressCheck = false;
         } else {
           resolve(true);
         }
+
+        // if (!addressCheck) {
+        //   reject(new Error('Address is too short'));
+        // } else {
+        //   resolve(true);
+        // }
       }
     });
   });
