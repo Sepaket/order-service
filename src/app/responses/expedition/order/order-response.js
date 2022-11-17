@@ -153,22 +153,45 @@ module.exports = class {
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
 
-      let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
-
+      var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
+      // var nextId = batch.id * 1000000;
+      // console.log("under");
+      var nextId = 0;
+      // console.log(batch.id);
+      const latestOrder = await this.order.findOne({
+        order: [['id', 'DESC']],
+      });
+      nextId = latestOrder.id + 1;
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           let parameter = null;
-          sicepatResi += 1;
-          let resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+          // sicepatResi += 1;
+          if (body.type === 'JNE') {
+            console.log(latestOrder.id);
+            console.log(body.type);
+            console.log(nextId);
+            var resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: nextId });
+          } else if (body.type === 'SICEPAT'){
+            sicepatResi += 1;
+            var resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+          }
+
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
 
           if (resiIsExist) {
+          console.log("resi is exist");
+            if (body.type === 'JNE') {
+              nextId = nextId + 1;
+              resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: nextId });
+            } else if (body.type === 'SICEPAT'){
+              sicepatResi += 1;
+              resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
+            }
 
-            sicepatResi += 1;
-            resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: sicepatResi });
           }
+
 
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {

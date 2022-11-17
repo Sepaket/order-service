@@ -52,10 +52,19 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
   }
 });
 
+function zerofill(number,length) {
+  var output = number.toString();
+  while(output.length < length) {
+    output = '0' + output;
+  }
+  return output;
+}
+
 const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
     const { expedition, currentResi, id } = params;
+    console.log(params);
     const ninjaResi = `
       ${process.env.NINJA_ORDER_PREFIX}
       ${await random({ min: 10000, max: 99999, integer: true })}
@@ -80,9 +89,8 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
 */
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${(moment().unix()).toString().substring(1)}
-      ${await random({ min: 10, max: 99, integer: true })}
-      ${id.length > 1 ? id : `0${id}`}
+      ${zerofill(currentResi,7)}
+      ${await random({ min: 1000, max: 9999, integer: true })}
     `;
 
     // console.log('jneResi : ' + jneResi);
