@@ -14,6 +14,8 @@ const required = (param) => new Promise((resolve) => {
 });
 
 const validate = (payload) => new Promise(async (resolve, reject) => {
+  console.log('payload COD order');
+  console.log(payload);
   try {
     const error = [];
     const {
@@ -22,11 +24,10 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       creditCondition,
       weight,
     } = payload;
-    console.log('payload COD order');
-    console.log(payload);
+
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
 
-    if (!shippingCharge) error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
+    if (!shippingCharge) error.push({ message: 'Destinasi yang dituju tidak ditemukan - no shipping charge' });
     if (!codCondition) error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD' });
     if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
     if (!weight || weight === null || weight === '') error.push({ message: 'Berat harus di isi dan minimal 1 KG' });
