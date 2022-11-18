@@ -198,6 +198,8 @@ module.exports = class {
           var servCode = '';
           if (body.service_code === 'JNECOD'){
             servCode = 'REG19';
+          } else {
+            servCode = body.service_code;
           }
 
           const shippingCharge = await shippingFee({
