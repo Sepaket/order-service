@@ -137,6 +137,7 @@ module.exports = class {
         };
       }
 
+
       let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
       if (!batchConditon) {
@@ -167,9 +168,6 @@ module.exports = class {
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
-            console.log(latestOrder.id);
-            console.log(body.type);
-            console.log(nextId);
             var resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: nextId });
           } else if (body.type === 'SICEPAT'){
             sicepatResi += 1;
@@ -191,20 +189,23 @@ module.exports = class {
             }
 
           }
-
-
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             const locationId = locationIds.find((id) => id === location.id);
             return location.id === locationId;
           });
 
+          var servCode = '';
+          if (body.service_code === 'JNECOD'){
+            servCode = 'REG19';
+          }
+
           const shippingCharge = await shippingFee({
             origin,
             destination,
             weight: item.weight,
             expedition: body.type,
-            serviceCode: body.service_code,
+            serviceCode: servCode,
           });
 
           let codValueCalculated = 0;
@@ -258,7 +259,7 @@ module.exports = class {
               }
             }
           }
-
+          console.log('RENOOOOOOOOOOOOO');
           let shippingCalculated = 0;
           if (item.is_cod) {
             shippingCalculated = parseFloat(shippingWithDiscount)
@@ -271,7 +272,7 @@ module.exports = class {
           }
 
           const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
-          const goodsAmount = !item.is_cod
+          const goodsAmount = !item.is_codf
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
@@ -304,7 +305,7 @@ module.exports = class {
           };
           // console.log(resi);
           console.log("===PAYLOAD START===");
-          // console.log(payload);
+          console.log(payload);
           console.log("===PAYLOAD END===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
