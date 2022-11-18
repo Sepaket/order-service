@@ -11,23 +11,21 @@ module.exports = async (request, response, next) => {
     const result = await new CheckPriceResponse({ request });
 
     var items = result.data;
-    var cod = {};
-// console.log(items.length);
-for (item in items) {
+    var cod = JSON.parse(JSON.stringify(items));
+    var codItemIndex = 0;
 
-console.log(items[item]);
-  if (items[item].type === 'JNE') {
-    if (items[item].service_code === 'REG19') {
-      cod = items[item];
+    for (item in cod) {
+      if (cod[item].type === 'JNE') {
+        if (cod[item].service_code === 'REG19') {
+          codItemIndex = item;
+        }
+      }
     }
-  }
 
-}
-if (cod !== {}) {
-  cod.service_name = 'JNE COD';
-  cod.service_code = 'JNECOD';
-}
-result.data.push(cod);
+    cod[codItemIndex].service_name = 'JNE COD';
+    cod[codItemIndex].service_code = 'JNECOD';
+    result.data.push(cod[codItemIndex]);
+
     response.send({
       code: 200,
       message: 'OK',
