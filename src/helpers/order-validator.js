@@ -22,7 +22,8 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       creditCondition,
       weight,
     } = payload;
-
+    console.log('payload COD order');
+    console.log(payload);
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
 
     if (!shippingCharge) error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
