@@ -30,7 +30,7 @@ console.log('enter validate order');
     if (!shippingCharge)
     {
 
-      error.push({ message: 'Destinasi yang dituju tidak ditemukan - no shipping charge' });
+      error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     }
 
     if (!codCondition) error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD' });

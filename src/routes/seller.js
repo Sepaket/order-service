@@ -66,6 +66,8 @@ router.group('/reports', (route) => {
   route.get('/rate-retur', Authorization, ReportController.rateRetur);
   route.get('/rate-success-delivered', Authorization, ReportController.rateSuccess);
   route.get('/order-total-chart', Authorization, ReportController.orderTotalChart);
+  route.get('/topup-paid', Authorization, ReportController.topupPaid);
+  route.get('/withdraw-completed', Authorization, ReportController.withdrawCompleted);
 });
 
 router.group('/payment', (route) => {

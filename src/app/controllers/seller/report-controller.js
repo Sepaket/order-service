@@ -13,6 +13,9 @@ const RateReturReponse = require('../../responses/seller/report/seller-report-ra
 const RateSuccessReponse = require('../../responses/seller/report/seller-report-rate-success');
 const OrderTotalChartReponse = require('../../responses/seller/report/seller-report-order-total-chart');
 
+const TopupPaidReponse = require('../../responses/seller/report/seller-report-topup-paid');
+const WithdrawCompletedReponse = require('../../responses/seller/report/seller-report-withdraw-completed');
+
 module.exports = {
   totalOrder: async (request, response, next) => {
     try {
@@ -183,4 +186,52 @@ module.exports = {
       next(error);
     }
   },
+
+
+  codProcessing: async (request, response, next) => {
+    try {
+      const result = await new CodProcessingReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  topupPaid: async (request, response, next) => {
+    console.log("top up paid");
+    try {
+      const result = await new TopupPaidReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        count: result.length,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  withdrawCompleted: async (request, response, next) => {
+    console.log("withdrawCompleted");
+    try {
+      const result = await new WithdrawCompletedReponse({ request });
+      console.log(result);
+      response.send({
+        code: 200,
+        message: 'OK',
+        count: result.length,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
 };
