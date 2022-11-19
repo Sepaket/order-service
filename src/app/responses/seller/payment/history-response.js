@@ -125,7 +125,11 @@ module.exports = class {
         },
       };
     }
+    if (query.start_date && query.end_date) {
 
+    } else {
+      filtered = {};
+    }
     const condition = {
       [this.op.or]: {
         status: { [this.op.eq]: query?.status || '' },
