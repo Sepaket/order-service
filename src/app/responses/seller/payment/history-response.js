@@ -16,7 +16,7 @@ module.exports = class {
   }
 
   async process() {
-    const limit = 300;
+    const limit = 10;
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
