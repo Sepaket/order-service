@@ -48,6 +48,17 @@ module.exports = class {
           attributes: [
             'orderId',
             'totalItem',
+            'notes',
+            'weight',
+            'volume',
+            'goodsContent',
+            'shippingCharge',
+            'useInsurance',
+            'insuranceAmount',
+            'sellerReceivedAmount',
+            'codFee',
+            'goodsPrice',
+            'codFeeAdmin',
           ],
           include: [
             {
