@@ -30,6 +30,7 @@ module.exports = {
   },
 
   index: async (request, response, next) => {
+    console.log('order index');
     try {
       await OrderListValidator(request.query);
 
