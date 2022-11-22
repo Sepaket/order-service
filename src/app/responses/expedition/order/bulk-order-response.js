@@ -126,6 +126,14 @@ module.exports = class {
             errorMsgArray = [];
             console.log('isCOD');
             console.log(excelData.isCod);
+            if (excelData.isCod) {
+              if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
+                errorMessage = 'cannot use ' + body.service_code + ' for COD';
+                console.log(errorMessage);
+                errorMsgArray.push({serviceCode : errorMessage});
+                errorFlag = true;
+              }
+            }
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
