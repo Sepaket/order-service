@@ -73,6 +73,8 @@ module.exports = class {
       const querySuccess = [];
       const queryrLogger = [];
       const { body } = this.request;
+      var servCode = '';
+
 
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
       const locationIds = body.order_items.map((item) => item.receiver_location_id);
@@ -165,6 +167,12 @@ module.exports = class {
       nextId = latestOrder.id + 1;
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
+          var codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          if (body.service_code === 'JNECOD'){
+            servCode = 'REG19';
+          } else {
+            servCode = body.service_code;
+          }
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
@@ -195,12 +203,6 @@ module.exports = class {
             return location.id === locationId;
           });
 
-          var servCode = '';
-          if (body.service_code === 'JNECOD'){
-            servCode = 'REG19';
-          } else {
-            servCode = body.service_code;
-          }
 
           const shippingCharge = await shippingFee({
             origin,
@@ -261,7 +263,7 @@ module.exports = class {
               }
             }
           }
-          console.log('RENOOOOOOOOOOOOO');
+
           let shippingCalculated = 0;
           if (item.is_cod) {
             shippingCalculated = parseFloat(shippingWithDiscount)
@@ -277,10 +279,10 @@ module.exports = class {
           const goodsAmount = !item.is_codf
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
-          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+
           console.log('codCondition : ');
           console.log(this.codValidator());
-          const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
+          // const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
 
           if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
@@ -362,7 +364,7 @@ module.exports = class {
         order: {
           pickup_info: {
             expedition: body.type,
-            service_code: body.service_code,
+            service_code: servCode,
             should_pickup_with: body.should_pickup_with,
             pickup_date: body.pickup_date,
             pickup_time: body.pickup_time,
@@ -426,7 +428,6 @@ module.exports = class {
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
     if (body.type === 'JNE') result = (body.service_code === 'REG19');
     if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
-    if (body.type === 'SICEPAT') result = (body.service_code === 'SIUNT');
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
 
     return result;
