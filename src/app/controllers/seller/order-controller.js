@@ -9,6 +9,7 @@ const PrintValidator = require('../../validators/seller/order/print-validator');
 const BatchResponse = require('../../responses/seller/order/order-batch-response');
 const OrderListResponse = require('../../responses/seller/order/order-list-response');
 const OrderDetailResponse = require('../../responses/seller/order/order-detail-response');
+const OrderMutasiResponse = require('../../responses/seller/order/order-mutasi-response');
 const ExportResponse = require('../../responses/seller/order/order-export-response');
 const PrintResponse = require('../../responses/seller/order/order-print-response');
 
@@ -35,6 +36,23 @@ module.exports = {
       await OrderListValidator(request.query);
 
       const result = await new OrderListResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  mutasi: async (request, response, next) => {
+    console.log('order mutasi');
+    try {
+      await OrderListValidator(request.query);
+
+      const result = await new OrderMutasiResponse({ request });
 
       response.send({
         code: 200,
