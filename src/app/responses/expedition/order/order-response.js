@@ -424,7 +424,9 @@ module.exports = class {
     let result;
     const { body } = this.request;
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
+    if (body.type === 'JNE') result = (body.service_code === 'REG19');
     if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
+    if (body.type === 'SICEPAT') result = (body.service_code === 'SIUNT');
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
 
     return result;
