@@ -124,6 +124,8 @@ module.exports = class {
             var errorMessage = '';
             errorFlag = false;
             errorMsgArray = [];
+            console.log('isCOD');
+            console.log(excelData.isCod);
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
