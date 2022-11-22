@@ -131,24 +131,25 @@ module.exports = class {
               if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
                 errorMessage = 'cannot use ' + body.service_code + ' for COD';
                 console.log(errorMessage);
-                errorLongString = errorLongString + '"' + errorMessage + '", ';
-                errorMsgArray.push({serviceCode : errorMessage});
+                // errorLongString = errorLongString + '"' + errorMessage + '", ';
+                // errorMsgArray.push({serviceCode : errorMessage});
+                errorMsgArray.push({message : errorMessage});
                 errorFlag = true;
               }
             }
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
-              errorLongString = errorLongString + '"' + errorMessage + '", ';
-              errorMsgArray.push({receiverAddress : errorMessage});
+              // errorLongString = errorLongString + '"' + errorMessage + '", ';
+              errorMsgArray.push({message : errorMessage});
               console.log(receiverAddress.length);
               errorFlag = true;
             } else if (receiverAddress.length > maxLength) {
               errorMessage = 'Address is too long';
               // errorMsgArray.push(errorMessage);
-              errorLongString = errorLongString + '"' + errorMessage + '", ';
+              // errorLongString = errorLongString + '"' + errorMessage + '", ';
               console.log(errorMessage);
-              errorMsgArray.push({receiverAddress : errorMessage});
+              errorMsgArray.push({message : errorMessage});
               console.log(receiverAddress.length);
               errorFlag = true;
             }
@@ -159,9 +160,7 @@ module.exports = class {
               successCount++;
             }
             result.push({
-              error: {
-                errorMsg:  errorLongString,
-              },
+              errors: errorMessage,
               receiver_name: excelData?.receiverName || '',
               receiver_phone: excelData?.receiverPhone || '',
               receiver_location: {
