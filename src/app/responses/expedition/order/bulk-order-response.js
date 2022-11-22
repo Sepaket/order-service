@@ -160,7 +160,7 @@ module.exports = class {
               successCount++;
             }
             result.push({
-              errors: errorMessage,
+              errors: errorMsgArray,
               receiver_name: excelData?.receiverName || '',
               receiver_phone: excelData?.receiverPhone || '',
               receiver_location: {
