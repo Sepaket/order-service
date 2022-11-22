@@ -131,7 +131,7 @@ module.exports = class {
               if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
                 errorMessage = 'cannot use ' + body.service_code + ' for COD';
                 console.log(errorMessage);
-                errorLongString = errorLongString + errorMessage + ', ';
+                errorLongString = errorLongString + '"' + errorMessage + '", ';
                 errorMsgArray.push({serviceCode : errorMessage});
                 errorFlag = true;
               }
