@@ -278,6 +278,8 @@ module.exports = class {
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          console.log('codCondition : ');
+          console.log(this.codValidator());
           const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
 
