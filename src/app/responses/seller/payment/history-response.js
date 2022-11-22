@@ -118,16 +118,19 @@ module.exports = class {
         updatedAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('year').format(),
-            moment(query.date_start).endOf('year').format(),
+            moment(query.date_end).endOf('year').format(),
             // moment(query.date_start, 'YYYY').startOf('year').format(),
             // moment(query.date_start, 'YYYY').endOf('year').format(),
           ],
         },
       };
     }
-    if (query.start_date && query.end_date) {
-
+    if (query.date_start && query.date_end) {
+      // console.log('start data end date');
     } else {
+      // console.log('{{{{{{{');
+      // console.log(query);
+      // console.log(query.end_date);
       filtered = {};
     }
     const condition = {
