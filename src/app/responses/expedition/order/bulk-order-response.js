@@ -139,14 +139,14 @@ module.exports = class {
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
-              errorLongString = errorLongString + errorMessage + ', ';
+              errorLongString = errorLongString + '"' + errorMessage + '", ';
               errorMsgArray.push({receiverAddress : errorMessage});
               console.log(receiverAddress.length);
               errorFlag = true;
             } else if (receiverAddress.length > maxLength) {
               errorMessage = 'Address is too long';
               // errorMsgArray.push(errorMessage);
-              errorLongString = errorLongString + errorMessage + ', ';
+              errorLongString = errorLongString + '"' + errorMessage + '", ';
               console.log(errorMessage);
               errorMsgArray.push({receiverAddress : errorMessage});
               console.log(receiverAddress.length);
@@ -159,7 +159,7 @@ module.exports = class {
               successCount++;
             }
             result.push({
-              error: errorLongString,
+              error: '{errorMsg :  ' +  errorLongString + '}',
               receiver_name: excelData?.receiverName || '',
               receiver_phone: excelData?.receiverPhone || '',
               receiver_location: {
