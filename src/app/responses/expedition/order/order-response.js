@@ -428,7 +428,8 @@ module.exports = class {
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
     if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
-
+    console.log('codValidator : ');
+    console.log(result);
     return result;
   }
 

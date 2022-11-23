@@ -34,7 +34,9 @@ console.log(payload);
       error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     }
 
-    if (codCondition) error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD.' });
+    if (codCondition) {
+      error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD.' });
+    }
     if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
     if (!weight || weight === null || weight === '') error.push({ message: 'Berat harus di isi dan minimal 1 KG' });
 
