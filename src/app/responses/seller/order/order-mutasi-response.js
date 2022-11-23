@@ -174,9 +174,14 @@ module.exports = class {
       };
     }
 
-    if (query?.status) {
-      condition.status = 'CANCELLED';
-    }
+    // if (query?.status) {
+      // condition.status = query.status;
+      condition.status = {
+        [this.op.notIn]: [
+            'CANCELED', 'PROCESSED',
+        ],
+      };
+    // }
 
     if (query?.type) {
       condition.is_cod = query.type === 'cod';
