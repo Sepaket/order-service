@@ -15,7 +15,7 @@ const required = (param) => new Promise((resolve) => {
 
 const validate = (payload) => new Promise(async (resolve, reject) => {
 console.log('enter validate order');
-console.log(payload);
+// console.log(payload);
   try {
     const error = [];
     const {

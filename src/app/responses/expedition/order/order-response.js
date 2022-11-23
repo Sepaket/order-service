@@ -31,6 +31,7 @@ const {
   SellerAddress,
   TransactionFee,
 } = require('../../../models');
+const { stringify } = require('querystring');
 
 module.exports = class {
   constructor({ request }) {
@@ -165,6 +166,8 @@ module.exports = class {
         order: [['id', 'DESC']],
       });
       nextId = latestOrder.id + 1;
+      console.log(locationIds);
+      // console.log(destinationLocation);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
@@ -199,10 +202,15 @@ module.exports = class {
           }
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
-            const locationId = locationIds.find((id) => id === location.id);
+            // const locationId = locationIds.find((id) => id === location.id);
+            const locationId = item.receiver_location_id;
+            // console.log('location id');
+            // console.log(location.id);
+            // console.log(index);
+            // console.log(item);
+            // console.log(locationId);
             return location.id === locationId;
           });
-
 
           const shippingCharge = await shippingFee({
             origin,
@@ -311,7 +319,7 @@ module.exports = class {
           };
           // console.log(resi);
           console.log("===PAYLOAD START===");
-          console.log(payload);
+          // console.log(payload);
           console.log("===PAYLOAD END===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
