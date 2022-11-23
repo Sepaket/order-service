@@ -34,7 +34,7 @@ console.log(payload);
       error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     }
 
-    if (codCondition) {
+    if (!codCondition) {
       error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD.' });
     }
     if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
