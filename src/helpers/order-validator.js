@@ -38,6 +38,8 @@ console.log(payload);
       error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD.' });
     }
     if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
+    if (payload.is_cod && !payload.cod_value) error.push({ message: 'COD Value harus diisi untuk tipe COD' });
+    if (!payload.is_cod && !payload.goods_amount) error.push({ message: 'Goods Amount harus diisi untuk tipe non COD' });
     if (!weight || weight === null || weight === '') error.push({ message: 'Berat harus di isi dan minimal 1 KG' });
 
     if (await required(payload?.is_cod)) error.push({ message: 'Metode pengiriman harus diisi 1 atau 0' });
