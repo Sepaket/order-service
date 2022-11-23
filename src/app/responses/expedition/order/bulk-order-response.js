@@ -177,6 +177,7 @@ module.exports = class {
               receiver_address_note: excelData?.receiverAddressNote || '',
               is_cod: excelData?.isCod || false,
               weight: excelData?.weight || 1,
+              cod_value: excelData?.codValue || 0,
               goods_amount: price || 0,
               goods_content: excelData?.goodsContent || '',
               goods_qty: excelData?.goodsQty || 1,
