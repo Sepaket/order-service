@@ -16,7 +16,7 @@ module.exports = class {
       try {
         this.seller = await jwtSelector({ request: this.request });
 
-        this.order.count({
+        this.order.findAll({
           where: {
             '$detail.seller_id$': seller.id,
             status: 'DELIVERED',

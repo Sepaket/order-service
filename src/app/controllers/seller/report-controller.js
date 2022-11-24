@@ -45,27 +45,15 @@ module.exports = {
     }
   },
 
-  codProcessing: async (request, response, next) => {
-    try {
-      const result = await new CodProcessingReponse({ request });
-
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
 
   nonCodProcessing: async (request, response, next) => {
     try {
       const result = await new NonCodProcessingReponse({ request });
-
+      const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
+        count : resultCount,
         data: result,
       });
     } catch (error) {
@@ -89,11 +77,13 @@ module.exports = {
 
   codSent: async (request, response, next) => {
     try {
+      console.log('cod sent response');
       const result = await new CodSentReponse({ request });
-
+      const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
+        count : resultCount,
         data: result,
       });
     } catch (error) {
@@ -103,11 +93,13 @@ module.exports = {
 
   nonCodSent: async (request, response, next) => {
     try {
+      console.log('NON cod sent response');
       const result = await new NonCodSentReponse({ request });
-
+      const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
+        count : resultCount,
         data: result,
       });
     } catch (error) {
@@ -187,20 +179,36 @@ module.exports = {
     }
   },
 
-
   codProcessing: async (request, response, next) => {
     try {
+      console.log('cod processing');
       const result = await new CodProcessingReponse({ request });
-
+      const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
+        count : resultCount,
         data: result,
       });
     } catch (error) {
       next(error);
     }
   },
+
+
+  // codProcessing: async (request, response, next) => {
+  //   try {
+  //     const result = await new CodProcessingReponse({ request });
+  //
+  //     response.send({
+  //       code: 200,
+  //       message: 'OK',
+  //       data: result,
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // },
 
   topupPaid: async (request, response, next) => {
     console.log("top up paid");
