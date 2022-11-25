@@ -2,6 +2,7 @@ const moment = require('moment');
 const { Op } = require('sequelize');
 const { Order, OrderDetail } = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
+const sequelize = require('sequelize');
 
 module.exports = class {
   constructor({ request }) {
@@ -16,7 +17,11 @@ module.exports = class {
       try {
         this.seller = await jwtSelector({ request: this.request });
 
-        this.order.count({
+        this.order.findAll({
+          // attributes: [
+          //   'id', 'batchId', 'orderCode', 'resi', 'expedition', 'serviceCode',
+          //   [sequelize.fn('COUNT', sequelize.col('detail.batchId')), 'batchID_count'] // To add the aggregation...
+          // ],
           where: {
             '$detail.seller_id$': seller.id,
             status: {
