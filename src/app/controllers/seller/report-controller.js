@@ -54,7 +54,8 @@ module.exports = {
         code: 200,
         message: 'OK',
         count : resultCount,
-        data: result,
+        data: resultCount,
+        items : result,
       });
     } catch (error) {
       next(error);
@@ -84,7 +85,8 @@ module.exports = {
         code: 200,
         message: 'OK',
         count : resultCount,
-        data: result,
+        data: resultCount,
+        items : result,
       });
     } catch (error) {
       next(error);
@@ -100,7 +102,8 @@ module.exports = {
         code: 200,
         message: 'OK',
         count : resultCount,
-        data: result,
+        data: resultCount,
+        items : result,
       });
     } catch (error) {
       next(error);
@@ -188,7 +191,8 @@ module.exports = {
         code: 200,
         message: 'OK',
         count : resultCount,
-        data: result,
+        data: resultCount,
+        items : result,
       });
     } catch (error) {
       next(error);
