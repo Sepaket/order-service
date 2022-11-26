@@ -18,10 +18,11 @@ module.exports = class {
         this.seller = await jwtSelector({ request: this.request });
 
         this.order.findAll({
-          // attributes: [
-          //   'id', 'batchId', 'orderCode', 'resi', 'expedition', 'serviceCode',
+          attributes: [
+            'id', 'batchId', 'orderCode', 'resi', 'expedition', 'serviceCode',
+            sequelize.literal(['COALESCE(detail.id, 0) + COALESCE(detail.id, 0)'], 'total'),
           //   [sequelize.fn('COUNT', sequelize.col('detail.batchId')), 'batchID_count'] // To add the aggregation...
-          // ],
+          ],
           where: {
             '$detail.seller_id$': seller.id,
             status: {

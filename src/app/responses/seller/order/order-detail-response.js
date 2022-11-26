@@ -32,7 +32,7 @@ module.exports = class {
   async process() {
     const { params } = this.request;
     const seller = await jwtSelector({ request: this.request });
-
+    console.log(seller);
     return new Promise((resolve, reject) => {
       try {
         this.orderDetail.findOne({
@@ -141,59 +141,75 @@ module.exports = class {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
+          if (response != null) {
 
-          const orderLogs = await this.orderLog.findAll({
-            order: [['id', 'ASC']],
-            where: { orderId: result.order_id },
-          });
 
-          result.order = await this.converter.objectToSnakeCase(result?.order) || null;
-          result.cod_value = result?.cod_fee || 0;
 
-          result.seller_address = await this.converter.objectToSnakeCase(
-            result?.seller_address,
-          ) || null;
+            const orderLogs = await this.orderLog.findAll({
+              attributes: [
+                'previous_status',
+                // 'current_status', 'pod_status', 'note',
+                [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                // 'updated_at', 'deleted_at', 'order_id',
+                [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+              ],
+              group: ['previous_status'],
+              where: { orderId: result.order_id },
+            });
 
-          result.receiver_address = await this.converter.objectToSnakeCase(
-            result?.receiver_address,
-          ) || null;
+            result.order = await this.converter.objectToSnakeCase(result?.order) || null;
+            result.cod_value = result?.cod_fee || 0;
 
-          result.receiver_address.location = await this.converter.objectToSnakeCase(
-            result?.receiver_address?.location,
-          ) || null;
+            result.seller_address = await this.converter.objectToSnakeCase(
+              result?.seller_address,
+            ) || null;
 
-          result.seller_address.location = await this.converter.objectToSnakeCase(
-            result?.seller_address?.location,
-          ) || null;
+            result.receiver_address = await this.converter.objectToSnakeCase(
+              result?.receiver_address,
+            ) || null;
 
-          result.order_log = await this.converter.arrayToSnakeCase(
-            JSON.parse(JSON.stringify(orderLogs)),
-          );
+            result.receiver_address.location = await this.converter.objectToSnakeCase(
+              result?.receiver_address?.location,
+            ) || null;
 
-          let vatCalculated = this.tax.vat;
+            result.seller_address.location = await this.converter.objectToSnakeCase(
+              result?.seller_address?.location,
+            ) || null;
 
-          if (this.tax.vatType === 'PERCENTAGE') {
-            vatCalculated = (
-              parseFloat(result.shipping_charge) * parseFloat(this.tax.vat)
-            ) / 100;
+            result.order_log = await this.converter.arrayToSnakeCase(
+              JSON.parse(JSON.stringify(orderLogs)),
+            );
+
+            let vatCalculated = this.tax.vat;
+
+            if (this.tax.vatType === 'PERCENTAGE') {
+              vatCalculated = (
+                parseFloat(result.shipping_charge) * parseFloat(this.tax.vat)
+              ) / 100;
+            }
+
+            const codFeeAdmin = result.cod_fee_admin;
+            const insureanceAmount = result.insurance_amount;
+            let shippingCalculated = result.shipping_charge;
+            const shippingWithDiscount = result.shipping_charge - result?.discount?.value;
+
+            if (result?.order?.is_cod) {
+              shippingCalculated = parseFloat(shippingWithDiscount)
+                + parseFloat(codFeeAdmin)
+                + parseFloat(insureanceAmount);
+            } else {
+              shippingCalculated = parseFloat(shippingWithDiscount)
+                + parseFloat(vatCalculated)
+                + parseFloat(insureanceAmount);
+            }
+
+            result.shipping_charge = parseFloat(shippingCalculated);
+
           }
 
-          const codFeeAdmin = result.cod_fee_admin;
-          const insureanceAmount = result.insurance_amount;
-          let shippingCalculated = result.shipping_charge;
-          const shippingWithDiscount = result.shipping_charge - result?.discount?.value;
 
-          if (result?.order?.is_cod) {
-            shippingCalculated = parseFloat(shippingWithDiscount)
-            + parseFloat(codFeeAdmin)
-            + parseFloat(insureanceAmount);
-          } else {
-            shippingCalculated = parseFloat(shippingWithDiscount)
-            + parseFloat(vatCalculated)
-            + parseFloat(insureanceAmount);
-          }
 
-          result.shipping_charge = parseFloat(shippingCalculated);
+
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
