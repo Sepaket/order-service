@@ -319,7 +319,7 @@ module.exports = class {
           };
           // console.log(resi);
           console.log("===PAYLOAD START===");
-          // console.log(payload);
+          console.log(payload);
           console.log("===PAYLOAD END===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
