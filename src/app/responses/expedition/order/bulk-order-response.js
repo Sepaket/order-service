@@ -111,7 +111,8 @@ module.exports = class {
 
             const origin = this.sellerAddress?.location || null;
             const price = excelData?.isCod ? excelData?.codValue : excelData?.goodsAmount;
-            const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`);
+            const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`); //destination menggunakan postal code *reno
+            console.log(destination)
             const shippingFee = await this.shippingFee({
               origin,
               destination,

@@ -65,7 +65,7 @@ const validator = joi.object({
     cod_value: joi.any().allow(null, ''),
     goods_amount: joi.any().allow(null, ''),
     goods_qty: joi.number().allow(null, ''),
-    notes: joi.string().allow(null, '').max(50),
+    notes: joi.string().allow(null, '').max(150),
     is_insurance: joi.boolean().allow(null, ''),
     postal_code: joi.any().allow(null, ''),
     sub_district: joi.any().allow(null, ''),
