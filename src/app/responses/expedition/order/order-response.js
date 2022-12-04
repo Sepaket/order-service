@@ -204,11 +204,7 @@ module.exports = class {
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);
             const locationId = item.receiver_location_id;
-            // console.log('location id');
-            // console.log(location.id);
-            // console.log(index);
-            // console.log(item);
-            // console.log(locationId);
+
             return location.id === locationId;
           });
           console.log(servCode)

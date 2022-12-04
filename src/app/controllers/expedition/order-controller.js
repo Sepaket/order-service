@@ -36,17 +36,17 @@ module.exports = {
       await BulkOrderValidator(request);
       var success = '';
       var [result, successCount, failCount] = await new BulkOrderResponse({ request });
-      console.log(result);
+      console.log(JSON.stringify(result, null, 2));
       //if result ada error kirim return
-      // response.send({
-      //   code: 200,
-      //   message: 'OK',
-      //   data: result,
-      //   info : {
-      //     success : successCount,
-      //     fail : failCount,
-      //   },
-      // });
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+        info : {
+          success : successCount,
+          fail : failCount,
+        },
+      });
     } catch (error) {
       next(error);
     }

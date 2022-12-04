@@ -19,14 +19,16 @@ const isExist = async ({ params, identifier, model }) => new Promise((resolve, r
 });
 
 const fileValidator = async () => new Promise((resolve, reject) => {
-  console.log('enter fle validator')
+  console.log('enter fle validator ')
   const { body } = request;
   let addressCheck = true;
+  let isError = false;
   const error = [];
+  let errorString = '';
   const fileName = body.file.split('/public/');
   // reject(new Error('This file code does not exist'));
-  const minLength = 10;
-  const maxLength = 200;
+  const minLength = 4;
+  const maxLength = 5;
   if (!fileName[1]) reject(new Error('This filename does not exist'));
   // else resolve(true);
   //  const dataOrders = excelReader(`public/${fileName[1]}`);
@@ -39,31 +41,43 @@ const fileValidator = async () => new Promise((resolve, reject) => {
           receiverPhone: item[1],
           receiverAddress: item[2],
           receiverAddressNote: item[3],
-          receiverAddressSubDistrict: item[4],
-          receiverAddressPostalCode: item[5],
-          weight: item[6],
-          volume: item[7],
-          goodsAmount: item[8],
-          codValue: item[9],
-          goodsContent: item[10],
-          goodsQty: item[11],
-          isInsurance: item[12],
-          note: item[13],
-          isCod: !!((item[9] && item[9] !== '' && item[9] !== 0) || item[9] !== null),
+          receiverAddressDistrict: item[4],
+          receiverAddressSubDistrict: item[5],
+          receiverAddressPostalCode: item[6],
+          weight: item[7],
+          volume: item[8],
+          goodsAmount: item[9],
+          codValue: item[10],
+          goodsContent: item[11],
+          goodsQty: item[12],
+          isInsurance: item[13],
+          note: item[14],
+          isCod: !!((item[10] && item[10] !== '' && item[10] !== 0) || item[10] !== null),
         };
-        // console.log(excelData.receiverAddress.length);
-        // if (excelData.receiverAddress.length < minLength) {
-        //   reject(new Error('Address is too short'));
-        //   addressCheck = false;
-        // } else if (excelData.receiverAddress.length > maxLength){
-        //   reject(new Error('Address is too long'));
-        //   addressCheck = false;
-        // } else {
-        //   resolve(true);
-        // }
+        console.log('length : ' + excelData.receiverAddress.length);
+        if (excelData.receiverAddress.length < minLength) {
+          errorString += 'Address is too short. ';
+          // reject(new Error('Address is too short'));
+          addressCheck = false;
+          isError = true;
+        } else if (excelData.receiverAddress.length > maxLength){
+          // reject(new Error('Address is too long'));
+          errorString += 'Address is too long. ';
+          addressCheck = false;
+          isError = true;
+        }
+
+
 
       }
     });
+    if (isError) {
+      console.log('is error')
+      reject(new Error(errorString))
+    } else {
+      resolve(true)
+    }
+
   });
 
 });
@@ -92,17 +106,18 @@ const validator = joi.object({
     .required()
     .external((req) => isExist({ params: req, identifier: 'id', model: SellerAddress })),
   file: joi.string().required(),
-  // .external(() => fileValidator()),
+    // .external(() => fileValidator()), -- BELUM DIGUNAKAN. BELUM TAHU APA SAJA YG DIVALIDASI DI FILE
 });
 
 module.exports = (object) => {
   request = object;
-  console.log('call bulk validator')
+  // console.log('call bulk validator')
   return validator.validateAsync(object.body, {
     errors: {
       wrap: {
         label: '',
       },
     },
+    abortEarly: false,
   });
 };

@@ -80,27 +80,28 @@ module.exports = class {
               receiverPhone: item[1],
               receiverAddress: item[2],
               receiverAddressNote: item[3],
-              receiverAddressSubDistrict: item[4],
-              receiverAddressPostalCode: item[5],
-              weight: item[6],
-              volume: item[7],
-              goodsAmount: item[8],
-              codValue: item[9],
-              goodsContent: item[10],
-              goodsQty: item[11],
-              isInsurance: item[12],
-              note: item[13],
-              isCod: !!((item[9] && item[9] !== '' && item[9] !== 0) || item[9] !== null),
+              receiverAddressDistrict: item[4],
+              receiverAddressSubDistrict: item[5],
+              receiverAddressPostalCode: item[6],
+              weight: item[7],
+              volume: item[8],
+              goodsAmount: item[9],
+              codValue: item[10],
+              goodsContent: item[11],
+              goodsQty: item[12],
+              isInsurance: item[13],
+              note: item[14],
+              isCod: !!((item[10] && item[10] !== '' && item[10] !== 0) || item[10] !== null),
             };
 
             const locations = await this.location.findAll({
               where: {
                 [this.op.or]: {
-                  subDistrict: {
-                    [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
-                  },
+                  // subDistrict: {
+                  //   [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
+                  // },
                   district: {
-                    [this.op.substring]: excelData?.receiverAddressSubDistrict?.toLowerCase(),
+                    [this.op.substring]: excelData?.receiverAddressDistrict?.toLowerCase(),
                   },
                   postalCode: {
                     [this.op.eq]: `${excelData?.receiverAddressPostalCode}`,
@@ -112,7 +113,7 @@ module.exports = class {
             const origin = this.sellerAddress?.location || null;
             const price = excelData?.isCod ? excelData?.codValue : excelData?.goodsAmount;
             const destination = locations?.find((location) => location.postalCode === `${excelData.receiverAddressPostalCode}`); //destination menggunakan postal code *reno
-            console.log(destination)
+            // console.log(destination)
             const shippingFee = await this.shippingFee({
               origin,
               destination,
@@ -131,27 +132,24 @@ module.exports = class {
               if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
                 errorMessage = 'cannot use ' + body.service_code + ' for COD';
                 console.log(errorMessage);
-                // errorLongString = errorLongString + '"' + errorMessage + '", ';
-                // errorMsgArray.push({serviceCode : errorMessage});
                 errorMsgArray.push({message : errorMessage});
                 errorFlag = true;
               }
             }
-            console.log(receiverAddress);
-            if (receiverAddress.length < minLength) {
-              errorMessage = 'Address is too short';
-              console.log(errorMessage);
-              // errorLongString = errorLongString + '"' + errorMessage + '", ';
-              errorMsgArray.push({message : errorMessage});
-              errorFlag = true;
-            } else if (receiverAddress.length > maxLength) {
-              errorMessage = 'Address is too long';
-              // errorMsgArray.push(errorMessage);
-              // errorLongString = errorLongString + '"' + errorMessage + '", ';
-              console.log(errorMessage);
-              errorMsgArray.push({message : errorMessage});
-              errorFlag = true;
-            }
+
+            // if (receiverAddress.length < minLength) {
+            //   errorMessage = 'Address is too short - bulk order response';
+            //   console.log(errorMessage);
+            //   errorMsgArray.push({message : errorMessage});
+            //   errorFlag = true;
+            // } else if (receiverAddress.length > maxLength) {
+            //   errorMessage = 'Address is too long';
+            //   console.log(errorMessage);
+            //   errorMsgArray.push({message : errorMessage});
+            //   errorFlag = true;
+            // }
+            //
+
             if (errorFlag) {
               failCount++;
             } else {
@@ -187,9 +185,7 @@ module.exports = class {
               },
             });
           }
-          // console.log(result);
-          // console.log("============================================");
-          // console.log(item);
+
           return item;
         }) || [],
       ).finally(() => {
