@@ -34,7 +34,6 @@ module.exports = {
     bulkOrder: async (request, response, next) => {
     try {
       await BulkOrderValidator(request);
-
       var success = '';
       var [result, successCount, failCount] = await new BulkOrderResponse({ request });
       console.log(result);

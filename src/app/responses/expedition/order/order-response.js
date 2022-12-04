@@ -451,8 +451,9 @@ module.exports = class {
     const truncatedAddressNote = (payload?.receiver_address_note).substring(0,100) || null;
     const truncatedGoodsContent = (payload?.goods_content).substring(0,50) || null;
     const truncatedGoodsNotes = (payload?.notes).substring(0,100) || null;
+    var servCode = payload?.service_code || null;
     if (payload.service_code === "JNECOD") {
-      const servCode = "REG19";
+      servCode = "REG19";
     }
     return {
       resi: payload?.resi,
