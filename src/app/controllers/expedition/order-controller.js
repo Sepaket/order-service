@@ -20,11 +20,11 @@ module.exports = {
       // console.log(result.logs.failed_log.errors);
       // console.log('result : ' + result);
       console.log(JSON.stringify(result, null, 2));
-      // response.send({
-      //   code: 200,
-      //   message: 'OK',
-      //   data: result,
-      // });
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
     } catch (error) {
       console.log("error - validator - reno ");
       next(error);

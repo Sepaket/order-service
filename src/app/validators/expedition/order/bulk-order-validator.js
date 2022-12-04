@@ -52,15 +52,15 @@ const fileValidator = async () => new Promise((resolve, reject) => {
           isCod: !!((item[9] && item[9] !== '' && item[9] !== 0) || item[9] !== null),
         };
         // console.log(excelData.receiverAddress.length);
-        if (excelData.receiverAddress.length < minLength) {
-          reject(new Error('Address is too short'));
-          addressCheck = false;
-        } else if (excelData.receiverAddress.length > maxLength){
-          reject(new Error('Address is too long'));
-          addressCheck = false;
-        } else {
-          resolve(true);
-        }
+        // if (excelData.receiverAddress.length < minLength) {
+        //   reject(new Error('Address is too short'));
+        //   addressCheck = false;
+        // } else if (excelData.receiverAddress.length > maxLength){
+        //   reject(new Error('Address is too long'));
+        //   addressCheck = false;
+        // } else {
+        //   resolve(true);
+        // }
 
       }
     });
