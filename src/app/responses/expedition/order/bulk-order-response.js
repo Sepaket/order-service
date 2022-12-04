@@ -126,8 +126,7 @@ module.exports = class {
             errorFlag = false;
             errorMsgArray = [];
             var errorLongString = '';
-            console.log('isCOD');
-            console.log(excelData.isCod);
+            console.log('isCOD :' + excelData.isCod)
             if (excelData.isCod) {
               if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
                 errorMessage = 'cannot use ' + body.service_code + ' for COD';
@@ -138,12 +137,12 @@ module.exports = class {
                 errorFlag = true;
               }
             }
+            console.log(receiverAddress);
             if (receiverAddress.length < minLength) {
               errorMessage = 'Address is too short';
               console.log(errorMessage);
               // errorLongString = errorLongString + '"' + errorMessage + '", ';
               errorMsgArray.push({message : errorMessage});
-              console.log(receiverAddress.length);
               errorFlag = true;
             } else if (receiverAddress.length > maxLength) {
               errorMessage = 'Address is too long';
@@ -151,11 +150,9 @@ module.exports = class {
               // errorLongString = errorLongString + '"' + errorMessage + '", ';
               console.log(errorMessage);
               errorMsgArray.push({message : errorMessage});
-              console.log(receiverAddress.length);
               errorFlag = true;
             }
             if (errorFlag) {
-              console.log(receiverAddress);
               failCount++;
             } else {
               successCount++;
@@ -196,11 +193,8 @@ module.exports = class {
           return item;
         }) || [],
       ).finally(() => {
-        console.log('success - fail');
-        console.log(successCount);
-        console.log(failCount);
+        console.log('success - fail : ' + successCount + ' : ' + failCount);
       });
-
       return [result, successCount, failCount];
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');

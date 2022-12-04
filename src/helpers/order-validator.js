@@ -14,8 +14,6 @@ const required = (param) => new Promise((resolve) => {
 });
 
 const validate = (payload) => new Promise(async (resolve, reject) => {
-console.log('enter validate order');
-// console.log(payload);
   try {
     const error = [];
     const {
@@ -55,11 +53,11 @@ console.log('enter validate order');
     if (await required(payload?.goods_qty)) error.push({ message: 'Jumlah/pcs harus diisi' });
     if (await required(payload?.is_insurance)) error.push({ message: 'Asuransi harus diisi 1 atau 0' });
     if (payload?.goods_qty?.toString()?.length > 5) error.push({ message: 'Jumlah/pcs maksimum 5 digit' });
-    if (payload?.goods_content?.length >= 50) error.push({ message: 'Isi paket maximal 50 karakter' });
-    if (payload?.receiver_address?.length >= 80) error.push({ message: 'Alamat tujuan maximal 80 karakter' });
-    if (payload?.receiver_address_note?.length >= 20) error.push({ message: 'Patokan alamat tujuan maximal 20 karakter' });
-    if (payload?.notes?.length >= 50) error.push({ message: 'Catatan maximal 50 karakter' });
-    if (payload?.receiver_address && payload?.receiver_address?.length <= 10) error.push({ message: 'Alamat tujuan minimal 10 karakter' });
+    // if (payload?.goods_content?.length >= 50) error.push({ message: 'Isi paket maximal 50 karakter' });
+    // if (payload?.receiver_address?.length >= 10) error.push({ message: 'Alamat tujuan maximal 200 karakter' });
+    // if (payload?.receiver_address_note?.length >= 100) error.push({ message: 'Patokan alamat tujuan maximal 100 karakter' });
+    // if (payload?.notes?.length >= 10) error.push({ message: 'Catatan maximal 150 karakter' });
+    // if (payload?.receiver_address && payload?.receiver_address?.length <= 10) error.push({ message: 'Alamat tujuan minimal 10 karakter' });
 
     if (await isExist({ param: payload?.receiver_location_id, identifier: 'id', model: Location })) {
       error.push({ message: 'Alamat tujuan yang anda pilih tidak ditemukan' });

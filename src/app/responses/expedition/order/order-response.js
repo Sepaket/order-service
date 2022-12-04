@@ -211,7 +211,7 @@ module.exports = class {
             // console.log(locationId);
             return location.id === locationId;
           });
-
+          console.log(servCode)
           const shippingCharge = await shippingFee({
             origin,
             destination,
@@ -319,7 +319,7 @@ module.exports = class {
           };
           // console.log(resi);
           console.log("===PAYLOAD START===");
-          console.log(payload);
+          // console.log(payload);
           console.log("===PAYLOAD END===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
@@ -436,23 +436,34 @@ module.exports = class {
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
     if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
-    console.log('codValidator : ');
-    console.log(result);
     return result;
   }
 
+
+  // Adess 200 (otomatis terpotong tidak perlu notif dan validasi)
+  // patokan 100 (otomatis terpotong tidak perlu notif dan validasi)
+  // isi paket 50 (otomatis terpotong tidak perlu notif dan validasi)
+  // catatan 100 (otomatis terpotong tidak perlu notif dan validasi)
+
   // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
+    const truncatedAddress = (payload?.receiver_address).substring(0,200) || null;
+    const truncatedAddressNote = (payload?.receiver_address_note).substring(0,100) || null;
+    const truncatedGoodsContent = (payload?.goods_content).substring(0,50) || null;
+    const truncatedGoodsNotes = (payload?.notes).substring(0,100) || null;
+    if (payload.service_code === "JNECOD") {
+      const servCode = "REG19";
+    }
     return {
       resi: payload?.resi,
       order: {
         order_code: payload?.orderCode,
         service: payload?.type,
-        service_code: payload?.service_code,
+        service_code: servCode,
         weight: payload?.weight,
-        goods_content: payload?.goods_content,
+        goods_content: truncatedGoodsContent,
         goods_qty: payload?.goods_qty,
-        goods_notes: payload?.notes,
+        goods_notes: truncatedGoodsNotes,
         insurance_amount: payload?.is_insurance ? payload?.insuranceSelected || 0 : 0,
         is_cod: payload?.is_cod,
         total_amount: {
@@ -463,8 +474,8 @@ module.exports = class {
       receiver: {
         name: payload?.receiver_name,
         phone: payload?.receiver_phone,
-        address: payload?.receiver_address,
-        address_note: payload?.receiver_address_note,
+        address: truncatedAddress,
+        address_note: truncatedAddressNote,
         location: payload?.destination || null,
         postal_code: payload?.postal_code,
         sub_district: payload?.sub_district,

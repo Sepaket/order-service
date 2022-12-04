@@ -19,14 +19,14 @@ const isExist = async ({ params, identifier, model }) => new Promise((resolve, r
 });
 
 const fileValidator = async () => new Promise((resolve, reject) => {
+  console.log('enter fle validator')
   const { body } = request;
   let addressCheck = true;
+  const error = [];
   const fileName = body.file.split('/public/');
   // reject(new Error('This file code does not exist'));
   const minLength = 10;
   const maxLength = 200;
-  console.log('file validator');
-  // console.log(fileName);
   if (!fileName[1]) reject(new Error('This filename does not exist'));
   // else resolve(true);
   //  const dataOrders = excelReader(`public/${fileName[1]}`);
@@ -53,7 +53,6 @@ const fileValidator = async () => new Promise((resolve, reject) => {
         };
         // console.log(excelData.receiverAddress.length);
         if (excelData.receiverAddress.length < minLength) {
-          // console.log("address too short");
           reject(new Error('Address is too short'));
           addressCheck = false;
         } else if (excelData.receiverAddress.length > maxLength){
@@ -63,11 +62,6 @@ const fileValidator = async () => new Promise((resolve, reject) => {
           resolve(true);
         }
 
-        // if (!addressCheck) {
-        //   reject(new Error('Address is too short'));
-        // } else {
-        //   resolve(true);
-        // }
       }
     });
   });
@@ -75,7 +69,6 @@ const fileValidator = async () => new Promise((resolve, reject) => {
 });
 
 const serviceCodeValidator = async () => new Promise((resolve, reject) => {
-  console.log('SC validator');
   const { body } = request;
   const exist = serviceCode[body.type]?.find((item) => item.code === body.service_code);
   if (exist) resolve(true);
@@ -104,6 +97,7 @@ const validator = joi.object({
 
 module.exports = (object) => {
   request = object;
+  console.log('call bulk validator')
   return validator.validateAsync(object.body, {
     errors: {
       wrap: {

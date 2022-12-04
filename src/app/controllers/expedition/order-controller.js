@@ -19,23 +19,21 @@ module.exports = {
       // console.log(result);
       // console.log(result.logs.failed_log.errors);
       // console.log('result : ' + result);
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
+      console.log(JSON.stringify(result, null, 2));
+      // response.send({
+      //   code: 200,
+      //   message: 'OK',
+      //   data: result,
+      // });
     } catch (error) {
-      console.log("error - validator - reno");
+      console.log("error - validator - reno ");
       next(error);
     }
   },
 
     bulkOrder: async (request, response, next) => {
     try {
-      // console.log(request);
-      // console.log("Before bulk validator");
       await BulkOrderValidator(request);
-      // console.log("after bulk order validator");
 
       var success = '';
       var [result, successCount, failCount] = await new BulkOrderResponse({ request });

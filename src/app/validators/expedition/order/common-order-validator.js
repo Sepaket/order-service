@@ -59,13 +59,23 @@ const validator = joi.object({
     receiver_name: joi.string().allow(null, ''),
     receiver_phone: joi.string().allow(null, ''),
     receiver_address: joi.string().allow(null, ''),
-    receiver_address_note: joi.string().allow(null, ''),
+    receiver_address_note: joi.string().allow(null, '')
+      // .max(10)
+    //   .messages({
+    //   'string.max': `/nPatokan maximal {#limit} karakter`,
+    // })
+    ,
     goods_content: joi.string().allow(null, ''),
     goods_category: joi.string().allow(null, ''),
     cod_value: joi.any().allow(null, ''),
     goods_amount: joi.any().allow(null, ''),
     goods_qty: joi.number().allow(null, ''),
-    notes: joi.string().allow(null, '').max(150),
+    notes: joi.string().allow(null, '')
+      // .max(10)
+    //   .messages({
+    //   'string.max': `/nCatatan maximal {#limit} karakter`,
+    // })
+    ,
     is_insurance: joi.boolean().allow(null, ''),
     postal_code: joi.any().allow(null, ''),
     sub_district: joi.any().allow(null, ''),
@@ -80,5 +90,6 @@ module.exports = (object) => {
         label: '',
       },
     },
+    abortEarly: false,
   });
 };
