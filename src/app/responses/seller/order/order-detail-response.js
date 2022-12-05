@@ -138,11 +138,14 @@ module.exports = class {
             orderId: params.id,
           },
         }).then(async (response) => {
+          console.log('got order details : ' + params.id)
+          console.log('seller id  : ' + seller.id)
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
+          console.log(result)
           if (response != null) {
-
+            console.log('response is not null')
 
 
             const orderLogs = await this.orderLog.findAll({
@@ -205,6 +208,8 @@ module.exports = class {
 
             result.shipping_charge = parseFloat(shippingCalculated);
 
+          } else {
+            console.log('RESPONSE IS ELSE')
           }
 
 
@@ -215,6 +220,7 @@ module.exports = class {
           else reject(httpErrors(404, 'No Data Found', { data: null }));
         });
       } catch (error) {
+        console.log('this is error for detail response')
         reject(error);
       }
     });

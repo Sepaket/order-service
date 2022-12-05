@@ -137,11 +137,20 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
-    model.OrderDetail.hasOne(model.OrderDiscount, {
+      // model.OrderDiscount.belongsTo(model.OrderDetail, {
+      //   as: 'orderDetail',
+      //   foreignKey: 'orderId',
+      //   targetKey: 'orderId',
+      // });
+
+
+    model.OrderDetail.belongsTo(model.OrderDiscount, {
       as: 'discount',
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
+
+
 
     model.OrderDetail.belongsTo(model.OrderBatch, {
       as: 'batch',

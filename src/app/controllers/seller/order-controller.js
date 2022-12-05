@@ -65,6 +65,7 @@ module.exports = {
   },
 
   detail: async (request, response, next) => {
+    console.log('order detail');
     try {
       await OrderDetailValidator(request);
 
