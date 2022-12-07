@@ -10,7 +10,7 @@ const runner = cron.schedule('0 */3 * * *', async () => {
 
   try {
     await jne.tracking();
-    await sicepat.tracking();
+    // await sicepat.tracking();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);
