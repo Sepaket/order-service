@@ -178,7 +178,7 @@ module.exports = class {
       // condition.status = query.status;
       condition.status = {
         [this.op.notIn]: [
-            'CANCELED', 'PROCESSED',
+          'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
         ],
       };
     // }

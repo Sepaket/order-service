@@ -38,6 +38,8 @@ module.exports = class {
       const totalWithdrawValue = await this.totalCredit({ selector: 'withdraw' , status: 'COMPLETED'});
       const orderCodProfitDone = await this.orderProfit({ status: 'DELIVERED', isCod: true });
       const orderCodProfitUndone = await this.orderProfit({ status: 'UNDELIVERED', isCod: true });
+      const orderNonCodProfitDone = await this.orderProfit({ status: 'DELIVERED', isCod: false });
+      const orderNonCodProfitUndone = await this.orderProfit({ status: 'UNDELIVERED', isCod: false });
       const orderProfit = await this.orderProfit({ status: '', isCod: '' });
       const shippingChargeCodPaid = await this.orderProfitShipping({ isCod: true });
       const shippingChargeNonCodPaid = await this.orderProfitShipping({ isCod: false });
@@ -84,6 +86,14 @@ module.exports = class {
         shipping_charge_paid_non_cod: {
           raw: shippingChargeNonCodPaid,
           formatted: formatCurrency(shippingChargeNonCodPaid, 'Rp.'),
+        },
+        non_cod_profit_done: {
+          raw: orderNonCodProfitDone,
+          formatted: formatCurrency(orderNonCodProfitDone, 'Rp.'),
+        },
+        non_cod_profit_pending: {
+          raw: orderNonCodProfitUndone,
+          formatted: formatCurrency(orderNonCodProfitUndone, 'Rp.'),
         },
       };
     } catch (error) {
