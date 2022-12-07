@@ -241,14 +241,14 @@ module.exports = class {
       condition.is_cod = query.type === 'cod';
     }
 
-    if (query?.date_start || query?.date_end) {
-      condition.createdAt = {
-        [this.op.between]: [
-          moment(`${query?.date_start}`).startOf('day').format(),
-          moment(`${query?.date_end}`).endOf('day').format(),
-        ],
-      };
-    }
+    // if (query?.date_start || query?.date_end) {
+    //   condition.createdAt = {
+    //     [this.op.between]: [
+    //       moment(`${query?.date_start}`).startOf('day').format(),
+    //       moment(`${query?.date_end}`).endOf('day').format(),
+    //     ],
+    //   };
+    // }
 
     return condition;
   }
