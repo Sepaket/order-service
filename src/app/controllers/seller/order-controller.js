@@ -1,6 +1,7 @@
 // validator
 const BatchValidator = require('../../validators/seller/order/batch-validator');
 const OrderListValidator = require('../../validators/seller/order/list-validator');
+const MutasiValidator = require('../../validators/seller/order/mutasi');
 const OrderDetailValidator = require('../../validators/seller/order/detail-validator');
 const ExportValidator = require('../../validators/seller/order/export-validator');
 const PrintValidator = require('../../validators/seller/order/print-validator');
@@ -12,6 +13,7 @@ const OrderDetailResponse = require('../../responses/seller/order/order-detail-r
 const OrderMutasiResponse = require('../../responses/seller/order/order-mutasi-response');
 const ExportResponse = require('../../responses/seller/order/order-export-response');
 const PrintResponse = require('../../responses/seller/order/order-print-response');
+const HistoryValidator = require('../../validators/seller/payment/history-validator');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -50,7 +52,7 @@ module.exports = {
   mutasi: async (request, response, next) => {
     console.log('order mutasi');
     try {
-      await OrderListValidator(request.query);
+      await MutasiValidator(request.query);
 
       const result = await new OrderMutasiResponse({ request });
 

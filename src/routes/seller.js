@@ -70,7 +70,6 @@ router.group('/reports', (route) => {
   route.get('/topup-paid', Authorization, ReportController.topupPaid);
   route.get('/withdraw-completed', Authorization, ReportController.withdrawCompleted);
   route.get('/cod-shipping-paid', Authorization, ReportController.codShippingPaid);
-  // route.get('/non-cod-shipping-paid', Authorization, ReportController.shippingChargeNonCodPaid());
 });
 
 router.group('/payment', (route) => {

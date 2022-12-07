@@ -13,11 +13,48 @@ module.exports = class {
     return this.process();
   }
 
+  async orderProfitShipping({ isCod }) {
+    try {
+      const order = await this.orderDetail.findAll({
+        groupBy: 'orderDetail.orderId',
+        where: {
+          sellerId: this.sellerId,
+          ...this.search,
+        },
+        include: [
+          {
+            model: this.order,
+            as: 'order',
+            required: true,
+            where: {
+              isCod,
+              status: {
+                [this.op.notIn]: ['RETURN_TO_SELLER', 'CANCELED'],
+              },
+            },
+          },
+        ],
+      });
+
+      let result = 0;
+      order?.forEach((item) => {
+        result += parseFloat(item.shippingCharge, 10);
+      });
+
+      // return order;
+      return parseFloat(result);
+    } catch (error) {
+      throw new Error(error?.message);
+    }
+  }
+
   async process() {
     const limit = 10;
     const offset = 0;
     const { query } = this.request;
     console.log("shipping paid cod");
+    const shippingChargeCodPaid = await this.orderProfitShipping({ isCod: true });
+
     const seller = await jwtSelector({ request: this.request });
     return new Promise(async (resolve, reject) => {
       try {

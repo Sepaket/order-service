@@ -180,11 +180,51 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
+    let filtered = {};
     const condition = {};
 
     if (query?.keyword) {
       condition[this.op.or] = {
         resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+      };
+    }
+
+    if (query?.filter_by === 'DATE') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).startOf('day').format(),
+            moment(query.date_end).endOf('day').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'MONTH') {
+      console.log("filder by month");
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            // moment(query.date_start, 'M').startOf('month').format(),
+            // moment(query.date_start, 'M').endOf('month').format(),
+            moment(query.date_start).startOf('month').format(),
+            moment(query.date_end).endOf('month').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'YEAR') {
+      console.log("filder by YEAR");
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).startOf('year').format(),
+            moment(query.date_end).endOf('year').format(),
+            // moment(query.date_start, 'YYYY').startOf('year').format(),
+            // moment(query.date_start, 'YYYY').endOf('year').format(),
+          ],
+        },
       };
     }
 
