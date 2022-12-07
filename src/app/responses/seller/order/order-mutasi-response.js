@@ -38,10 +38,17 @@ module.exports = class {
 
     const total = await this.orderDetail.count({ where: {
         sellerId: seller.id,
-        authorId: {
-          [Op.notIn]: ['WAITING_PICKUP', 'PROCESSED', 'PROBLEM'],
-        },
-      } });
+      },
+      include: [{
+        model: Order,as: "order",
+        where: {
+          status: {
+            [this.op.notIn]: ['WAITING_PICKUP', 'PROCESSED', 'PROBLEM'],
+          },
+        }
+      }]
+
+    });
 
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
