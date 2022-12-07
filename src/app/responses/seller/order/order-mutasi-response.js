@@ -56,7 +56,7 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
-        this.orderDetail.findAll({
+        this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
             'totalItem',
@@ -132,8 +132,10 @@ module.exports = class {
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
         }).then((response) => {
+          console.log(response.count);
+          // console.log(response.rows);
           const result = this.converter.arrayToSnakeCase(
-            JSON.parse(JSON.stringify(response)),
+            JSON.parse(JSON.stringify(response.rows)),
           );
 
           const mapped = result?.map((item) => ({
@@ -150,7 +152,7 @@ module.exports = class {
             resolve({
               data: mapped,
               meta: {
-                total,
+                total: response.count,
                 total_result: mapped.length,
                 limit: parseInt(query.limit, 10) || limit,
                 page: parseInt(query.page, 10) || (offset + 1),
@@ -161,7 +163,7 @@ module.exports = class {
               data: {
                 data: [],
                 meta: {
-                  total,
+                  total: response.count,
                   total_result: mapped.length,
                   limit: parseInt(query.limit, 10) || limit,
                   page: parseInt(query.page, 10) || (offset + 1),
