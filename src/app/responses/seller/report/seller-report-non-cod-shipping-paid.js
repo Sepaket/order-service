@@ -33,7 +33,7 @@ module.exports = class {
               [Op.notIn]: ['RETURN_TO_SELLER', 'CANCELED'],
             },
             // status: 'PROCESSED',
-            isCod: true,
+            isCod: false,
             ...this.querySearch(),
           },
           include: [{

@@ -16,6 +16,7 @@ const OrderTotalChartReponse = require('../../responses/seller/report/seller-rep
 const TopupPaidReponse = require('../../responses/seller/report/seller-report-topup-paid');
 const WithdrawCompletedReponse = require('../../responses/seller/report/seller-report-withdraw-completed');
 const CodShippingPaid = require('../../responses/seller/report/seller-report-cod-shipping-paid');
+const NonCodShippingPaid = require('../../responses/seller/report/seller-report-non-cod-shipping-paid');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -252,6 +253,22 @@ module.exports = {
     console.log('CodShippingPaid');
     try {
       const result = await new CodShippingPaid({ request });
+      console.log(result);
+      response.send({
+        code: 200,
+        message: 'OK',
+        count: result.length,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  nonCodShippingPaid: async (request, response, next) => {
+    console.log('NonCodShippingPaid');
+    try {
+      const result = await new NonCodShippingPaid({ request });
       console.log(result);
       response.send({
         code: 200,
