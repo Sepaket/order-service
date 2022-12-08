@@ -41,19 +41,61 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
-    if (query.start_date && query.end_date) {
-      const condition = {
-        createdAt: {
-          [Op.between]: [
-            moment(query.start_date).startOf('day').format(),
-            moment(query.end_date).endOf('day').format(),
+    let filtered = {};
+    const condition = {};
+
+    if (query?.keyword) {
+      condition[this.op.or] = {
+        resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+      };
+    }
+
+    if (query?.filter_by === 'DATE') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).startOf('day').format(),
+            moment(query.date_end).endOf('day').format(),
           ],
         },
       };
-
-      return condition;
     }
 
-    return {};
+    if (query.filter_by === 'MONTH') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).startOf('month').format(),
+            moment(query.date_end).endOf('month').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'YEAR') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).startOf('year').format(),
+            moment(query.date_end).endOf('year').format(),
+          ],
+        },
+      };
+    }
+
+    // condition.status = {
+    //   [this.op.notIn]: [
+    //     'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
+    //   ],
+    // };
+
+
+    if (query?.type) {
+      condition.is_cod = query.type === 'cod';
+    }
+
+
+    return condition;
   }
+
 };

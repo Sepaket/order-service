@@ -35,20 +35,20 @@ module.exports = class {
     const whereCondition = query?.batch_id
       ? { sellerId: seller.id, batchId: query.batch_id }
       : { sellerId: seller.id };
-
-    const total = await this.orderDetail.count({ where: {
-        sellerId: seller.id,
-      },
-      include: [{
-        model: Order,as: "order",
-        where: {
-          status: {
-            [this.op.notIn]: ['WAITING_PICKUP', 'PROCESSED', 'PROBLEM'],
-          },
-        }
-      }]
-
-    });
+    console.log('order mutasi response');
+    // const total = await this.orderDetail.count({ where: {
+    //     sellerId: seller.id,
+    //   },
+    //   include: [{
+    //     model: Order,as: "order",
+    //     where: {
+    //       status: {
+    //         [this.op.notIn]: ['WAITING_PICKUP', 'PROCESSED', 'PROBLEM'],
+    //       },
+    //     }
+    //   }]
+    //
+    // });
 
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
@@ -191,7 +191,7 @@ module.exports = class {
 
     if (query?.filter_by === 'DATE') {
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('day').format(),
             moment(query.date_end).endOf('day').format(),
@@ -201,12 +201,9 @@ module.exports = class {
     }
 
     if (query.filter_by === 'MONTH') {
-      console.log("filder by month");
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
-            // moment(query.date_start, 'M').startOf('month').format(),
-            // moment(query.date_start, 'M').endOf('month').format(),
             moment(query.date_start).startOf('month').format(),
             moment(query.date_end).endOf('month').format(),
           ],
@@ -215,40 +212,27 @@ module.exports = class {
     }
 
     if (query.filter_by === 'YEAR') {
-      console.log("filder by YEAR");
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('year').format(),
             moment(query.date_end).endOf('year').format(),
-            // moment(query.date_start, 'YYYY').startOf('year').format(),
-            // moment(query.date_start, 'YYYY').endOf('year').format(),
           ],
         },
       };
     }
 
-    // if (query?.status) {
-      // condition.status = query.status;
       condition.status = {
         [this.op.notIn]: [
           'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
         ],
       };
-    // }
+
 
     if (query?.type) {
       condition.is_cod = query.type === 'cod';
     }
 
-    // if (query?.date_start || query?.date_end) {
-    //   condition.createdAt = {
-    //     [this.op.between]: [
-    //       moment(`${query?.date_start}`).startOf('day').format(),
-    //       moment(`${query?.date_end}`).endOf('day').format(),
-    //     ],
-    //   };
-    // }
 
     return condition;
   }

@@ -86,9 +86,10 @@ module.exports = {
       response.send({
         code: 200,
         message: 'OK',
-        count : resultCount,
-        data: resultCount,
-        items : result,
+        data: result,
+        // count : resultCount,
+        // data: resultCount,
+        // items : result,
       });
     } catch (error) {
       next(error);
