@@ -82,7 +82,7 @@ module.exports = {
     try {
       console.log('cod sent response');
       const result = await new CodSentReponse({ request });
-      const resultCount = result.length;
+      // const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
@@ -189,13 +189,14 @@ module.exports = {
     try {
       console.log('cod processing');
       const result = await new CodProcessingReponse({ request });
-      const resultCount = result.length;
+      // const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
-        count : resultCount,
-        data: resultCount,
-        items : result,
+        data: result,
+        // count : resultCount,
+        // data: resultCount,
+        // items : result,
       });
     } catch (error) {
       next(error);

@@ -1,38 +1,180 @@
 const moment = require('moment');
-const { Op } = require('sequelize');
-const { Order, OrderDetail } = require('../../../models');
+const { Op,
+  Sequelize
+} = require('sequelize');
+const { Order, OrderDetail,
+  Location,
+  OrderLog,
+  OrderAddress,
+  SellerAddress
+} = require('../../../models');
 const jwtSelector = require('../../../../helpers/jwt-selector');
+const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
+const httpErrors = require('http-errors');
 
 module.exports = class {
   constructor({ request }) {
     this.request = request;
     this.order = Order;
+    this.op = Sequelize.Op;
+    this.location = Location;
+    this.orderLog = OrderLog;
+    this.orderDetail = OrderDetail;
+    this.orderAddress = OrderAddress;
+    this.sellerAddress = SellerAddress;
+    this.converter = snakeCaseConverter;
     return this.process();
   }
 
   async process() {
+    const limit = 10;
+    const offset = 0;
+    const { query } = this.request;
+    const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
+    const whereCondition = query?.batch_id
+      ? { sellerId: seller.id, batchId: query.batch_id }
+      : { sellerId: seller.id };
+    const nextPage = (
+      (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
+    ) || parseInt(offset, 10);
     return new Promise(async (resolve, reject) => {
       try {
         this.seller = await jwtSelector({ request: this.request });
-
-        this.order.findAll({
-          where: {
-            '$detail.seller_id$': seller.id,
-            status: {
-              [Op.or]: ['PROCESSED', 'WAITING_PICKUP']
+        this.orderDetail.findAndCountAll({
+          attributes: [
+            'orderId',
+            'totalItem',
+            'notes',
+            'weight',
+            'volume',
+            'goodsContent',
+            'shippingCharge',
+            'useInsurance',
+            'insuranceAmount',
+            'sellerReceivedAmount',
+            'codFee',
+            'goodsPrice',
+            'codFeeAdmin',
+          ],
+          include: [
+            {
+              model: this.orderAddress,
+              as: 'receiverAddress',
+              required: true,
+              attributes: [
+                ['id', 'receiver_id'],
+                'receiverName',
+              ],
             },
-            // status: 'PROCESSED',
-            isCod: true,
-            ...this.querySearch(),
-          },
-          include: [{
-            model: OrderDetail,
-            as: 'detail',
-          }],
+            {
+              model: this.order,
+              as: 'order',
+              required: true,
+              where: search,
+              attributes: [
+                'orderCode',
+                'resi',
+                'orderDate',
+                'orderTime',
+                'expedition',
+                'serviceCode',
+                'isCod',
+                'status',
+                'updatedAt',
+                'createdAt',
+              ],
+            },
+            {
+              model: this.sellerAddress,
+              as: 'sellerAddress',
+              required: false,
+              attributes: [
+                ['id', 'seller_address_id'],
+                'address',
+                'picName',
+                'picPhoneNumber',
+              ],
+              include: [
+                {
+                  model: this.location,
+                  as: 'location',
+                  required: false,
+                  attributes: [
+                    ['id', 'location_id'],
+                    'province',
+                    'city',
+                    'district',
+                    'subDistrict',
+                    'postalCode',
+                  ],
+                },
+              ],
+            },
+          ],
+          where: whereCondition,
+          order: [['id', 'DESC']],
+          limit: parseInt(query.limit, 10) || parseInt(limit, 10),
+          offset: nextPage,
+
         }).then((response) => {
-          resolve(response);
+          console.log(response.count);
+          // console.log(response.rows);
+          const result = this.converter.arrayToSnakeCase(
+            JSON.parse(JSON.stringify(response.rows)),
+          );
+
+          const mapped = result?.map((item) => ({
+            ...item,
+            order: this.converter.objectToSnakeCase(item?.order) || null,
+            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            seller_address: {
+              ...item.seller_address,
+              location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
+            },
+          }));
+
+          if (mapped.length > 0) {
+            resolve({
+              data: mapped,
+              meta: {
+                total: response.count,
+                total_result: mapped.length,
+                limit: parseInt(query.limit, 10) || limit,
+                page: parseInt(query.page, 10) || (offset + 1),
+              },
+            });
+          } else {
+            reject(httpErrors(404, 'No Data Found', {
+              data: {
+                data: [],
+                meta: {
+                  total: response.count,
+                  total_result: mapped.length,
+                  limit: parseInt(query.limit, 10) || limit,
+                  page: parseInt(query.page, 10) || (offset + 1),
+                },
+              },
+            }));
+          }
         });
+        // this.order.findAll({
+        //   where: {
+        //     '$detail.seller_id$': seller.id,
+        //     status: {
+        //       [Op.or]: ['PROCESSED', 'WAITING_PICKUP']
+        //     },
+        //     // status: 'PROCESSED',
+        //     isCod: true,
+        //     ...this.querySearch(),
+        //   },
+        //   include: [{
+        //     model: OrderDetail,
+        //     as: 'detail',
+        //   }],
+        // }).then((response) => {
+        //   resolve(response);
+        // });
       } catch (error) {
         reject(error);
       }
@@ -52,7 +194,7 @@ module.exports = class {
 
     if (query?.filter_by === 'DATE') {
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('day').format(),
             moment(query.date_end).endOf('day').format(),
@@ -63,7 +205,7 @@ module.exports = class {
 
     if (query.filter_by === 'MONTH') {
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('month').format(),
             moment(query.date_end).endOf('month').format(),
@@ -74,7 +216,7 @@ module.exports = class {
 
     if (query.filter_by === 'YEAR') {
       filtered = {
-        updatedAt: {
+        createdAt: {
           [this.op.between]: [
             moment(query.date_start).startOf('year').format(),
             moment(query.date_end).endOf('year').format(),
@@ -82,19 +224,20 @@ module.exports = class {
         },
       };
     }
+    condition.status = {
+      [this.op.in]: [
+        'PROCESSED', 'WAITING_PICKUP'
+      ],
+    };
 
-    // condition.status = {
-    //   [this.op.notIn]: [
-    //     'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
-    //   ],
-    // };
+    // if (query?.type) {
+    // {
+    //   is_cod: false,
+    // }
+      condition.is_cod = true;
+    // }
 
-
-    if (query?.type) {
-      condition.is_cod = query.type === 'cod';
-    }
-
-
+    console.log(condition);
     return condition;
   }
 

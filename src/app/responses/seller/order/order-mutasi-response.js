@@ -183,13 +183,14 @@ module.exports = class {
     let filtered = {};
     const condition = {};
 
-    if (query?.keyword) {
-      condition[this.op.or] = {
-        resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-      };
-    }
+    // if (query?.keyword) {
+    //   condition[this.op.or] = {
+    //     resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+    //   };
+    // }
 
     if (query?.filter_by === 'DATE') {
+      console.log("filter by date");
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -201,6 +202,7 @@ module.exports = class {
     }
 
     if (query.filter_by === 'MONTH') {
+      console.log("filter by MONTH");
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -210,7 +212,6 @@ module.exports = class {
         },
       };
     }
-
     if (query.filter_by === 'YEAR') {
       filtered = {
         createdAt: {
@@ -221,13 +222,11 @@ module.exports = class {
         },
       };
     }
-
       condition.status = {
         [this.op.notIn]: [
           'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
         ],
       };
-
 
     if (query?.type) {
       condition.is_cod = query.type === 'cod';
