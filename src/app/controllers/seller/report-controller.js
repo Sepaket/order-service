@@ -17,6 +17,7 @@ const TopupPaidReponse = require('../../responses/seller/report/seller-report-to
 const WithdrawCompletedReponse = require('../../responses/seller/report/seller-report-withdraw-completed');
 const CodShippingPaid = require('../../responses/seller/report/seller-report-cod-shipping-paid');
 const NonCodShippingPaid = require('../../responses/seller/report/seller-report-non-cod-shipping-paid');
+const MutasiValidator = require('../../validators/seller/order/mutasi');
 
 module.exports = {
   totalOrder: async (request, response, next) => {
@@ -50,6 +51,7 @@ module.exports = {
 
   nonCodProcessing: async (request, response, next) => {
     try {
+      await MutasiValidator(request.query);
       const result = await new NonCodProcessingReponse({ request });
       const resultCount = result.length;
       response.send({
@@ -81,6 +83,7 @@ module.exports = {
   codSent: async (request, response, next) => {
     try {
       console.log('cod sent response');
+      await MutasiValidator(request.query);
       const result = await new CodSentReponse({ request });
       // const resultCount = result.length;
       response.send({
@@ -98,6 +101,7 @@ module.exports = {
 
   nonCodSent: async (request, response, next) => {
     try {
+      await MutasiValidator(request.query);
       console.log('NON cod sent response');
       const result = await new NonCodSentReponse({ request });
       const resultCount = result.length;
@@ -188,6 +192,7 @@ module.exports = {
   codProcessing: async (request, response, next) => {
     try {
       console.log('cod processing');
+      await MutasiValidator(request.query);
       const result = await new CodProcessingReponse({ request });
       // const resultCount = result.length;
       response.send({
