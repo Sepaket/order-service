@@ -56,6 +56,12 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
+        // if (moment(query.date_start, 'YYYY-MM-DD', true).isValid()) {
+        //   console.log('DATE VALID');
+        // } else {
+        //   console.log('START DATE NOT VALID');
+        // };
+        //
         this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
@@ -180,6 +186,7 @@ module.exports = class {
 
   querySearch() {
     const { query } = this.request;
+
     let filtered = {};
     // const condition = {};
 
