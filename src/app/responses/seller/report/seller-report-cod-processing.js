@@ -184,15 +184,16 @@ module.exports = class {
   querySearch() {
     const { query } = this.request;
     let filtered = {};
-    const condition = {};
+    // const condition = {};
 
-    if (query?.keyword) {
-      condition[this.op.or] = {
-        resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-      };
-    }
+    // if (query?.keyword) {
+    //   condition[this.op.or] = {
+    //     resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+    //   };
+    // }
 
     if (query?.filter_by === 'DATE') {
+      console.log('DATE');
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -224,21 +225,32 @@ module.exports = class {
         },
       };
     }
-    condition.status = {
-      [this.op.in]: [
-        'PROCESSED', 'WAITING_PICKUP'
-      ],
-    };
+    // condition.status = {
+    //   [this.op.in]: [
+    //     'PROCESSED', 'WAITING_PICKUP'
+    //   ],
+    // };
 
     // if (query?.type) {
     // {
     //   is_cod: false,
     // }
-      condition.is_cod = true;
+    //   condition.is_cod = true;
     // }
 
-    console.log(condition);
-    return condition;
+    const condition = {
+      [this.op.and]: {
+        ...filtered,
+      },
+      is_cod: true,
+      status: {
+        [this.op.in]: [
+          'PROCESSED', 'WAITING_PICKUP'
+        ],
+      }
+    };
+
+    return query?.filter_by ? condition : {};
   }
 
 };

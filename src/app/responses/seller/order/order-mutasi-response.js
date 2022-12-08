@@ -181,7 +181,7 @@ module.exports = class {
   querySearch() {
     const { query } = this.request;
     let filtered = {};
-    const condition = {};
+    // const condition = {};
 
     // if (query?.keyword) {
     //   condition[this.op.or] = {
@@ -190,7 +190,7 @@ module.exports = class {
     // }
 
     if (query?.filter_by === 'DATE') {
-      console.log("filter by date");
+
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -202,7 +202,6 @@ module.exports = class {
     }
 
     if (query.filter_by === 'MONTH') {
-      console.log("filter by MONTH");
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -222,17 +221,33 @@ module.exports = class {
         },
       };
     }
-      condition.status = {
+    //   condition.status = {
+    //     [this.op.notIn]: [
+    //       'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
+    //     ],
+    //   };
+    //
+    // if (query?.type) {
+    //   condition.is_cod = query.type === 'cod';
+    // }
+
+
+    // return condition;
+
+    const condition = {
+      [this.op.and]: {
+        ...filtered,
+      },
+      // is_cod: true,
+      status: {
         [this.op.notIn]: [
-          'WAITING_PICKUP', 'PROCESSED', 'PROBLEM',
+          'WAITING_PICKUP', 'PROCESSED', 'PROBLEM'
         ],
-      };
+      }
+    };
 
-    if (query?.type) {
-      condition.is_cod = query.type === 'cod';
-    }
+    return query?.filter_by ? condition : {};
 
 
-    return condition;
   }
 };

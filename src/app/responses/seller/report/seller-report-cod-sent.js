@@ -178,16 +178,15 @@ module.exports = class {
   querySearch() {
     const { query } = this.request;
     let filtered = {};
-    const condition = {};
+    // const condition = {};
 
-    if (query?.keyword) {
-      condition[this.op.or] = {
-        resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-      };
-    }
+    // if (query?.keyword) {
+    //   condition[this.op.or] = {
+    //     resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+    //   };
+    // }
 
     if (query?.filter_by === 'DATE') {
-      console.log("cod sent DATE");
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -199,7 +198,6 @@ module.exports = class {
     }
 
     if (query.filter_by === 'MONTH') {
-      console.log("cod sent month");
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -221,21 +219,19 @@ module.exports = class {
       };
     }
 
-    condition.status = {
-      [this.op.in]: [
-        'DELIVERED',
-      ],
+    const condition = {
+      [this.op.and]: {
+        ...filtered,
+      },
+      is_cod: true,
+      status: {
+        [this.op.in]: [
+          'DELIVERED'
+        ],
+      }
     };
 
-    // if (query?.type) {
-    //   condition.is_cod = query.type === 'cod';
-    // }
-    condition.is_cod = {
-      [this.op.is]: true,
-    };
-
-
-    return condition;
+    return query?.filter_by ? condition : {};
   }
 
 };

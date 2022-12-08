@@ -137,8 +137,6 @@ module.exports = class {
         //     as: 'detail',
         //   }],
         }).then((response) => {
-          console.log(response.count);
-          // console.log(response.rows);
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response.rows)),
           );
@@ -187,16 +185,15 @@ module.exports = class {
 querySearch() {
   const { query } = this.request;
   let filtered = {};
-  const condition = {};
+  // const condition = {};
 
-  if (query?.keyword) {
-    condition[this.op.or] = {
-      resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-    };
-  }
+  // if (query?.keyword) {
+  //   condition[this.op.or] = {
+  //     resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
+  //   };
+  // }
 
   if (query?.filter_by === 'DATE') {
-    console.log("cod sent DATE");
     filtered = {
       createdAt: {
         [this.op.between]: [
@@ -208,7 +205,6 @@ querySearch() {
   }
 
   if (query.filter_by === 'MONTH') {
-    console.log("cod sent month");
     filtered = {
       createdAt: {
         [this.op.between]: [
@@ -230,30 +226,20 @@ querySearch() {
     };
   }
 
-  condition.status = {
-    [this.op.in]: [
-      'PROCESSED', 'WAITING_PICKUP'
-    ],
+  const condition = {
+    [this.op.and]: {
+      ...filtered,
+    },
+    is_cod: false,
+    status: {
+      [this.op.in]: [
+        'PROCESSED', 'WAITING_PICKUP'
+      ],
+    }
   };
-  condition.is_cod = false;
-  return condition;
+
+  return query?.filter_by ? condition : {};
 }
 
-  // querySearch() {
-  //   const { query } = this.request;
-  //   if (query.start_date && query.end_date) {
-  //     const condition = {
-  //       createdAt: {
-  //         [Op.between]: [
-  //           moment(query.start_date).startOf('day').format(),
-  //           moment(query.end_date).endOf('day').format(),
-  //         ],
-  //       },
-  //     };
-  //
-  //     return condition;
-  //   }
-  //
-  //   return {};
-  // }
+
 };
