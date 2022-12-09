@@ -141,7 +141,7 @@ module.exports = class {
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
             receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
-            seller_received_amount: item.order.status === 'CANCELED'? '0.00' : item.seller_received_amount,
+            seller_received_amount: item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? '0.00' : item.seller_received_amount,
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
