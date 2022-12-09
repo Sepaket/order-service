@@ -27,6 +27,20 @@ module.exports = class {
   }
 
   async process() {
+    function getSellerReceivedAmount(item) {
+      let amount = '';
+      let ongkirReturned = 0.00;
+      // console.log(item.order.status);
+      // console.log(item.order);
+      ongkirReturned = item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? 0.00 : parseFloat(item.seller_received_amount);
+      if (item.order.isCod && (item.order.status === 'RETURN_TO_SELLER')) {
+        // console.log('didalam return to sller');
+        // console.log(item.shipping_calculated);
+        ongkirReturned = -1 * parseFloat(item.shipping_calculated);
+      }
+      return String(ongkirReturned.toFixed(2));
+    }
+
     const limit = 10;
     const offset = 0;
     const { query } = this.request;
@@ -56,7 +70,6 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
-
         this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
@@ -72,6 +85,7 @@ module.exports = class {
             'codFee',
             'goodsPrice',
             'codFeeAdmin',
+            'shippingCalculated',
           ],
           include: [
             {
@@ -141,7 +155,8 @@ module.exports = class {
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
             receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
-            seller_received_amount: item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? '0.00' : item.seller_received_amount,
+            seller_received_amount: getSellerReceivedAmount(item),
+            // item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? '0.00' : item.seller_received_amount,
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
@@ -191,7 +206,6 @@ module.exports = class {
     // }
 
     if (query?.filter_by === 'DATE') {
-
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -232,7 +246,6 @@ module.exports = class {
     //   condition.is_cod = query.type === 'cod';
     // }
 
-
     // return condition;
 
     const condition = {
@@ -243,13 +256,11 @@ module.exports = class {
       status: {
         [this.op.notIn]: [
           // 'WAITING_PICKUP', 'PROCESSED',
-          'PROBLEM'
+          'PROBLEM',
         ],
-      }
+      },
     };
 
     return query?.filter_by ? condition : {};
-
-
   }
 };
