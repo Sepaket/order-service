@@ -63,6 +63,7 @@ module.exports = class {
 
   async checkServiceFee() {
     try {
+      console.log('enter service fee');
       const { body } = this.request;
       const fees = [];
 
@@ -83,6 +84,7 @@ module.exports = class {
       );
 
       if (body.type === 'JNE' && jneCondition) {
+        console.log('jne & condition');
         const jnePrices = await this.jneFee();
         if (jnePrices?.length > 0) fees.push(jnePrices);
       }
@@ -161,6 +163,8 @@ module.exports = class {
         destination: this.destination.jneDestinationCode,
         weight: body.weight,
       });
+
+      console.log(prices);
 
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';

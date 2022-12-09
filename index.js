@@ -45,7 +45,7 @@ const corsOptions = {
 
 batchScheduler.start();
 trackingScheduler.start();
-// createOrderScheduler.start(); RENO
+createOrderScheduler.start();
 cleanerNinjaTokenScheduler.start();
 
 application.use(cors(corsOptions));
