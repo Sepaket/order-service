@@ -56,12 +56,7 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
-        // if (moment(query.date_start, 'YYYY-MM-DD', true).isValid()) {
-        //   console.log('DATE VALID');
-        // } else {
-        //   console.log('START DATE NOT VALID');
-        // };
-        //
+
         this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
@@ -138,8 +133,6 @@ module.exports = class {
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
         }).then((response) => {
-          console.log(response.count);
-          // console.log(response.rows);
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response.rows)),
           );
@@ -148,6 +141,7 @@ module.exports = class {
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
             receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            seller_received_amount: item.order.status === 'CANCELED'? '0.00' : item.seller_received_amount,
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
