@@ -38,7 +38,7 @@ module.exports = class {
         // console.log(item.shipping_calculated);
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
-      if (!(item.order.isCod) && (item.order.status === 'RETURN_TO_SELLER')) {
+      if (!(item.order.isCod)) {
         // console.log('didalam return to sller');
         // console.log(item.shipping_calculated);
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
