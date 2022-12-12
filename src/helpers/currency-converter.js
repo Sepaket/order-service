@@ -19,7 +19,7 @@ const formatCurrency = (
 
   const j = i.length > 3 ? i.length % 3 : 0;
 
-  return `${prefix.length > 0 ? `${prefix} ` : ''}${j ? i.substr(0, j) + thousands : ''}${i
+  const returnValue = `${prefix.length > 0 ? `${prefix} ` : ''}${j ? i.substr(0, j) + thousands : ''}${i
     .substr(j)
     .replace(/(\d{3})(?=\d)/g, `$1${thousands}`)}${
     decimalCount
@@ -28,6 +28,12 @@ const formatCurrency = (
         .slice(2)}`
       : ''
   }`;
+  if (amountArg < 0) {
+    return `(${  returnValue})`;
+  } else {
+    return returnValue;
+  }
+
 };
 
 module.exports = {
