@@ -30,8 +30,9 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
     totalOrder,
     batchCode,
   } = params;
-
   try {
+    console.log('inside order - helper batch creator 1');
+    console.log(expedition);
     const batch = await OrderBatch.create(
       {
         expedition,
@@ -44,9 +45,13 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
       },
       { transaction: dbTransaction },
     );
+    console.log('inside order - helper batch creator 2');
     await dbTransaction.commit();
+    console.log('inside order - helper batch creator 3');
+    console.log('helper batch creator 2');
     resolve(batch);
   } catch (error) {
+    console.log(error);
     await dbTransaction.rollback();
     reject(error);
   }
@@ -327,6 +332,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
     await dbTransaction.commit();
     resolve(true);
   } catch (error) {
+    console.log(error);
     await dbTransaction.rollback();
     reject(error);
   }

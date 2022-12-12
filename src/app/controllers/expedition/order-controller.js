@@ -13,20 +13,20 @@ const NinjaCallbackResponse = require('../../responses/expedition/order/ninja-ca
 module.exports = {
   commonOrder: async (request, response, next) => {
     try {
-      // console.log(request);
       await CommonOrderValidator(request);
       const result = await new OrderResponse({ request });
       // console.log(result);
       // console.log(result.logs.failed_log.errors);
       // console.log('result : ' + result);
-      console.log(JSON.stringify(result, null, 2));
+      // console.log(JSON.stringify(result, null, 2));
       response.send({
         code: 200,
         message: 'OK',
         data: result,
       });
     } catch (error) {
-      console.log("error - validator - reno ");
+      console.log(error);
+      // console.log("error - validator - reno ");
       next(error);
     }
   },
@@ -36,7 +36,7 @@ module.exports = {
       await BulkOrderValidator(request);
       var success = '';
       var [result, successCount, failCount] = await new BulkOrderResponse({ request });
-      console.log(JSON.stringify(result, null, 2));
+      // console.log(JSON.stringify(result, null, 2));
       //if result ada error kirim return
       response.send({
         code: 200,

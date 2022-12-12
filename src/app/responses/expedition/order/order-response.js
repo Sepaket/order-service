@@ -55,10 +55,11 @@ module.exports = class {
   }
 
   process() {
+    console.log('order-response process 2');
     return new Promise(async (resolve, reject) => {
       try {
         const result = await this.createOrder();
-
+        console.log('after create order');
         resolve(result);
       } catch (error) {
         reject(error);
@@ -76,7 +77,6 @@ module.exports = class {
       const { body } = this.request;
       var servCode = '';
 
-
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
       const locationIds = body.order_items.map((item) => item.receiver_location_id);
       const sellerId = await jwtSelector({ request: this.request });
@@ -86,7 +86,6 @@ module.exports = class {
       let batch = await this.batch.findOne({
         where: { id: body?.batch_id || 0, sellerId: sellerId.id },
       });
-
       const order = await this.order.findOne({
         order: [['id', 'DESC']],
         where: { expedition: 'SICEPAT' },
@@ -106,6 +105,7 @@ module.exports = class {
         where: { id: body.seller_location_id, sellerId: sellerId.id },
         include: [{ model: this.location, as: 'location' }],
       });
+
 
       const destinationLocation = await this.location.findAll({
         where: { id: locationIds },
@@ -142,7 +142,9 @@ module.exports = class {
 
 
       let calculatedCredit = parseFloat(seller.sellerDetail.credit);
-
+      console.log('here - reno');
+      console.log(sellerId.id);
+      console.log(body.type);
       if (!batchConditon) {
         batch = await batchCreator({
           dbTransaction,
@@ -152,7 +154,7 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-
+      console.log('here - reno 2');
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
@@ -313,10 +315,10 @@ module.exports = class {
             ...item,
             ...body,
           };
-          // console.log(resi);
+
           console.log("===PAYLOAD START===");
           // console.log(payload);
-          console.log("===PAYLOAD END===");
+          console.log("===PAYLOAD END 2===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
@@ -336,7 +338,6 @@ module.exports = class {
               orderCode,
               batchId: batch.id,
             });
-
             const resultResponse = await this.responseMapper({
               ...payload,
               totalAmount,
@@ -346,19 +347,25 @@ module.exports = class {
 
             result.push(resultResponse);
           }
-
+          console.log('after validator 4');
+          console.log(JSON.stringify(messages));
           return error?.shift();
+          // return error;
         }),
       );
-
+      console.log('in order response - after response');
+      console.log(JSON.stringify(querySuccess));
       if (querySuccess?.length > 0) {
+        console.log('aa');
         await orderSuccessLogger(querySuccess);
+        console.log('bb');
         await orderLogger({
           items: queryrLogger,
           sellerId: seller.id,
         });
+        console.log('cc');
       }
-
+      console.log('reno x');
       const filtered = response?.filter((item) => item);
       const orderResponse = {
         info: {
@@ -380,8 +387,10 @@ module.exports = class {
           failed_log: filtered,
         },
       };
+      console.log('reno x2');
 
       if (filtered?.length > 0 && !batchConditon) {
+        console.log('reno x3');
         await this.batch.update(
           {
             totalOrderSent: 0,
