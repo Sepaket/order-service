@@ -41,7 +41,8 @@ module.exports = class {
       if (!(item.order.isCod)) {
         // console.log('didalam return to sller');
         // console.log(item.shipping_calculated);
-        ongkirReturned = -1 * parseFloat(item.shipping_calculated);
+        ongkirReturned = item.order.status === 'CANCELED' ? 0.00 : (-1 * parseFloat(item.shipping_calculated));
+        // ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
 
       return String(ongkirReturned.toFixed(2));

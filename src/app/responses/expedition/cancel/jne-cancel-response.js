@@ -38,9 +38,7 @@ module.exports = class {
         const person = await this.orderAddress.findOne({
           where: { orderId: order?.id },
         });
-
-        await this.jne.cancel({ resi: order.resi, pic: person.senderName });
-
+        // await this.jne.cancel({ resi: order.resi, pic: person.senderName });
         this.insertLog(order);
 
         resolve(true);
@@ -76,11 +74,12 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
+      const shippingCalculated = order?.detail?.shippingCalculated;
+      const seller = await this.sellerDetail.findOne({
+        where: { sellerId: order.detail.sellerId },
+      });
+
       if (!order.isCod) {
-        const shippingCalculated = order?.detail?.shippingCalculated;
-        const seller = await this.sellerDetail.findOne({
-          where: { sellerId: order.detail.sellerId },
-        });
 
         const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
         const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
@@ -90,6 +89,8 @@ module.exports = class {
           { where: { sellerId: seller.sellerId } },
           { transaction: dbTransaction },
         );
+      } else {
+        console.log('canceled order is COD');
       }
 
       await dbTransaction.commit();

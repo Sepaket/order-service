@@ -9,6 +9,8 @@ const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat
 module.exports = async (request, response, next) => {
   try {
     let result = null;
+    console.log('cancelling order...');
+    // console.log(request);
     const order = await CancelValidator(request);
     const expedition = order?.id?.order?.expedition;
 
