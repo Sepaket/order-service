@@ -33,14 +33,11 @@ module.exports = class {
       let amount = '';
       let ongkirReturned = 0.00;
 
-      ongkirReturned = item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? 0.00 : parseFloat(item.seller_received_amount);
+      ongkirReturned = item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? 0.00 : parseFloat(item.shipping_calculated);
       if (item.order.isCod && (item.order.status === 'RETURN_TO_SELLER')) {
-
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
       if ((item.order.isCod)) {
-        // console.log('didalam return to sller');
-        console.log(item.shipping_calculated);
         ongkirReturned = parseFloat(item.cod_value) - parseFloat(item.shipping_calculated);
       }
 

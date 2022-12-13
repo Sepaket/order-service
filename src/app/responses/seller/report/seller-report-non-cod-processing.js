@@ -28,6 +28,23 @@ module.exports = class {
   }
 
   async process() {
+
+    function getSellerReceivedAmount(item) {
+      let amount = '';
+      let ongkirReturned = 0.00;
+
+      ongkirReturned = item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? 0.00 : parseFloat(item.shipping_calculated);
+      if (!item.order.isCod && (item.order.status === 'RETURN_TO_SELLER')) {
+
+        ongkirReturned = -1 * parseFloat(item.shipping_calculated);
+      }
+      if (!(item.order.isCod)) {
+        ongkirReturned = -1 * parseFloat(item.shipping_calculated);
+      }
+      return String(ongkirReturned.toFixed(2));
+    }
+
+
     const limit = 10;
     const offset = 0;
     const { query } = this.request;
@@ -57,6 +74,7 @@ module.exports = class {
             'codFee',
             'goodsPrice',
             'codFeeAdmin',
+            'shippingCalculated',
           ],
           include: [
             {
@@ -145,6 +163,7 @@ module.exports = class {
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
             receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            seller_received_amount: getSellerReceivedAmount(item),
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
