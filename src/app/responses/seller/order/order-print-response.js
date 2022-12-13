@@ -54,6 +54,7 @@ module.exports = class {
             'useInsurance',
             'insuranceAmount',
             'shippingCharge',
+            'shippingCalculated',
           ],
           include: [
             {
