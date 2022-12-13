@@ -38,7 +38,7 @@ module.exports = class {
         const person = await this.orderAddress.findOne({
           where: { orderId: order?.id },
         });
-        // await this.jne.cancel({ resi: order.resi, pic: person.senderName });
+        await this.jne.cancel({ resi: order.resi, pic: person.senderName });
         this.insertLog(order);
 
         resolve(true);
