@@ -30,12 +30,12 @@ module.exports = class {
       );
       console.log("after sellerdetail create");
       await this.send();
-
+      console.log('sending...');
       await dbTransaction.commit();
       console.log("After db transact commit")
       return true;
     } catch (error) {
-      console.log("exception");
+      console.log(error);
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
@@ -57,8 +57,9 @@ module.exports = class {
     const { email } = this.request.body;
     this.token = shortid.generate();
     this.email = email;
+    console.log('inside redis');
     this.storeToRedis();
-
+    console.log('after stored redis');
     await sender({
       to: email,
       subject: 'Email Activation',

@@ -168,8 +168,7 @@ module.exports = class {
         order: [['id', 'DESC']],
       });
       nextId = latestOrder.id + 1;
-      console.log(locationIds);
-      // console.log(destinationLocation);
+
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
@@ -192,7 +191,6 @@ module.exports = class {
           });
 
           if (resiIsExist) {
-          console.log("resi is exist");
             if (body.type === 'JNE') {
               nextId = nextId + 1;
               resi = await resiMapper({ id: `${index}`, expedition: body.type, currentResi: nextId });
@@ -286,8 +284,6 @@ module.exports = class {
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
-          console.log('codCondition : ');
-          console.log(this.codValidator());
           // const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
 
@@ -347,25 +343,17 @@ module.exports = class {
 
             result.push(resultResponse);
           }
-          console.log('after validator 4');
-          console.log(JSON.stringify(messages));
           return error?.shift();
           // return error;
         }),
       );
-      console.log('in order response - after response');
-      console.log(JSON.stringify(querySuccess));
       if (querySuccess?.length > 0) {
-        console.log('aa');
         await orderSuccessLogger(querySuccess);
-        console.log('bb');
         await orderLogger({
           items: queryrLogger,
           sellerId: seller.id,
         });
-        console.log('cc');
       }
-      console.log('reno x');
       const filtered = response?.filter((item) => item);
       const orderResponse = {
         info: {
@@ -387,10 +375,8 @@ module.exports = class {
           failed_log: filtered,
         },
       };
-      console.log('reno x2');
 
       if (filtered?.length > 0 && !batchConditon) {
-        console.log('reno x3');
         await this.batch.update(
           {
             totalOrderSent: 0,
@@ -416,7 +402,7 @@ module.exports = class {
           { where: { id: batch.id } },
         );
       }
-
+      console.log(orderResponse);
       return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');

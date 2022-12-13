@@ -5,7 +5,8 @@ const profitHandler = (payload) => new Promise((resolve, reject) => {
         return parseFloat(item.cod_value) - parseFloat(item.shippingCalculated);
       }
 
-      return parseFloat(item.goods_amount) - parseFloat(item.shippingCalculated);
+      // return parseFloat(item.goods_amount) - parseFloat(item.shippingCalculated);
+      return 0;
     });
 
     resolve(profits);

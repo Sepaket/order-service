@@ -31,6 +31,10 @@ module.exports = class {
   }
 
   async process() {
+
+
+
+
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
 
@@ -131,6 +135,12 @@ module.exports = class {
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
 
+            const truncatedAddress = (item?.receiver_address).substring(0,200) || null;
+            const truncatedAddressNote = (item?.receiver_address_note).substring(0,100) || null;
+            const truncatedGoodsContent = (item?.goods_content).substring(0,50) || null;
+            const truncatedGoodsNotes = (item?.notes).substring(0,100) || null;
+
+
             return {
               resi: item.order.resi,
               order_id: item.order_id,
@@ -140,9 +150,9 @@ module.exports = class {
                 service: item.order.expedition,
                 service_code: item.order.serviceCode,
                 weight: item.weight,
-                goods_content: item.goods_content,
+                goods_content: truncatedGoodsContent,
                 goods_qty: item.total_item,
-                goods_notes: item.notes,
+                goods_notes: truncatedGoodsNotes,
                 use_insurance: item.use_insurance,
                 insurance_amount: item.insurance_amount,
                 is_cod: item.order.isCod,
@@ -154,8 +164,8 @@ module.exports = class {
               receiver: {
                 name: item?.receiver_address?.receiverName || '',
                 phone: item?.receiver_address?.receiverPhone || '',
-                address: item?.receiver_address?.receiverAddress || '',
-                address_note: item?.receiver_address?.receiverAddressNote || '',
+                address: truncatedAddress || '',
+                address_note: truncatedAddressNote || '',
                 location: this.converter.arrayToSnakeCase(item?.receiver_address?.location) || null,
               },
               sender: {
