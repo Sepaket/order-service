@@ -38,6 +38,11 @@ module.exports = class {
         // console.log(item.shipping_calculated);
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
+      if (item.order.isCod && (item.order.status === 'DELIVERED')) {
+        // console.log('didalam return to sller');
+        // console.log(item.shipping_calculated);
+        ongkirReturned = 1 * parseFloat(item.seller_received_amount);
+      }
       if (!(item.order.isCod)) {
         // console.log('didalam return to sller');
         // console.log(item.shipping_calculated);

@@ -34,6 +34,7 @@ const getLastStatus = (trackingStatus) => {
 };
 
 const tracking = async () => {
+  console.log('inside JNE tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -60,14 +61,9 @@ const tracking = async () => {
             },
           },
         ],
-
-
-
-
-
       },
     });
-
+    console.log(`order length : ${  order.length}`);
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
@@ -95,16 +91,9 @@ const tracking = async () => {
           );
 
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
+          console.log(`${item.resi} : ${currentStatus}`);
+          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
 
-          // console.log(item.resi + ' : ' + currentStatus);
-          //  console.log('log length : ' + log.length);
-          // console.log(`${item.resi} : ${currentStatus}`);
-          // console.log(`log length : ${log.length}`);
-          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0
-            // && log.length < 2
-          ) {
-            console.log(item.resi + ' : ' + currentStatus);
-            console.log('log length : ' + log.length);
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
@@ -120,9 +109,8 @@ const tracking = async () => {
             );
           }
 
-          if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0
-            // && log.length < 2
-          ) {
+          if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0) {
+
             // console.log(item.resi + ' : ' + currentStatus);
             // console.log('log length : ' + log.length);
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
@@ -144,16 +132,16 @@ const tracking = async () => {
           // RENO MASIH SAMPAI DIBAWAH INIb
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             // console.log('SCHEDULER - JNE - TRACKING - RETURN TO SELLER');
-            // console.log(`${item.resi} : ${currentStatus}`);
-            // console.log(`log length : ${log.length}`);
-            // console.log(item.resi + ' : ' + currentStatus);
+
+
             // console.log('log length : ' + log.length);
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
             });
+            // console.log(parseFloat(orderDetail.codFeeAdmin));
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
-            const calculated = parseFloat(credit) - parseFloat(orderDetail.shippingCalculated);
+            const calculated = parseFloat(credit) - parseFloat(orderDetail.shippingCalculated) + parseFloat(orderDetail.codFeeAdmin);
             // console.log(item.resi + ` calculated : ${calculated}`);
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
@@ -166,6 +154,7 @@ const tracking = async () => {
       }),
     );
 
+    console.log(order.length);
     await Promise.all(
       trackHistories?.map(async (item) => {
         const log = await OrderLog.findOne({
