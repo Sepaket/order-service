@@ -71,7 +71,7 @@ const tracking = async () => {
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
-
+        // console.log('Item id : ' + item.id);
         if (!track?.error) {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
@@ -95,11 +95,16 @@ const tracking = async () => {
           );
 
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
+
           // console.log(item.resi + ' : ' + currentStatus);
-          // console.log('log length : ' + log.length);
+          //  console.log('log length : ' + log.length);
           // console.log(`${item.resi} : ${currentStatus}`);
           // console.log(`log length : ${log.length}`);
-          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0 && log.length < 2) {
+          if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0
+            // && log.length < 2
+          ) {
+            console.log(item.resi + ' : ' + currentStatus);
+            console.log('log length : ' + log.length);
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
@@ -114,6 +119,27 @@ const tracking = async () => {
               { where: { sellerId: orderDetail.sellerId } },
             );
           }
+
+          if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0
+            // && log.length < 2
+          ) {
+            // console.log(item.resi + ' : ' + currentStatus);
+            // console.log('log length : ' + log.length);
+            // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
+            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
+            const currentCredit = await SellerDetail.findOne({
+              where: { sellerId: orderDetail.sellerId },
+            });
+
+            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
+            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
+
+            await SellerDetail.update(
+              { credit: parseFloat(calculated) },
+              { where: { sellerId: orderDetail.sellerId } },
+            );
+          }
+
 
           // RENO MASIH SAMPAI DIBAWAH INIb
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
