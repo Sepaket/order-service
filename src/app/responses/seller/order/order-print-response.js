@@ -135,9 +135,9 @@ module.exports = class {
             const totalAmount = item.order.isCod
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
-
-            const truncatedAddress = (item?.receiver_address.receiver_address).substring(0,200) || null;
-            const truncatedAddressNote = (item?.receiver_address.receiver_address_note).substring(0,100) || null;
+console.log(item);
+            const truncatedAddress = (item?.receiver_address.receiverAddress).substring(0,200) || null;
+            const truncatedAddressNote = (item?.receiver_address.receiverAddressNote).substring(0,100) || null;
             const truncatedGoodsContent = (item?.goods_content).substring(0,50) || null;
             const truncatedGoodsNotes = (item?.notes).substring(0,100) || null;
 
