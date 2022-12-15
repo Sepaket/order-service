@@ -152,12 +152,12 @@ module.exports = class {
               attributes: [
                 'previous_status',
                 'current_status',
-                // 'pod_status', 'note',
-                [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                'pod_status', 'note',
+                // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
                 // 'updated_at', 'deleted_at', 'order_id',
-                [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+                // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
               ],
-              group: ['previous_status', 'current_status'],
+              // group: ['previous_status', 'current_status'],
               where: { orderId: result.order_id },
             });
             console.log(orderLogs);
