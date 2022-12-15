@@ -33,8 +33,6 @@ module.exports = class {
   async process() {
 
 
-
-
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
 

@@ -38,7 +38,8 @@ module.exports = class {
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
       if ((item.order.isCod)) {
-        ongkirReturned = parseFloat(item.cod_value) - parseFloat(item.shipping_calculated);
+        ongkirReturned = parseFloat(item.cod_fee) - parseFloat(item.shipping_calculated);
+        // console.log(parseFloat(item.cod_fee));
       }
 
       return String(ongkirReturned.toFixed(2));

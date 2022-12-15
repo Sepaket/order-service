@@ -473,7 +473,8 @@ module.exports = class {
         sub_district: payload?.sub_district,
       },
       sender: {
-        name: payload?.sellerLocation?.picName || '',
+        name: payload?.sellerLocation?.Name || '',
+        pic_name: payload?.sellerLocation?.picName || '',
         phone: payload?.sellerLocation?.picPhoneNumber || '',
         hide_address: payload?.sellerLocation?.hideInResi || false,
         address: payload?.sellerLocation?.address || '',
