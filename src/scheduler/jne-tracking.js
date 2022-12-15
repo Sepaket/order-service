@@ -71,14 +71,16 @@ const tracking = async () => {
         if (!track?.error) {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
+          // const currentStatus = getLastStatus(historical.code || '');
           // console.log(item.resi + ' : ' + currentStatus);
           track?.history?.forEach((historical) => {
             trackHistories.push({
               orderId: item?.id,
               note: historical.desc,
               previousStatus: item.status,
-              podStatus: trackingStatus?.code,
-              currentStatus,
+              podStatus: historical.code,
+              // podStatus: trackingStatus?.code,
+              currentStatus: getLastStatus(historical.code || ''),
             });
           });
 
@@ -91,7 +93,7 @@ const tracking = async () => {
           );
 
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
-          console.log(`${item.resi} : ${currentStatus}`);
+          console.log(`${item.id} : ${item.resi} : ${currentStatus}`);
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
 
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
@@ -154,19 +156,27 @@ const tracking = async () => {
       }),
     );
 
-    console.log(order.length);
+    // console.log(order.length);
     await Promise.all(
       trackHistories?.map(async (item) => {
+        if (item.orderId == 436) { //262
+          // console.log(`${item.orderId} : ${item.previousStatus} : ${item.currentStatus} : ${item.podStatus}`);
+        } else {
+          // console.log(`${item.orderId} : ${item.currentStatus}`);
+          // console.log(item.orderId)
+        }
+
         const log = await OrderLog.findOne({
           where: {
             orderId: item?.orderId,
-            currentStatus: item?.currentStatus,
+            // currentStatus: item?.currentStatus,
             podStatus: item?.podStatus,
             note: item?.note,
           },
         });
 
         if (!log) {
+          console.log(`create ${  item.note}`);
           await OrderLog.create({
             orderId: item?.orderId,
             previousStatus: item?.previousStatus,

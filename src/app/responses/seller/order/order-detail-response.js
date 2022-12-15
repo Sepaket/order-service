@@ -143,7 +143,7 @@ module.exports = class {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
-          console.log(result)
+          // console.log(result)
           if (response != null) {
             console.log('response is not null')
 
@@ -151,15 +151,16 @@ module.exports = class {
             const orderLogs = await this.orderLog.findAll({
               attributes: [
                 'previous_status',
-                // 'current_status', 'pod_status', 'note',
+                'current_status',
+                // 'pod_status', 'note',
                 [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
                 // 'updated_at', 'deleted_at', 'order_id',
                 [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
               ],
-              group: ['previous_status'],
+              group: ['previous_status', 'current_status'],
               where: { orderId: result.order_id },
             });
-
+            console.log(orderLogs);
             result.order = await this.converter.objectToSnakeCase(result?.order) || null;
             result.cod_value = result?.cod_fee || 0;
 
