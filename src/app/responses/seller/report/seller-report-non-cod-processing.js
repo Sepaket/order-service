@@ -135,25 +135,7 @@ module.exports = class {
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
-        // this.order.findAll({
-        //   attributes: [
-        //     'id', 'batchId', 'orderCode', 'resi', 'expedition', 'serviceCode',
-        //     sequelize.literal(['COALESCE(detail.id, 0) + COALESCE(detail.id, 0)'], 'total'),
-        //   //   [sequelize.fn('COUNT', sequelize.col('detail.batchId')), 'batchID_count'] // To add the aggregation...
-        //   ],
-        //   where: {
-        //     '$detail.seller_id$': seller.id,
-        //     status: {
-        //       [Op.or]: ['PROCESSED', 'WAITING_PICKUP']
-        //     },
-        //     // status: 'PROCESSED',
-        //     isCod: false,
-        //     ...this.querySearch(),
-        //   },
-        //   include: [{
-        //     model: OrderDetail,
-        //     as: 'detail',
-        //   }],
+
         }).then((response) => {
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response.rows)),
@@ -204,14 +186,6 @@ module.exports = class {
 querySearch() {
   const { query } = this.request;
   let filtered = {};
-  // const condition = {};
-
-  // if (query?.keyword) {
-  //   condition[this.op.or] = {
-  //     resi: { [this.op.substring]: query?.keyword?.toUpperCase() || '' },
-  //   };
-  // }
-
   if (query?.filter_by === 'DATE') {
     filtered = {
       createdAt: {

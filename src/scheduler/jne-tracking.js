@@ -34,7 +34,7 @@ const getLastStatus = (trackingStatus) => {
 };
 
 const tracking = async () => {
-  console.log('inside JNE tracking');
+  // console.log('inside JNE tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -63,7 +63,7 @@ const tracking = async () => {
         ],
       },
     });
-    console.log(`order length : ${  order.length}`);
+    // console.log(`order length : ${  order.length}`);
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
@@ -93,7 +93,7 @@ const tracking = async () => {
           );
 
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
-          console.log(`${item.id} : ${item.resi} : ${currentStatus}`);
+          // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
 
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
