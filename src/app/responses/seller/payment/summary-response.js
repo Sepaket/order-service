@@ -227,7 +227,18 @@ module.exports = class {
 
       let result = 0;
       order?.forEach((item) => {
-        result += parseFloat(item.sellerReceivedAmount);
+
+        if (item.order.status === 'CANCELED') {
+          console.log(item.order.status);
+        }
+          else if (item.order.status === 'RETURN_TO_SELLER') {
+            console.log(item.order.status);
+          }           else if (item.order.status === 'PROBLEM') {
+          console.log(item.order.status);
+        } else {
+          result += parseFloat(item.sellerReceivedAmount);
+        }
+
       });
 
       return parseFloat(result);

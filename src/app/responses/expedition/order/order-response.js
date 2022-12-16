@@ -55,7 +55,6 @@ module.exports = class {
   }
 
   process() {
-    console.log('order-response process 2');
     return new Promise(async (resolve, reject) => {
       try {
         const result = await this.createOrder();
@@ -154,7 +153,7 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-      console.log('here - reno 2');
+
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
@@ -207,7 +206,7 @@ module.exports = class {
 
             return location.id === locationId;
           });
-          console.log(servCode)
+
           const shippingCharge = await shippingFee({
             origin,
             destination,
@@ -313,7 +312,7 @@ module.exports = class {
           };
 
           console.log("===PAYLOAD START===");
-          // console.log(payload);
+          console.log(payload);
           console.log("===PAYLOAD END 2===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
