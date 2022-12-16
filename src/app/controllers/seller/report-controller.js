@@ -7,6 +7,7 @@ const NonCodProcessingReponse = require('../../responses/seller/report/seller-re
 const PercentageProcessingReponse = require('../../responses/seller/report/seller-report-percentage-processing');
 const CodSentReponse = require('../../responses/seller/report/seller-report-cod-sent');
 const NonCodSentReponse = require('../../responses/seller/report/seller-report-non-cod-sent');
+const CodTotalReponse = require('../../responses/seller/report/seller-report-cod-total');
 const ReturnToSellerReponse = require('../../responses/seller/report/seller-report-return-to-seller');
 const NeedAttentionReponse = require('../../responses/seller/report/seller-report-need-attention');
 const RateReturReponse = require('../../responses/seller/report/seller-report-rate-retur');
@@ -98,6 +99,25 @@ module.exports = {
       next(error);
     }
   },
+
+  codTotal: async (request, response, next) => {
+    try {
+      console.log('cod TOTAL response');
+      await MutasiValidator(request.query);
+      const result = await new CodTotalReponse({ request });
+      // const resultCount = result.length;
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
 
   nonCodSent: async (request, response, next) => {
     try {

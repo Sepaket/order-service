@@ -61,6 +61,7 @@ router.group('/reports', (route) => {
   route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);
   route.get('/percentage-processing', Authorization, ReportController.percentageProcessing);
   route.get('/cod-sent', Authorization, ReportController.codSent);
+  route.get('/cod-total', Authorization, ReportController.codTotal);
   route.get('/non-cod-sent', Authorization, ReportController.nonCodSent);
   route.get('/return-to-seller', Authorization, ReportController.returnToSeller);
   route.get('/need-attention', Authorization, ReportController.needAttention);
