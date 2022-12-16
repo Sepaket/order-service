@@ -137,7 +137,44 @@ module.exports = class {
           offset: nextPage,
 
         }).then((response) => {
-          resolve(response);
+          const result = this.converter.arrayToSnakeCase(
+            JSON.parse(JSON.stringify(response.rows)),
+          );
+
+          const mapped = result?.map((item) => ({
+            ...item,
+            order: this.converter.objectToSnakeCase(item?.order) || null,
+            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            seller_received_amount: getSellerReceivedAmount(item),
+            seller_address: {
+              ...item.seller_address,
+              location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,
+            },
+          }));
+
+          if (mapped.length > 0) {
+            resolve({
+              data: mapped,
+              meta: {
+                total: response.count,
+                total_result: mapped.length,
+                limit: parseInt(query.limit, 10) || limit,
+                page: parseInt(query.page, 10) || (offset + 1),
+              },
+            });
+          } else {
+            reject(httpErrors(404, 'No Data Found', {
+              data: {
+                data: [],
+                meta: {
+                  total: response.count,
+                  total_result: mapped.length,
+                  limit: parseInt(query.limit, 10) || limit,
+                  page: parseInt(query.page, 10) || (offset + 1),
+                },
+              },
+            }));
+          }
         });
       } catch (error) {
         reject(error);
