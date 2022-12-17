@@ -235,7 +235,7 @@ module.exports = class {
             console.log(item.order.status);
           }           else if (item.order.status === 'PROBLEM') {
           console.log(item.order.status);
-        } else {
+        } else { //SISA NYA DISINI ADALAH WAIITING_PICKUP
           result += parseFloat(item.sellerReceivedAmount);
         }
 
