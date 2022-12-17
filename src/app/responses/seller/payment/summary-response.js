@@ -40,7 +40,7 @@ module.exports = class {
       const orderCodProfitUndone = await this.orderProfit({ status: 'UNDELIVERED', isCod: true });
       const orderNonCodProfitDone = await this.orderProfit({ status: 'DELIVERED', isCod: false });
       const orderNonCodProfitUndone = await this.orderProfit({ status: 'UNDELIVERED', isCod: false });
-      const orderProfit = await this.orderProfit({ status: '', isCod: '' });
+      const orderProfit = await this.orderProfit({ status: '', isCod: true });
       const shippingChargeCodPaid = await this.orderProfitShipping({ isCod: true });
       const shippingChargeNonCodPaid = await this.orderProfitShipping({ isCod: false });
 
