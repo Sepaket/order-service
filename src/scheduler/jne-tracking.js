@@ -38,6 +38,20 @@ const tracking = async () => {
   try {
     const trackHistories = [];
     const order = await Order.findAll({
+//       attributes: [
+// 'id','resi',
+//       ],
+      include:[
+        {
+          model: OrderDetail,
+          as: 'detail',
+          // as:'ads',
+          // where:{
+          //   is_valid:1,
+          //   is_vertify:1},
+          required: true,
+        }
+      ],
       where: {
         expedition: 'JNE',
         [Sequelize.Op.or]: [
@@ -63,9 +77,11 @@ const tracking = async () => {
         ],
       },
     });
-    // console.log(`order length : ${  order.length}`);
+    console.log(`order length : ${  order.length}`);
     await Promise.all(
       order?.map(async (item) => {
+        // console.log(item.id);
+        // console.log(item.detail.sellerId);
         const track = await jne.tracking({ resi: item?.resi });
         // console.log('Item id : ' + item.id);
         if (!track?.error) {
@@ -93,7 +109,8 @@ const tracking = async () => {
           );
 
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
-          // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
+
+          console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
 
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
@@ -111,25 +128,26 @@ const tracking = async () => {
             );
           }
 
-          if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0) {
-
-            // console.log(item.resi + ' : ' + currentStatus);
-
-            // console.log('log length : ' + log.length);
-            // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
-            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
-            const currentCredit = await SellerDetail.findOne({
-              where: { sellerId: orderDetail.sellerId },
-            });
-
-            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
-            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
-            console.log(item.id + ' : ' + currentStatus + ' : ' + calculated);
-            await SellerDetail.update(
-              { credit: parseFloat(calculated) },
-              { where: { sellerId: orderDetail.sellerId } },
-            );
-          }
+          // if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0) {
+          //
+          //   // console.log(item.resi + ' : ' + currentStatus);
+          //
+          //   // console.log('log length : ' + log.length);
+          //   // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
+          //   const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
+          //   const currentCredit = await SellerDetail.findOne({
+          //     where: { sellerId: orderDetail.sellerId },
+          //   });
+          //
+          //   const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
+          //   const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
+          //   console.log(parseFloat(orderDetail.sellerReceivedAmount));
+          //   console.log(item.id + ' : ' + item.detail.sellerId + ' : ' + currentStatus + ' : ' + calculated);
+          //   await SellerDetail.update(
+          //     { credit: parseFloat(calculated) },
+          //     { where: { sellerId: orderDetail.sellerId } },
+          //   );
+          // }
 
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {

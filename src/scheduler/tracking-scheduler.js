@@ -9,7 +9,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   console.info('tracking scheduler run');
 
   try {
-    // await jne.tracking();
+    await jne.tracking();
     // await sicepat.tracking();
   } catch (error) {
     // eslint-disable-next-line no-console
