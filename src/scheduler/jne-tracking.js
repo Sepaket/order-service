@@ -34,7 +34,7 @@ const getLastStatus = (trackingStatus) => {
 };
 
 const tracking = async () => {
-  // console.log('inside JNE tracking');
+  console.log('inside JNE tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -114,6 +114,7 @@ const tracking = async () => {
           if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0) {
 
             // console.log(item.resi + ' : ' + currentStatus);
+
             // console.log('log length : ' + log.length);
             // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
             const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
@@ -123,7 +124,7 @@ const tracking = async () => {
 
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
             const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
-
+            console.log(item.id + ' : ' + currentStatus + ' : ' + calculated);
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
               { where: { sellerId: orderDetail.sellerId } },
@@ -131,7 +132,6 @@ const tracking = async () => {
           }
 
 
-          // RENO MASIH SAMPAI DIBAWAH INIb
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             // console.log('SCHEDULER - JNE - TRACKING - RETURN TO SELLER');
 
@@ -144,7 +144,7 @@ const tracking = async () => {
             // console.log(parseFloat(orderDetail.codFeeAdmin));
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
             const calculated = parseFloat(credit) - parseFloat(orderDetail.shippingCalculated) + parseFloat(orderDetail.codFeeAdmin);
-            // console.log(item.resi + ` calculated : ${calculated}`);
+            console.log(item.resi + ` calculated : ${calculated}`);
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
               { where: { sellerId: orderDetail.sellerId } },
