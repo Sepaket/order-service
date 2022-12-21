@@ -30,9 +30,9 @@ const sicepatExecutor = async (payload) => {
 const jneExecutor = async (payload) => {
   try {
     console.log('jne executor');
-    console.log(payload.id);
+    // console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
-    console.log(created);
+    // console.log(created);
     if (created.status) {
       console.log(created.status);
       await OrderBackground.update(
