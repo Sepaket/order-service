@@ -70,8 +70,8 @@ const checkPrice = (payload) => new Promise((resolve) => {
 
 const createOrder = (payload) => new Promise((resolve) => {
   try {
-    // console.log('jne.js - create order');
-    // console.log(JSON.stringify(payload));
+    console.log('jne.js - create order');
+    console.log(JSON.stringify(payload));
     axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, qs.stringify({
       username: process.env.JNE_USERNAME,
       api_key: process.env.JNE_APIKEY,

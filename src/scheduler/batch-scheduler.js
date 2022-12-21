@@ -13,6 +13,7 @@ const processing = async () => {
 
     batchs.forEach(async (item) => {
       const order = orders.filter((orderData) => orderData.batchId === item.id);
+      // console.log('order' + order.id);
       const sent = order.filter((orderData) => orderData.status === 'DELIVERED');
       const problem = order.filter((orderData) => orderData.status === 'PROBLEM');
       const processed = order.filter((orderData) => orderData.status === 'PROCESSED');
@@ -32,7 +33,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('0 */1 * * *', async () => {
+const runner = cron.schedule('*/10 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 

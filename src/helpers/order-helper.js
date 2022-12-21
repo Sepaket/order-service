@@ -249,6 +249,7 @@ const orderQueryDiscount = async (payload) => {
 };
 
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
+  console.log('order logger');
   const dbTransaction = await sequelize.transaction();
 
   try {
@@ -339,6 +340,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 });
 
 const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
+  console.log('order success logger');
   const dbTransaction = await sequelize.transaction();
 
   try {
@@ -368,6 +370,7 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
 });
 
 const orderFailedLogger = async (parameter) => new Promise(async (resolve, reject) => {
+  console.log('order failed logger');
   const dbTransaction = await sequelize.transaction();
 
   const payload = { ...parameter };

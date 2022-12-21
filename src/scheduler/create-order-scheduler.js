@@ -29,14 +29,18 @@ const sicepatExecutor = async (payload) => {
 
 const jneExecutor = async (payload) => {
   try {
+    console.log('jne executor');
+    console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
-
+    console.log(created);
     if (created.status) {
+      console.log(created.status);
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
+      console.log('error status');
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
@@ -71,7 +75,7 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('*/5 * * * *', async () => {
+const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('order scheduler run');
 
