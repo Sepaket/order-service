@@ -13,6 +13,7 @@ const {
   OrderAddress,
   SellerAddress,
   OrderDiscount,
+  Seller,
 } = require('../../../models');
 
 module.exports = class {
@@ -28,6 +29,7 @@ module.exports = class {
     this.orderAddress = OrderAddress;
     this.sellerAddress = SellerAddress;
     this.orderDiscount = OrderDiscount;
+    this.seller = Seller;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -51,6 +53,7 @@ module.exports = class {
             'insuranceAmount',
             'shippingCharge',
             'sellerReceivedAmount',
+            'shippingCalculated',
           ],
           include: [
             {
@@ -98,6 +101,15 @@ module.exports = class {
               attributes: [
                 ['id', 'discount_id'],
                 'value',
+              ],
+            },
+            {
+              model: this.seller,
+              as: 'seller',
+              required: true,
+              attributes: [
+                'name','email',
+                'phone',
               ],
             },
             {
