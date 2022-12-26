@@ -10,7 +10,7 @@ const parameterHandler = ({ payload }) => ({
   pickup_district: payload?.origin?.district || '',
   pickup_city: payload?.origin?.city || '',
   pickup_service: 'REG',
-  pickup_vechile: payload?.should_pickup_with,
+  pickup_vehicle: payload?.should_pickup_with,
   branch: payload?.origin?.jneOriginCode || '',
   cust_id: payload?.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
   order_id: `${shortid.generate()}${shortid.generate()}`.slice(0, 15),

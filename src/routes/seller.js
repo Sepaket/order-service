@@ -91,6 +91,7 @@ router.group('/ticket', (route) => {
   route.get('/', Authorization, TicketController.index);
   route.post('/', Authorization, TicketController.create);
   route.get('/:id', Authorization, TicketController.detail);
+  route.get('/detail-by-resi/:resi', Authorization, TicketController.detailByResi);
   route.post('/:id', Authorization, TicketController.comment);
 });
 

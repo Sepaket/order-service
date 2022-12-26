@@ -8,11 +8,13 @@ const Tracing = require('@sentry/tracing');
 const application = express();
 const bodyParser = require('body-parser');
 
-const batchScheduler = require('./src/scheduler/batch-scheduler');
 const errorHandler = require('./src/app/middlewares/errorHandler');
-const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+
+// const batchScheduler = require('./src/scheduler/batch-scheduler');
+// const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
+// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+
 const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
-const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 
 // port load
 const port = process.env.APP_PORT || 6000;
@@ -43,16 +45,17 @@ const corsOptions = {
   ],
 };
 
-batchScheduler.start();
-trackingScheduler.start();
+// batchScheduler.start();
+// trackingScheduler.start();
+// cleanerNinjaTokenScheduler.start();
 createOrderScheduler.start();
-cleanerNinjaTokenScheduler.start();
 
 application.use(cors(corsOptions));
 application.use(Sentry.Handlers.requestHandler());
 application.use(Sentry.Handlers.tracingHandler());
 application.use(bodyParser.urlencoded({ extended: true }));
 application.use(bodyParser.text({ defaultCharset: 'utf-8' }));
+// application.use(bodyParser.json({ limit: '500mb', type: 'application/json' }));
 application.use(bodyParser.json({ limit: 1024102420, type: 'application/json' }));
 application.use(express.json({ type: ['text/*', '*/json'] }));
 application.listen(port);

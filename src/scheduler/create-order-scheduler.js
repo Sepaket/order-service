@@ -33,20 +33,34 @@ const jneExecutor = async (payload) => {
     // console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
     // console.log(created);
+    console.log(payload.resi);
     if (created.status) {
-      console.log(created.status);
+
+      // if (payload.resi === 'SPKET00008018119') {
+      //   if (payload.resi === 'SPKET00008012398') {
+        console.log('SUCCESSS');
+      // }
+      // console.log(created.status);
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
-      console.log('error status');
-      await errorCatcher({
-        id: payload.id,
-        expedition: payload.expedition,
-        subject: 'CREATE ORDER',
-        ...created,
-      });
+      // if (payload.resi === 'SPKET00008018119') {
+      //   if (payload.resi === 'SPKET00008012398') {
+        console.log('error status');
+        // console.log(payload.resi);
+        // console.log(created);
+        // console.log(payload.parameter);
+
+      // }
+
+      // await errorCatcher({
+      //   id: payload.id,
+      //   expedition: payload.expedition,
+      //   subject: 'CREATE ORDER',
+      //   ...created,
+      // });
     }
   } catch (error) {
     throw new Error(error?.message);
@@ -77,7 +91,7 @@ const ninjaExecutor = async (payload) => {
 
 const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('order scheduler run');
+  console.info('create order scheduler run');
 
   try {
     const orders = await OrderBackground.findAll({
@@ -87,13 +101,14 @@ const runner = cron.schedule('*/1 * * * *', async () => {
 
     orders?.forEach((item, index) => {
       setTimeout(async () => {
-        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+        // if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
-        if (item.expedition === 'NINJA') await ninjaExecutor(item);
+        // if (item.expedition === 'NINJA') await ninjaExecutor(item);
       }, index * 20000);
     });
   } catch (error) {
     // eslint-disable-next-line no-console
+    console.log('pesan error : ');
     console.log(error.message);
   }
 }, {

@@ -121,33 +121,17 @@ const tracking = async () => {
 
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
             const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
+            if ((item.id === 647) || (item.id === 654)) {
+              console.log(item.id);
+              console.log(credit);
+              console.log(orderDetail.sellerReceivedAmount);
+            }
 
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
               { where: { sellerId: orderDetail.sellerId } },
             );
           }
-
-          // if (currentStatus === 'PROCESSED' && item.isCod && log.length > 0) {
-          //
-          //   // console.log(item.resi + ' : ' + currentStatus);
-          //
-          //   // console.log('log length : ' + log.length);
-          //   // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
-          //   const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
-          //   const currentCredit = await SellerDetail.findOne({
-          //     where: { sellerId: orderDetail.sellerId },
-          //   });
-          //
-          //   const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
-          //   const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
-          //   console.log(parseFloat(orderDetail.sellerReceivedAmount));
-          //   console.log(item.id + ' : ' + item.detail.sellerId + ' : ' + currentStatus + ' : ' + calculated);
-          //   await SellerDetail.update(
-          //     { credit: parseFloat(calculated) },
-          //     { where: { sellerId: orderDetail.sellerId } },
-          //   );
-          // }
 
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {

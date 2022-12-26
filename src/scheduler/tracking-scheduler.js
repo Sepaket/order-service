@@ -13,7 +13,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
     // await sicepat.tracking();
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error.message);
+    console.log('tracking error : ' + error.message);
   }
 }, {
   scheduled: true,

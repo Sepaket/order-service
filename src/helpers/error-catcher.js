@@ -11,7 +11,7 @@ const catcher = async (payload) => {
     });
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e?.message);
+    console.log("telegram error catcher error : " + e?.message);
   }
 };
 
