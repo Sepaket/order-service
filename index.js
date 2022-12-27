@@ -10,9 +10,9 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 
-// const batchScheduler = require('./src/scheduler/batch-scheduler');
-// const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
-// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+const batchScheduler = require('./src/scheduler/batch-scheduler');
+const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
+const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 
@@ -45,9 +45,9 @@ const corsOptions = {
   ],
 };
 
-// batchScheduler.start();
-// trackingScheduler.start();
-// cleanerNinjaTokenScheduler.start();
+batchScheduler.start();
+trackingScheduler.start();
+cleanerNinjaTokenScheduler.start();
 createOrderScheduler.start();
 
 application.use(cors(corsOptions));
