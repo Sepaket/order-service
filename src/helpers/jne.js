@@ -172,7 +172,7 @@ const createOrder = (payload) => new Promise((resolve) => {
     axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, payloadStringify, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept-Encoding': 'gzip, deflate, br',
+        // 'Accept-Encoding': 'gzip, deflate, br',
         // 'Content-Length' : 1000000000000,
       },
     }).then((response) => {
@@ -184,10 +184,18 @@ const createOrder = (payload) => new Promise((resolve) => {
         });
         return;
       }
-      // console.log('renonina-andrea');
+
+      const status = (response.data.detail[0]['status']).toLowerCase();
+      if (status === 'error') {
+        resolve({
+          status: false,
+          message: response.data.detail[0]['reason'],
+        });
+        return;
+      }
       resolve({
         status: true,
-        message: 'OK',
+        message: response,
       });
     }).catch((error) => {
       // console.log(`this is error : ${  error?.response?.data?.reason}`);

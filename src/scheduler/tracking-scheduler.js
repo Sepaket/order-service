@@ -4,7 +4,7 @@ const sicepat = require('./sicepat-tracking');
 
 // every 3 hour 0 */3 * * *
 // every 1 mis for debugging */2 * * * *
-const runner = cron.schedule('*/1 * * * *', async () => {
+const runner = cron.schedule('0 */1 * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('tracking scheduler run');
 

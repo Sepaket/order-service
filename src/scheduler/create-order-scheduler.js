@@ -39,6 +39,7 @@ const jneExecutor = async (payload) => {
       // if (payload.resi === 'SPKET00008018119') {
       //   if (payload.resi === 'SPKET00008012398') {
         console.log('SUCCESSS');
+        // console.log(created);
       // }
       // console.log(created.status);
       await OrderBackground.update(
@@ -49,6 +50,7 @@ const jneExecutor = async (payload) => {
       // if (payload.resi === 'SPKET00008018119') {
       //   if (payload.resi === 'SPKET00008012398') {
         console.log('error status');
+        console.log(created);
         // console.log(payload.resi);
         // console.log(created);
         // console.log(payload.parameter);
@@ -89,7 +91,7 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('*/3 * * * *', async () => {
+const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('create order scheduler run');
 
