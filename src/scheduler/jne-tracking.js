@@ -8,6 +8,28 @@ const {
   SellerDetail,
 } = require('../app/models');
 
+
+function updateSaldo(calculated1, orderDetail) {
+  console.log('order detail');
+  // console.log(orderDetail);
+  const currentCredit = SellerDetail.findOne({
+    where: { sellerId: orderDetail.sellerId },
+  }).then(value => {
+      console.log('credit : ' + value.credit);
+    const credit = value.credit === 'NaN' ? 0 : value.credit;
+    const calculated = parseFloat(credit) + calculated1;
+    console.log(orderDetail.orderId + ' credit : ' + credit);
+    SellerDetail.update(
+      { credit: parseFloat(calculated) },
+      { where: { sellerId: orderDetail.sellerId } },
+    );
+  });
+
+// console.log(orderDetail.sellerId + ' : ' + currentCredit.credit);
+
+
+}
+
 const getLastStatus = (trackingStatus) => {
   let currentStatus = '';
   if (orderStatus.PROCESSED.statuses.JNE.indexOf(trackingStatus) !== -1) {
@@ -77,7 +99,6 @@ const tracking = async () => {
         ],
       },
     });
-    console.log(`order length : ${  order.length}`);
     await Promise.all(
       order?.map(async (item) => {
         // console.log(item.id);
@@ -88,7 +109,7 @@ const tracking = async () => {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
           // const currentStatus = getLastStatus(historical.code || '');
-          // console.log(item.resi + ' : ' + currentStatus);
+          console.log(`${item.resi  } : ${  currentStatus}`);
           track?.history?.forEach((historical) => {
             trackHistories.push({
               orderId: item?.id,
@@ -100,37 +121,23 @@ const tracking = async () => {
             });
           });
 
-          await Order.update(
+          Order.update(
             {
               status: currentStatus,
               podStatus: trackingStatus?.code,
             },
             { where: { resi: item.resi } },
           );
-
+          const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
           const log = await OrderLog.findAll({ where: { orderId: item.id } });
-
-          console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
+          // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
-
-            // console.log('SCHEDULER - JNE - TRACKING - DELIVERED');
-            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
-            const currentCredit = await SellerDetail.findOne({
-              where: { sellerId: orderDetail.sellerId },
-            });
-
-            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
-            const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
-            if ((item.id === 647) || (item.id === 654)) {
+            const calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
+            if ((item.id === 355) || (item.id === 700)) {
               console.log(item.id);
-              console.log(credit);
               console.log(orderDetail.sellerReceivedAmount);
             }
-
-            await SellerDetail.update(
-              { credit: parseFloat(calculated) },
-              { where: { sellerId: orderDetail.sellerId } },
-            );
+            await updateSaldo(calculated_1,orderDetail);
           }
 
 
@@ -139,18 +146,11 @@ const tracking = async () => {
 
 
             // console.log('log length : ' + log.length);
-            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
-            const currentCredit = await SellerDetail.findOne({
-              where: { sellerId: orderDetail.sellerId },
-            });
-            // console.log(parseFloat(orderDetail.codFeeAdmin));
-            const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
-            const calculated = parseFloat(credit) - parseFloat(orderDetail.shippingCalculated) + parseFloat(orderDetail.codFeeAdmin);
-            console.log(item.resi + ` calculated : ${calculated}`);
-            await SellerDetail.update(
-              { credit: parseFloat(calculated) },
-              { where: { sellerId: orderDetail.sellerId } },
-            );
+            // const orderDetail = OrderDetail.findOne({ where: { orderId: item.id } });
+
+            const calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
+            console.log(`${item.resi  } calculated : ${calculated_1}`);
+            updateSaldo(calculated_1,orderDetail);
           }
         }
 
@@ -161,13 +161,6 @@ const tracking = async () => {
     // console.log(order.length);
     await Promise.all(
       trackHistories?.map(async (item) => {
-        if (item.orderId == 436) { //262
-          // console.log(`${item.orderId} : ${item.previousStatus} : ${item.currentStatus} : ${item.podStatus}`);
-        } else {
-          // console.log(`${item.orderId} : ${item.currentStatus}`);
-          // console.log(item.orderId)
-        }
-
         const log = await OrderLog.findOne({
           where: {
             orderId: item?.orderId,

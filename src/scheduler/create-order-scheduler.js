@@ -91,7 +91,7 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('*/1 * * * *', async () => {
+const runner = cron.schedule('*/15 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('create order scheduler run');
 
