@@ -100,8 +100,10 @@ module.exports = class {
     if (query?.date_start && query?.date_end) {
       condition.createdAt = {
         [this.op.between]: [
-          moment(`${query?.date_start} 23:59:59`).toISOString(),
-          moment(`${query?.date_end} 23:59:59`).toISOString(),
+          moment(`${query?.date_start}`).startOf('day').format(),
+          moment(`${query?.date_end}`).endOf('day').format(),
+          // moment(`${query?.date_start} 23:59:59`).toISOString(),
+          // moment(`${query?.date_end} 23:59:59`).toISOString(),
         ],
       };
     }
