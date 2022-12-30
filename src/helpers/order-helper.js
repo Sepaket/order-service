@@ -57,10 +57,10 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
   }
 });
 
-function zerofill(number,length) {
-  var output = number.toString();
-  while(output.length < length) {
-    output = '0' + output;
+function zerofill(number, length) {
+  let output = number.toString();
+  while (output.length < length) {
+    output = `0${output}`;
   }
   return output;
 }
@@ -68,8 +68,10 @@ function zerofill(number,length) {
 const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
+
     const { expedition, currentResi, id } = params;
-    console.log(params);
+    console.log(`resimapper next Id to insert to orders : ${id}`);
+    // console.log(params);
     const ninjaResi = `
       ${process.env.NINJA_ORDER_PREFIX}
       ${await random({ min: 10000, max: 99999, integer: true })}
@@ -84,7 +86,6 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     random 3 karakter
     id
 
-
     const jneResi-deprecated = `
       ${process.env.JNE_ORDER_PREFIX}
       ${await random({ min: 10000, max: 99999, integer: true })}
@@ -92,11 +93,22 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
       ${id.length > 1 ? id : `0${id}`}
     `;
 */
+    // const jneResi = `
+    //   ${process.env.JNE_ORDER_PREFIX}
+    //   ${zerofill(currentResi,7)}
+    //   ${await random({ min: 1000, max: 9999, integer: true })}
+    // `;
+
+    const resitail = zerofill(currentResi.toString(),10).substring(10,5);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${zerofill(currentResi,7)}
-      ${await random({ min: 1000, max: 9999, integer: true })}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(0,3)}
+      ${resitail}
+      ${await random({ min: 100, max: 999, integer: true })}
     `;
+    console.log(resitail);
+    console.log(currentResi);
+    console.log(`jne resi : ${  jneResi}`);
 
     // console.log('jneResi : ' + jneResi);
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
@@ -110,7 +122,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     // console.log('resi : ' + resi);
-    resolve(resi);
+    // resolve(resi);
   } catch (error) {
     reject(error);
   }
