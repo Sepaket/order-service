@@ -106,9 +106,9 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
       ${resitail}
       ${await random({ min: 100, max: 999, integer: true })}
     `;
-    console.log(resitail);
-    console.log(currentResi);
-    console.log(`jne resi : ${  jneResi}`);
+    // console.log(resitail);
+    // console.log(currentResi);
+    // console.log(`jne resi : ${  jneResi}`);
 
     // console.log('jneResi : ' + jneResi);
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
@@ -122,7 +122,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     // console.log('resi : ' + resi);
-    // resolve(resi);
+    resolve(resi);
   } catch (error) {
     reject(error);
   }
