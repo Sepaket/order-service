@@ -165,7 +165,7 @@ module.exports = class {
         order: [['id', 'DESC']],
       });
 
-      let increment = 0;
+      let increment = 1;
       const response = await Promise.all(
 
 
@@ -180,7 +180,7 @@ module.exports = class {
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
-            increment += 1;
+
             console.log('increment : ' + increment);
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
@@ -327,6 +327,7 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
+            increment += 1;
             querySuccess.push({
               ...parameter,
               resi,
