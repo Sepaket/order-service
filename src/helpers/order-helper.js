@@ -102,8 +102,8 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     const resitail = zerofill(currentResi.toString(),10).substring(10,4);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${moment()?.format('x')?.valueOf()?.toString()?.substring(2,10)}
-      ${await random({ min: 100, max: 999, integer: true })}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1,10)}
+      ${await random({ min: 10, max: 99, integer: true })}
     `;
     // console.log(resitail);
     // console.log(currentResi);
