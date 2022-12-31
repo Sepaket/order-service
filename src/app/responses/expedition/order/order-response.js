@@ -166,6 +166,7 @@ module.exports = class {
       });
 
       let increment = 1;
+      console.log('this is the start of increment');
       const response = await Promise.all(
 
 
@@ -344,7 +345,8 @@ module.exports = class {
               insurance,
               orderCode,
             });
-
+            increment += 1;
+            console.log('sucess - increment');
             result.push(resultResponse);
           }
           return error?.shift();
@@ -352,7 +354,7 @@ module.exports = class {
         }),
       );
       if (querySuccess?.length > 0) {
-        increment += 1;
+
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,
