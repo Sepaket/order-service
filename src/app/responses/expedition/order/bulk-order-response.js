@@ -120,14 +120,14 @@ module.exports = class {
               weight: excelData.weight,
             });
             const receiverAddress = excelData.receiverAddress;
-            console.log(receiverAddress);
+
             const minLength = 10;
             const maxLength = 80;
             var errorMessage = '';
             errorFlag = false;
             errorMsgArray = [];
             var errorLongString = '';
-            console.log('isCOD :' + excelData.isCod)
+
             if (excelData.isCod) {
               if (body.type === 'JNE' && body.service_code !== 'JNECOD') {
                 errorMessage = 'cannot use ' + body.service_code + ' for COD';

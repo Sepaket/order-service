@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: true,
     },
     deltaCredit: {
       type: DataTypes.DECIMAL(10, 2),

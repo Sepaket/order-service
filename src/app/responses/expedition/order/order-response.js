@@ -284,7 +284,6 @@ module.exports = class {
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
-          // const changeCodServiceCode = (item.is_cod) ? (this.codServiceCodeTransformer()) : true;
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
 
           if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
@@ -408,18 +407,6 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
-
-  codServiceCodeTransformer() {
-    console.log("masuk codTransformer - reno");
-    let result;
-    const { body } = this.request;
-    if (body.type === 'JNE') body.service_code = 'REG19';
-    if (body.type === 'SICEPAT') body.service_code = 'SIUNT';
-    if (body.type === 'NINJA') body.service_code = 'Standard';
-
-    return true;
-  }
-
   codValidator() {
     // console.log("masuk codValidator - reno");
     let result;

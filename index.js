@@ -14,7 +14,7 @@ const batchScheduler = require('./src/scheduler/batch-scheduler');
 const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
-const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 
 // port load
 const port = process.env.APP_PORT || 6000;
@@ -48,7 +48,7 @@ const corsOptions = {
 batchScheduler.start();
 trackingScheduler.start();
 cleanerNinjaTokenScheduler.start();
-createOrderScheduler.start();
+// createOrderScheduler.start();
 
 application.use(cors(corsOptions));
 application.use(Sentry.Handlers.requestHandler());

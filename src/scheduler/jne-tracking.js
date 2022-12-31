@@ -12,21 +12,15 @@ const {
 
 
 async function updateSaldo(calculated1, orderDetail) {
-  console.log('order detail');
-  // console.log('seller id : ' + orderDetail.sellerId);
-  // console.log('seller id : ' + orderDetail.seller.sellerDetail.id);
-  const currentCredit = await SellerDetail.findOne({
-    where: { sellerId: orderDetail.sellerId },
-  }).then(value => {
-      console.log('credit : ' + value.credit);
-    const credit = value.credit === 'NaN' ? 0 : value.credit;
+      console.log('credit : ' + orderDetail.seller.sellerDetail.credit);
+    const credit = orderDetail.seller.sellerDetail.credit === 'NaN' ? 0 : orderDetail.seller.sellerDetail.credit;
     const calculated = parseFloat(credit) + calculated1;
     console.log(orderDetail.orderId + ' credit : ' + credit);
     SellerDetail.update(
       { credit: parseFloat(calculated) },
       { where: { sellerId: orderDetail.sellerId } },
     );
-  });
+  // });
 
 // console.log(orderDetail.sellerId + ' : ' + currentCredit.credit);
 
@@ -172,7 +166,8 @@ const tracking = async () => {
             { where: { resi: item.resi } },
           );
           var calculated_1 = 0;
-          const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
+          // const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
+          const orderDetail = item.detail;
           const log =  await OrderLog.findAll({ where: { orderId: item.id } });
           // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {

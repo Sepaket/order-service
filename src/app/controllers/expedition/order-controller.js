@@ -14,7 +14,11 @@ module.exports = {
   commonOrder: async (request, response, next) => {
     try {
       await CommonOrderValidator(request);
-      const result = await new OrderResponse({ request });
+      let result;
+      // for (let i = 0; i < 10; i++) {
+        result = await new OrderResponse({ request });
+      // }
+      // const result = await new OrderResponse({ request });
       // console.log(result);
       // console.log(result.logs.failed_log.errors);
       // console.log('result : ' + result);
