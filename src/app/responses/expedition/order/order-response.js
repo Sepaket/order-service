@@ -182,7 +182,7 @@ module.exports = class {
           // sicepatResi += 1;
           if (body.type === 'JNE') {
 
-            console.log('increment : ' + increment);
+
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: `${index}` });
@@ -345,8 +345,6 @@ module.exports = class {
               insurance,
               orderCode,
             });
-            increment += 1;
-            console.log('sucess - increment');
             result.push(resultResponse);
           }
           return error?.shift();

@@ -70,7 +70,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     let resi = '';
 
     const { expedition, currentResi, id } = params;
-    console.log(`resimapper next Id to insert to orders : ${id}`);
+    // console.log(`resimapper next Id to insert to orders : ${id}`);
     // console.log(params);
     const ninjaResi = `
       ${process.env.NINJA_ORDER_PREFIX}
@@ -102,13 +102,12 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     const resitail = zerofill(currentResi.toString(),10).substring(10,4);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${moment()?.format('x')?.valueOf()?.toString()?.substring(0,3)}
-      ${resitail}
-      ${await random({ min: 10, max: 99, integer: true })}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(2,10)}
+      ${await random({ min: 100, max: 999, integer: true })}
     `;
     // console.log(resitail);
     // console.log(currentResi);
-    // console.log(`jne resi : ${  jneResi}`);
+    console.log(`jne resi : ${  jneResi}`);
 
     // console.log('jneResi : ' + jneResi);
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
