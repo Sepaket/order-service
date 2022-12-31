@@ -141,9 +141,7 @@ module.exports = class {
 
 
       let calculatedCredit = parseFloat(seller.sellerDetail.credit);
-      console.log('here - reno');
-      console.log(sellerId.id);
-      console.log(body.type);
+
       if (!batchConditon) {
         batch = await batchCreator({
           dbTransaction,
@@ -166,10 +164,14 @@ module.exports = class {
       const latestOrder = await this.order.findOne({
         order: [['id', 'DESC']],
       });
-      nextId = latestOrder.id + 1;
 
+      let increment = 0;
       const response = await Promise.all(
+
+
         body.order_items.map(async (item, index) => {
+          increment++;
+          nextId = latestOrder.id + increment;
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
           if (body.service_code === 'JNECOD'){
             servCode = 'REG19';
@@ -179,7 +181,7 @@ module.exports = class {
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
-            console.log(`index = ${  index  } nextId ${  nextId}`);
+            // console.log(`index = ${  index  } nextId ${  nextId}`);
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: `${index}` });
           } else if (body.type === 'SICEPAT'){
             sicepatResi += 1;
