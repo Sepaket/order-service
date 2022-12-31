@@ -177,7 +177,7 @@ const tracking = async () => {
           // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-              // await updateSaldo(calculated_1,orderDetail);
+              await updateSaldo(calculated_1,orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,
@@ -189,7 +189,7 @@ const tracking = async () => {
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi  } calculated : ${calculated_1}`);
-            // await updateSaldo(calculated_1,orderDetail);
+            await updateSaldo(calculated_1,orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,
