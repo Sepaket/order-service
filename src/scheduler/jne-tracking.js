@@ -6,13 +6,16 @@ const {
   OrderLog,
   OrderDetail,
   SellerDetail,
+  OrderHistory,
+  Seller,
 } = require('../app/models');
 
 
-function updateSaldo(calculated1, orderDetail) {
+async function updateSaldo(calculated1, orderDetail) {
   console.log('order detail');
-  // console.log(orderDetail);
-  const currentCredit = SellerDetail.findOne({
+  // console.log('seller id : ' + orderDetail.sellerId);
+  // console.log('seller id : ' + orderDetail.seller.sellerDetail.id);
+  const currentCredit = await SellerDetail.findOne({
     where: { sellerId: orderDetail.sellerId },
   }).then(value => {
       console.log('credit : ' + value.credit);
@@ -54,42 +57,84 @@ const getLastStatus = (trackingStatus) => {
 
   return currentStatus;
 };
+const creditUpdate = async () => {
+  console.log('order credit update');
+  try {
+    const histories = await OrderHistory.findAll({
+      include:[
+        {
+          model: OrderDetail,
+          as: 'orderDetail',
+          required: true,
+          include : {
+            model: Seller,
+            as: 'seller',
+            required: true,
+            include : {
+              model: SellerDetail,
+              as: 'sellerDetail',
+              required: true,
+            }
+          },
+        },
+
+
+      ],
+      where: {
+        isExecute: false,
+        // [Sequelize.Op.or]: [
+        //   {
+        //     status: {
+        //       [Sequelize.Op.notIn]: [
+        //         'DELIVERED', 'CANCELED',
+        //         'RETURN_TO_SELLER',
+        //       ],
+        //     },
+        //   },
+        // ],
+      },
+    });
+
+    await Promise.all(
+      histories?.map(async (history) => {
+        console.log(history.orderDetail.seller.sellerDetail.credit);
+        // updateSaldo(history.deltaCredit,history.orderDetail)
+      }),
+      );
+
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 const tracking = async () => {
   console.log('inside JNE tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
-//       attributes: [
-// 'id','resi',
-//       ],
       include:[
         {
           model: OrderDetail,
           as: 'detail',
-          // as:'ads',
-          // where:{
-          //   is_valid:1,
-          //   is_vertify:1},
           required: true,
-        }
+        include : {
+          model: Seller,
+          as: 'seller',
+          required: true,
+          include : {
+            model: SellerDetail,
+            as: 'sellerDetail',
+            required: true,
+          }
+        },
+        },
+
       ],
       where: {
         expedition: 'JNE',
         [Sequelize.Op.or]: [
-          // {
-          //   status: {
-          //     [Sequelize.Op.ne]: 'DELIVERED',
-          //   },
-          // },
-          // {
-          //   status: {
-          //     [Sequelize.Op.ne]: 'CANCELED',
-          //   },
-          // },
           {
             status: {
-              // [Sequelize.Op.ne]: 'RETURN_TO_SELLER',
               [Sequelize.Op.notIn]: [
                 'DELIVERED', 'CANCELED',
                 'RETURN_TO_SELLER',
@@ -101,15 +146,13 @@ const tracking = async () => {
     });
     await Promise.all(
       order?.map(async (item) => {
-        // console.log(item.id);
-        // console.log(item.detail.sellerId);
         const track = await jne.tracking({ resi: item?.resi });
-        // console.log('Item id : ' + item.id);
+        // console.log('credit id : ' + item.detail.seller.sellerDetail.credit);
         if (!track?.error) {
           const trackingStatus = track?.history[track?.history?.length - 1];
           const currentStatus = getLastStatus(trackingStatus?.code || '');
           // const currentStatus = getLastStatus(historical.code || '');
-          console.log(`${item.resi  } : ${  currentStatus}`);
+          // console.log(`${item.resi  } : ${  currentStatus}`);
           track?.history?.forEach((historical) => {
             trackHistories.push({
               orderId: item?.id,
@@ -128,37 +171,40 @@ const tracking = async () => {
             },
             { where: { resi: item.resi } },
           );
-          const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
-          const log = await OrderLog.findAll({ where: { orderId: item.id } });
+          var calculated_1 = 0;
+          const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
+          const log =  await OrderLog.findAll({ where: { orderId: item.id } });
           // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
-            const calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-            if ((item.id === 355) || (item.id === 700)) {
-              console.log(item.id);
-              console.log(orderDetail.sellerReceivedAmount);
-            }
-            await updateSaldo(calculated_1,orderDetail);
+            calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
+              // await updateSaldo(calculated_1,orderDetail);
+            await OrderHistory.create({
+              orderId: item.id,
+              deltaCredit: calculated_1,
+              note: currentStatus,
+            });
+            // console.log('order history is created ' + item.orderId);
           }
-
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
-            // console.log('SCHEDULER - JNE - TRACKING - RETURN TO SELLER');
-
-
-            // console.log('log length : ' + log.length);
-            // const orderDetail = OrderDetail.findOne({ where: { orderId: item.id } });
-
-            const calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
+            calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi  } calculated : ${calculated_1}`);
-            updateSaldo(calculated_1,orderDetail);
+            // await updateSaldo(calculated_1,orderDetail);
+            await OrderHistory.create({
+              orderId: item.id,
+              deltaCredit: calculated_1,
+              note: currentStatus,
+            });
+            // console.log('order history is created ' + item.orderId);
           }
+
+
         }
 
         return item;
       }),
     );
 
-    // console.log(order.length);
     await Promise.all(
       trackHistories?.map(async (item) => {
         const log = await OrderLog.findOne({
@@ -171,7 +217,7 @@ const tracking = async () => {
         });
 
         if (!log) {
-          console.log(`create ${  item.note}`);
+          // console.log(`create ${  item.note}`);
           await OrderLog.create({
             orderId: item?.orderId,
             previousStatus: item?.previousStatus,
@@ -180,6 +226,10 @@ const tracking = async () => {
             note: item?.note,
           });
         }
+
+
+
+
       }),
     );
   } catch (error) {
@@ -189,4 +239,5 @@ const tracking = async () => {
 
 module.exports = {
   tracking,
+  creditUpdate,
 };

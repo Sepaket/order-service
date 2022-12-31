@@ -86,6 +86,7 @@ const jneStatus = {
     'F05', // JNE - CANCEL ORDER
   ],
   RETURN_TO_SELLER: [
+    'CR1', // RETURN ORIGIN
     'CR6', // JNE - UNDELIVERY
     'CR7', // JNE - RETURN SHIPMENT BEING HELD AT ORIGIN
     'CR8', // JNE - RETURN TO MARKETPLACE
