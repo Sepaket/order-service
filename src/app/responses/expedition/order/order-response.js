@@ -327,7 +327,7 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           if (messages?.length < 1) {
-            increment += 1;
+
             querySuccess.push({
               ...parameter,
               resi,
@@ -352,6 +352,7 @@ module.exports = class {
         }),
       );
       if (querySuccess?.length > 0) {
+        increment += 1;
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,
