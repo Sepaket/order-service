@@ -170,8 +170,7 @@ module.exports = class {
 
 
         body.order_items.map(async (item, index) => {
-          increment++;
-          nextId = latestOrder.id + increment;
+
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
           if (body.service_code === 'JNECOD'){
             servCode = 'REG19';
@@ -181,6 +180,9 @@ module.exports = class {
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
+            increment += 1;
+            console.log('increment : ' + increment);
+            nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: `${index}` });
           } else if (body.type === 'SICEPAT'){
@@ -313,9 +315,9 @@ module.exports = class {
             ...body,
           };
 
-          console.log("===PAYLOAD START===");
-          console.log(payload);
-          console.log("===PAYLOAD END 2===");
+          // console.log("===PAYLOAD START===");
+          // console.log(payload);
+          // console.log("===PAYLOAD END 2===");
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
