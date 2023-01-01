@@ -185,10 +185,10 @@ module.exports = class {
 
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
-            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: `${index}` });
+            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
           } else if (body.type === 'SICEPAT'){
             sicepatResi += 1;
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: `${index}` });
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
 
           const resiIsExist = await this.order.findOne({
@@ -198,10 +198,10 @@ module.exports = class {
           if (resiIsExist) {
             if (body.type === 'JNE') {
               nextId = nextId + 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: `${index}` });
+              resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
             } else if (body.type === 'SICEPAT'){
               sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: `${index}` });
+              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             }
 
           }

@@ -69,7 +69,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
   try {
     let resi = '';
 
-    const { expedition, currentResi, id } = params;
+    const { expedition, currentResi, id, batchId} = params;
     // console.log(`resimapper next Id to insert to orders : ${id}`);
     // console.log(params);
     const ninjaResi = `
@@ -100,10 +100,13 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     // `;
 
     const resitail = zerofill(currentResi.toString(),10).substring(10,4);
+    const batchno = zerofill(batchId.toString(),5);
+    const idno = zerofill(id.toString(),3);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${moment()?.format('x')?.valueOf()?.toString()?.substring(3,12)}
-      ${await random({ min: 10, max: 99, integer: true })}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1,4)}
+      ${batchno}
+      ${idno}
     `;
     // console.log(resitail);
     // console.log(currentResi);
