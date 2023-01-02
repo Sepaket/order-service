@@ -17,10 +17,15 @@ const caseConverter = ({ parameter }) => {
 
 const payloadFormatter = (payload) => {
   // eslint-disable-next-line no-unused-vars
-  payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
-  payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\n/gi, " ");
-  payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
-  payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
+  // payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
+  // payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\n/gi, " ");
+  // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
+  // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
+
+  payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\\"/g, '"');
+  payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\\"/g, '"');
+  payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\\"/g, '"');
+  payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\\"/g, '"');
   return payload;
 };
 
