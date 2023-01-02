@@ -15,6 +15,18 @@ const caseConverter = ({ parameter }) => {
   }, {});
 };
 
+String.prototype.escapeSpecialCharsInJSONString = function() {
+  return this .replace(/[\\]/g, '\\\\')
+    .replace(/[\"]/g, '\\\"')
+    .replace(/[\/]/g, '\\/')
+    .replace(/[\b]/g, '\\b')
+    .replace(/[\f]/g, '\\f')
+    .replace(/[\n]/g, '\\n')
+    .replace(/[\r]/g, '\\r')
+    .replace(/[\t]/g, '\\t');
+};
+
+
 const payloadFormatter = (payload) => {
   // eslint-disable-next-line no-unused-vars
   // payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
@@ -22,10 +34,10 @@ const payloadFormatter = (payload) => {
   // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
   // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
 
-  payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\\"/g, '"');
-  payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\\"/g, '"');
-  payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\\"/g, '"');
-  payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\\"/g, '"');
+  payload['GOODS_DESC'] = payload['GOODS_DESC'].escapeSpecialCharsInJSONString();
+  payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
+  payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
+  payload['SPECIAL_INS'] = payload['SPECIAL_INS'].escapeSpecialCharsInJSONString();
   return payload;
 };
 
