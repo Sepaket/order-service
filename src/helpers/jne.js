@@ -38,6 +38,8 @@ const payloadFormatter = (payload) => {
   payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
   payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
   payload['SPECIAL_INS'] = payload['SPECIAL_INS'].escapeSpecialCharsInJSONString();
+
+  console.log('payload formatter goods desc ' + payload['GOODS_DESC']);
   return payload;
 };
 
