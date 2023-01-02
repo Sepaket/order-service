@@ -100,13 +100,14 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     // `;
 
     const resitail = zerofill(currentResi.toString(),10).substring(10,4);
-    const batchno = zerofill(batchId.toString(),5);
+    const batchno = zerofill(batchId.toString(),4);
     const idno = zerofill(id.toString(),3);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
       ${moment()?.format('x')?.valueOf()?.toString()?.substring(1,4)}
       ${batchno}
       ${idno}
+      ${await random({ min: 0, max: 9, integer: true })}
     `;
     // console.log(resitail);
     // console.log(currentResi);
