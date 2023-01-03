@@ -100,7 +100,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     // `;
 
     const resitail = zerofill(currentResi.toString(),10).substring(10,4);
-    const batchno = zerofill(batchId.toString(),4);
+    const batchno = zerofill(batchId.toString(),4).substring(0,4);
     const idno = zerofill(id.toString(),3);
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}

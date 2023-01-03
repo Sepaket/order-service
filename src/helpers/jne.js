@@ -16,14 +16,25 @@ const caseConverter = ({ parameter }) => {
 };
 
 String.prototype.escapeSpecialCharsInJSONString = function() {
+
+  // return this .replace(/[\\]/g, '\\\\')
+  //   .replace(/[\"]/g, '\\\"')
+  //   .replace(/[\/]/g, '\\/')
+  //   .replace(/[\b]/g, '\\b')
+  //   .replace(/[\f]/g, '\\f')
+  //   .replace(/[\n]/g, '\\n')
+  //   .replace(/[\r]/g, '\\r')
+  //   .replace(/[\t]/g, '\\t');
+
+
   return this .replace(/[\\]/g, '\\\\')
     .replace(/[\"]/g, '\\\"')
     .replace(/[\/]/g, '\\/')
-    .replace(/[\b]/g, '\\b')
-    .replace(/[\f]/g, '\\f')
-    .replace(/[\n]/g, '\\n')
-    .replace(/[\r]/g, '\\r')
-    .replace(/[\t]/g, '\\t');
+    .replace(/[\b]/g, ' ')
+    .replace(/[\f]/g, ' ')
+    .replace(/[\n]/g, ' ')
+    .replace(/[\r]/g, ' ')
+    .replace(/[\t]/g, ' ');
 };
 
 

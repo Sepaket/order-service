@@ -51,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    isExecute: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
   };
 
   const Credit = sequelize.define('CreditHistory', schema, {

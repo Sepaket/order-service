@@ -11,19 +11,18 @@ const {
 } = require('../app/models');
 
 
+
+
 async function updateSaldo(calculated1, orderDetail) {
-      console.log('credit : ' + orderDetail.seller.sellerDetail.credit);
-    const credit = orderDetail.seller.sellerDetail.credit === 'NaN' ? 0 : orderDetail.seller.sellerDetail.credit;
-    const calculated = parseFloat(credit) + calculated1;
-    console.log(orderDetail.orderId + ' credit : ' + credit);
-    SellerDetail.update(
-      { credit: parseFloat(calculated) },
-      { where: { sellerId: orderDetail.sellerId } },
-    );
-  // });
-
-// console.log(orderDetail.sellerId + ' : ' + currentCredit.credit);
-
+  // the updateSaldo is deprecated in favor of creditUpdater() calculation
+  //     console.log('credit : ' + orderDetail.seller.sellerDetail.credit);
+  //   const credit = orderDetail.seller.sellerDetail.credit === 'NaN' ? 0 : orderDetail.seller.sellerDetail.credit;
+  //   const calculated = parseFloat(credit) + calculated1;
+  //   console.log(orderDetail.orderId + ' credit : ' + credit);
+  //   SellerDetail.update(
+  //     { credit: parseFloat(calculated) },
+  //     { where: { sellerId: orderDetail.sellerId } },
+  //   );
 
 }
 
@@ -91,7 +90,7 @@ const creditUpdate = async () => {
 
     await Promise.all(
       histories?.map(async (history) => {
-        console.log(history.orderDetail.seller.sellerDetail.credit);
+        // console.log(history.orderDetail.seller.sellerDetail.credit);
         // updateSaldo(history.deltaCredit,history.orderDetail)
       }),
       );
@@ -232,7 +231,9 @@ const tracking = async () => {
   }
 };
 
+
+
 module.exports = {
   tracking,
-  creditUpdate,
+  // creditUpdate, // creditUpdate is done from batch-updater. not tracking updater
 };
