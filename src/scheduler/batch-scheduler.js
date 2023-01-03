@@ -149,7 +149,7 @@ const ids = [];
 const historyIds = [];
   await creditHistories.forEach(async (item) => {
     historyIds.push(item.id);
-    console.log(item.id);
+    // console.log(item.id);
     let deltatopup = 0;
     if(item.topup === null) {
       deltatopup -= Number(item.withdraw);
@@ -158,12 +158,12 @@ const historyIds = [];
     }
 
 
-    console.log('current credit : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['credit']));
-    console.log('credit delta : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['delta']));
-    console.log('topup : '  + item.sellerId + ' : ' + item.topup);
-    console.log('withdraw : '  + item.sellerId + ' : ' + item.withdraw);
-console.log('delta topup : '  + item.sellerId + ' : ' + deltatopup);
-console.log(" ");
+//     console.log('current credit : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['credit']));
+//     console.log('credit delta : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['delta']));
+//     console.log('topup : '  + item.sellerId + ' : ' + item.topup);
+//     console.log('withdraw : '  + item.sellerId + ' : ' + item.withdraw);
+// console.log('delta topup : '  + item.sellerId + ' : ' + deltatopup);
+// console.log(" ");
     sellerUpdateObject[item.sellerId]['deltatopup'] += Number(deltatopup);
     // console.log('result : ');
     // console.log(updateResult);
@@ -266,7 +266,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/1 * * * *', async () => {
+const runner = cron.schedule('*/5 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
