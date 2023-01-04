@@ -35,6 +35,7 @@ module.exports = class {
           sellerId: body.seller_id,
           topup: parseFloat(body.amount),
           status: PAID.text,
+          isExecute: true,
         },
         { transaction: dbTransaction },
       );

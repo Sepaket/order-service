@@ -157,13 +157,6 @@ const historyIds = [];
       deltatopup += Number(item.topup);
     }
 
-
-//     console.log('current credit : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['credit']));
-//     console.log('credit delta : '  + item.sellerId + ' : ' + Number(sellerUpdateObject[item.sellerId]['delta']));
-//     console.log('topup : '  + item.sellerId + ' : ' + item.topup);
-//     console.log('withdraw : '  + item.sellerId + ' : ' + item.withdraw);
-// console.log('delta topup : '  + item.sellerId + ' : ' + deltatopup);
-// console.log(" ");
     sellerUpdateObject[item.sellerId]['deltatopup'] += Number(deltatopup);
     // console.log('result : ');
     // console.log(updateResult);

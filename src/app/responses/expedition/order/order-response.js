@@ -111,7 +111,8 @@ module.exports = class {
       });
 
       const sellerDiscount = seller.sellerDetail.discount;
-      const sellerDiscountType = seller.discountType;
+      console.log('Discount : ' + sellerDiscount);
+      const sellerDiscountType = seller.sellerDetail.discountType;
       const globalDiscount = await this.discount.findOne({
         where: {
           [this.op.or]: {
@@ -125,20 +126,25 @@ module.exports = class {
         },
       });
 
-      if (sellerDiscount && sellerDiscount !== 0) {
-        selectedDiscount = {
-          value: sellerDiscount || 0,
-          type: sellerDiscountType || '',
-        };
-      }
-
       if (globalDiscount) {
+        console.log('GLOBAL discount = TRUE');
         selectedDiscount = {
           value: globalDiscount?.value || 0,
           type: globalDiscount?.type || '',
         };
       }
 
+      if (sellerDiscount && sellerDiscount !== 0) {
+        console.log('seller discount = TRUE');
+        console.log('seller discount type = ' + sellerDiscountType);
+        selectedDiscount = {
+          value: sellerDiscount || 0,
+          type: sellerDiscountType || '',
+        };
+      }
+
+
+    console.log('crete order selected discount : ' + selectedDiscount.value);
 
       let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
@@ -247,6 +253,8 @@ module.exports = class {
             codValueCalculated = codFeeCalculated + vatCalculated;
           }
 
+          console.log('crete order 2 selected discount : ' + selectedDiscount.value);
+          console.log('crete order 2 selected discount type : ' + selectedDiscount.type);
           if (selectedDiscount?.type === 'PERCENTAGE') {
             discountAmount = (
               parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
@@ -275,6 +283,7 @@ module.exports = class {
 
           let shippingCalculated = 0;
           if (item.is_cod) {
+
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
             + parseFloat(insuranceSelected);

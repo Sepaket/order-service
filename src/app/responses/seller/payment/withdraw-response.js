@@ -53,6 +53,7 @@ module.exports = class {
           sellerId: seller?.id,
           withdraw: parseFloat(body.amount),
           status: PENDING.text,
+          isExecute: true,
           createdAt: moment().tz('Asia/Jakarta').format(),
           updatedAt: moment().tz('Asia/Jakarta').format(),
           requestPayload: JSON.stringify({

@@ -39,12 +39,13 @@ module.exports = class {
       });
 
       let { status } = body;
+      const isExecute = true;
       if (body.status === 'PAID') status = PAID.text;
       if (body.status === 'EXPIRED') status = EXPIRED.text;
       if (body.status === 'FAILED') status = FAILED.text;
 
       await this.credit.update(
-        { status, payloadResponse: JSON.stringify(body) },
+        { status, isExecute, payloadResponse: JSON.stringify(body) },
         { where: { id: credit?.id } },
         { transaction: dbTransaction },
       );
