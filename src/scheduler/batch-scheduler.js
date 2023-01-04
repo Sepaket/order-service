@@ -15,7 +15,7 @@ const {
 
 const creditUpdater = async () => {
 
-  const t = await sequelize.transaction();
+  // const t = await sequelize.transaction();
 
   const orderHistory = await OrderHistory.findAll({
     include: [
@@ -189,9 +189,9 @@ const historyIds = [];
         },
 
       },
-      {
-        transaction: t,
-      },
+      // {
+      //   transaction: t,
+      // },
     );
 
   let creditUpdateResult = await CreditHistory.update(
@@ -202,9 +202,9 @@ const historyIds = [];
       },
 
     },
-    {
-      transaction: t,
-    },
+    // {
+    //   transaction: t,
+    // },
   );
 
 
@@ -221,9 +221,9 @@ console.log ('new credit ' + key + ' : ' + newCredit + ' : ' + sellerUpdateObjec
         },
 
       },
-      {
-        transaction: t,
-      },
+      // {
+      //   transaction: t,
+      // },
     );
 
   }
@@ -266,7 +266,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/20 * * * *', async () => {
+const runner = cron.schedule('*/15 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
