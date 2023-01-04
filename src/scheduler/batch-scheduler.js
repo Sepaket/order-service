@@ -118,6 +118,11 @@ const ids = [];
               seller_id: {
                 [Sequelize.Op.in]:seller_keys,
               },
+            },
+            {
+              status: {
+                [Sequelize.Op.in]:['COMPLETED', 'PAID'],
+              },
             }
           ]
         },
@@ -132,6 +137,11 @@ const ids = [];
             {
               seller_id: {
                 [Sequelize.Op.in]:seller_keys,
+              },
+            },
+            {
+              status: {
+                [Sequelize.Op.in]:['COMPLETED', 'PAID'],
               },
             }
           ]
