@@ -113,6 +113,10 @@ module.exports = class {
       const sellerDiscount = seller.sellerDetail.discount;
       console.log('Discount : ' + sellerDiscount);
       const sellerDiscountType = seller.sellerDetail.discountType;
+      const sellerCodFee = seller.sellerDetail.codFee;
+      const sellerCodFeeType = seller.sellerDetail.codFeeType;
+
+
       const globalDiscount = await this.discount.findOne({
         where: {
           [this.op.or]: {
@@ -229,7 +233,11 @@ module.exports = class {
 
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
+
+
           let codFeeCalculated = trxFee?.codFee || 0;
+
+
           let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
@@ -237,11 +245,21 @@ module.exports = class {
           let shippingWithDiscount = parseFloat(shippingCharge)
             + parseFloat(selectedDiscount?.value || 0);
 
-          if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
-            codFeeCalculated = (
-              parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
-            ) / 100;
+          if (sellerCodFee && sellerCodFee >= 0) {
+            if (sellerCodFeeType === 'PERCENTAGE' && item.is_cod) {
+              codFeeCalculated = (
+                parseFloat(item.cod_value) * parseFloat(sellerCodFee || 0)
+              ) / 100;
+            }
+          } else {
+            if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
+              codFeeCalculated = (
+                parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
+              ) / 100;
+            }
           }
+          console.log('cod fee' + codFeeCalculated);
+
 
           if (this.tax.vatType === 'PERCENTAGE') {
             vatCalculated = (
