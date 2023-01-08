@@ -269,7 +269,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/15 * * * *', async () => {
+const runner = cron.schedule('*/10 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
