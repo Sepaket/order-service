@@ -45,6 +45,20 @@ const payloadFormatter = (payload) => {
   // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
   // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
 
+  payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
+  payload['PICKUP_PIC'] = payload['PICKUP_PIC'].escapeSpecialCharsInJSONString();
+  payload['PICKUP_NAME'] = payload['PICKUP_NAME'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_NAME'] = payload['SHIPPER_NAME'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_CONTACT'] = payload['SHIPPER_CONTACT'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_ADDR1'] = payload['SHIPPER_ADDR1'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_ADDR2'] = payload['SHIPPER_ADDR2'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_ADDR3'] = payload['SHIPPER_ADDR3'].escapeSpecialCharsInJSONString();
+
+  payload['RECEIVER_NAME'] = payload['RECEIVER_NAME'].escapeSpecialCharsInJSONString();
+  payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
+  payload['RECEIVER_ADDR2'] = payload['RECEIVER_ADDR2'].escapeSpecialCharsInJSONString();
+  payload['RECEIVER_ADDR3'] = payload['RECEIVER_ADDR3'].escapeSpecialCharsInJSONString();
+  payload['RECEIVER_CONTACT'] = payload['RECEIVER_CONTACT'].escapeSpecialCharsInJSONString();
   payload['GOODS_DESC'] = payload['GOODS_DESC'].escapeSpecialCharsInJSONString();
   payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
   payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();

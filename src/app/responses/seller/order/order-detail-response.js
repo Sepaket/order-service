@@ -69,6 +69,20 @@ module.exports = class {
               ],
             },
             {
+              model: this.ticket,
+              as: 'ticket',
+              required: false,
+              attributes: [
+                'title',
+                'message',
+                'category',
+                'priority',
+                'status',
+                'created_at',
+                'updated_at'
+              ],
+            },
+            {
               model: this.discount,
               as: 'discount',
               required: true,

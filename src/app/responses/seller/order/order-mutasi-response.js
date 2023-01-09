@@ -28,7 +28,7 @@ module.exports = class {
 
   async process() {
     function getSellerReceivedAmount(item) {
-      let amount = '';
+      const amount = '';
       let ongkirReturned = 0.00;
       // console.log(item.order.status);
       // console.log(item.order);
@@ -268,6 +268,7 @@ module.exports = class {
       status: {
         [this.op.notIn]: [
           // 'WAITING_PICKUP', 'PROCESSED',
+          'WAITING_PICKUP',
           'PROBLEM',
         ],
       },

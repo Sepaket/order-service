@@ -137,6 +137,15 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
+
+    model.OrderDetail.belongsTo(model.Ticket, {
+      as: 'ticket',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
+
+
+
       // model.OrderDiscount.belongsTo(model.OrderDetail, {
       //   as: 'orderDetail',
       //   foreignKey: 'orderId',
