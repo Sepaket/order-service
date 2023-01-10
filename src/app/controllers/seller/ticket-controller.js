@@ -32,7 +32,6 @@ module.exports = {
   create: async (request, response, next) => {
     try {
       await TicketCreateValidator(request);
-
       const result = await new TicketCreateResponse({ request });
 
       response.send({

@@ -16,12 +16,10 @@ module.exports = class {
     try {
       this.seller = await jwtSelector({ request: this.request });
       const parameterMapper = await this.mapper();
-
       await this.ticket.create(
         { ...parameterMapper },
         { transaction: dbTransaction },
       );
-
       await dbTransaction.commit();
       return true;
     } catch (error) {

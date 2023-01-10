@@ -72,11 +72,6 @@ module.exports = (sequelize, DataTypes) => {
       as: 'order',
     });
 
-    model.Ticket.belongsTo(model.OrderDetail, {
-      as: 'detail',
-    });
-
-
     model.Ticket.belongsTo(model.Seller, {
       as: 'seller',
     });
