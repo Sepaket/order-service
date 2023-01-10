@@ -180,6 +180,33 @@ const tracking = async () => {
             // console.log('order history is created ' + item.orderId);
           }
 
+          if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
+            calculated_1 = parseFloat(orderDetail.shippingCalculated);
+            // await updateSaldo(calculated_1,orderDetail);
+            await OrderHistory.create({
+              orderId: item.id,
+              deltaCredit: calculated_1,
+              note: currentStatus,
+              isExecute: true,
+            });
+            // console.log('order history is created ' + item.orderId);
+          }
+
+          if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
+            calculated_1 = parseFloat(orderDetail.shippingCalculated);
+            await updateSaldo(calculated_1,orderDetail);
+            await OrderHistory.create({
+              orderId: item.id,
+              deltaCredit: calculated_1,
+              note: currentStatus,
+              isExecute: true,
+            });
+            // console.log('order history is created ' + item.orderId);
+          }
+
+
+
+
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi  } calculated : ${calculated_1}`);

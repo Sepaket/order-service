@@ -77,6 +77,7 @@ module.exports = class {
               as: 'ticket',
               required: false,
               attributes: [
+                'id',
                 'title',
                 'message',
                 'category',
