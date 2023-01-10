@@ -147,7 +147,7 @@ module.exports = class {
               ) / 100;
             }
 
-            const codFeeCalculated = parseFloat(vatCalculated) + parseFloat(item.cod_fee_admin);
+            const codFeeCalculated = parseFloat(item.cod_fee_admin);
             const shippingDiscount = (
               parseFloat(item.shipping_charge) - parseFloat(item.discount.value)
             );
