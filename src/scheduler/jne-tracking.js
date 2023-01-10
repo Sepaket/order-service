@@ -199,7 +199,7 @@ const tracking = async () => {
               orderId: item.id,
               deltaCredit: calculated_1,
               note: currentStatus,
-              isExecute: true,
+              isExecute: false,
             });
             // console.log('order history is created ' + item.orderId);
           }

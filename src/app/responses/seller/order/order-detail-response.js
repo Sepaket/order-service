@@ -11,6 +11,7 @@ const {
   OrderLog,
   OrderAddress,
   OrderDiscount,
+  Ticket,
 } = require('../../../models');
 
 module.exports = class {
@@ -26,6 +27,7 @@ module.exports = class {
     this.orderAddress = OrderAddress;
     this.sellerAddress = SellerAddress;
     this.converter = snakeCaseConverter;
+    this.ticket = Ticket;
     return this.process();
   }
 
@@ -73,6 +75,7 @@ module.exports = class {
               as: 'ticket',
               required: false,
               attributes: [
+                'id',
                 'title',
                 'message',
                 'category',
