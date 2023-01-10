@@ -267,7 +267,8 @@ module.exports = class {
       // is_cod: true,
       status: {
         [this.op.notIn]: [
-          // 'WAITING_PICKUP', 'PROCESSED',
+          // 'WAITING_PICKUP',
+          'PROCESSED',
           'WAITING_PICKUP',
           'PROBLEM',
         ],
