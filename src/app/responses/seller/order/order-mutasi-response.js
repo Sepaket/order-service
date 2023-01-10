@@ -270,6 +270,7 @@ module.exports = class {
           // 'WAITING_PICKUP',
           'PROCESSED',
           'WAITING_PICKUP',
+          'CANCELED',
           'PROBLEM',
         ],
       },
