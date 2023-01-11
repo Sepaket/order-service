@@ -12,6 +12,7 @@ const {
   OrderAddress,
   SellerAddress,
   OrderDiscount,
+  Seller,
 } = require('../../../models');
 
 module.exports = class {
@@ -28,6 +29,7 @@ module.exports = class {
     this.sellerAddress = SellerAddress;
     this.orderDiscount = OrderDiscount;
     this.converter = snakeCaseConverter;
+    this.seller = Seller;
     return this.process();
   }
 
@@ -76,6 +78,14 @@ module.exports = class {
                 'orderTime',
                 'createdAt',
                 'updatedAt',
+              ],
+            },
+            {
+              model: this.seller,
+              as: 'seller',
+              required: true,
+              attributes: [
+                'name','email','phone',
               ],
             },
             {
@@ -151,19 +161,6 @@ module.exports = class {
             const shippingDiscount = (
               parseFloat(item.shipping_charge) - parseFloat(item.discount.value)
             );
-            // let shippingChargeTotal = (
-            //   parseFloat(shippingDiscount)
-            //   + parseFloat(vatCalculated)
-            //   + parseFloat(item.insurance_amount)
-            // );
-            //
-            // if (item.order.isCod) {
-            //   shippingChargeTotal = (
-            //     parseFloat(shippingDiscount)
-            //     + parseFloat(codFeeCalculated)
-            //     + parseFloat(item.insurance_amount)
-            //   );
-            // }
 
             let shippingChargeTotal = (parseFloat(item.shippingCalculated));
 
