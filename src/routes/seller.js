@@ -47,6 +47,7 @@ router.group('/address', (route) => {
 
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
+  route.get('/all', Authorization, OrderController.listall);
   route.get('/mutasi', Authorization, OrderController.mutasi);
   route.get('/batch', Authorization, OrderController.batch);
   route.post('/export', Authorization, OrderController.export);
