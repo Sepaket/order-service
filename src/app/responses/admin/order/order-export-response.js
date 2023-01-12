@@ -52,6 +52,7 @@ module.exports = class {
             'insuranceAmount',
             'shippingCharge',
             'sellerReceivedAmount',
+            'shippingCalculated',
           ],
           include: [
             {
@@ -162,8 +163,10 @@ module.exports = class {
               parseFloat(item.shipping_charge) - parseFloat(item.discount.value)
             );
 
-            let shippingChargeTotal = (parseFloat(item.shippingCalculated));
-
+            let shippingChargeTotal = (parseFloat(item.shipping_calculated));
+            // console.log('shipping --- ');
+            // console.log(item);
+            // console.log(shippingChargeTotal);
             itemResponse.shipping_charge_discount = Number(shippingDiscount).toFixed(2);
             itemResponse.shipping_charge_total = Number(shippingChargeTotal).toFixed(2);
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
