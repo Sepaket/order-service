@@ -142,8 +142,16 @@ const tracking = async () => {
         const track = await jne.tracking({ resi: item?.resi });
         // console.log('credit id : ' + item.detail.seller.sellerDetail.credit);
         if (!track?.error) {
-          const trackingStatus = track?.history[track?.history?.length - 1];
-          const currentStatus = getLastStatus(trackingStatus?.code || '');
+          // const trackingStatus = track?.history[track?.history?.length - 1];
+          // console.log('POD STATUS :');
+          // console.log(track?.cnote.pod_status);
+          // DIBAWAH INI KODE LAMA
+          // const currentStatus = getLastStatus(trackingStatus?.code || '');
+
+          // RENO
+          const currentStatus = getLastStatus(track?.cnote.pod_code || '');
+
+
           // const currentStatus = getLastStatus(historical.code || '');
           // console.log(`${item.resi  } : ${  currentStatus}`);
           track?.history?.forEach((historical) => {
@@ -160,7 +168,8 @@ const tracking = async () => {
           Order.update(
             {
               status: currentStatus,
-              podStatus: trackingStatus?.code,
+              podStatus: track?.cnote.pod_code,
+              // podStatus: trackingStatus?.code,
             },
             { where: { resi: item.resi } },
           );
