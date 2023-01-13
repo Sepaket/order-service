@@ -167,11 +167,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'batchId',
     });
 
-    // model.OrderDetail.belongsTo(model.OrderHistory, {
-    //   as: 'history',
-    //   targetKey: 'orderId',
-    //   foreignKey: 'orderId',
-    // });
+    model.OrderDetail.belongsTo(model.OrderHistory, {
+      as: 'history',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
 
 
   };

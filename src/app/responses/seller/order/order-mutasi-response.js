@@ -10,6 +10,7 @@ const {
   SellerAddress,
   Location,
   OrderLog,
+  OrderHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -23,6 +24,7 @@ module.exports = class {
     this.orderAddress = OrderAddress;
     this.sellerAddress = SellerAddress;
     this.converter = snakeCaseConverter;
+    this.orderHistory = OrderHistory;
     return this.process();
   }
 
@@ -107,6 +109,14 @@ module.exports = class {
               attributes: [
                 ['id', 'receiver_id'],
                 'receiverName',
+              ],
+            },
+            {
+              model: this.orderHistory,
+              as: 'history',
+              required: true,
+              attributes: [
+'deltaCredit',
               ],
             },
             {
