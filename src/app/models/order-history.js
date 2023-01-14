@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: true,
     },
+    onHold: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
     note: {
       type: DataTypes.TEXT,
       allowNull: true,

@@ -45,10 +45,7 @@ const batchCreator = (params) => new Promise(async (resolve, reject) => {
       },
       { transaction: dbTransaction },
     );
-    console.log('inside order - helper batch creator 2');
     await dbTransaction.commit();
-    console.log('inside order - helper batch creator 3');
-    console.log('helper batch creator 2');
     resolve(batch);
   } catch (error) {
     console.log(error);

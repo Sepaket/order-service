@@ -173,6 +173,13 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
+    model.OrderDetail.belongsTo(model.TrackingHistory, {
+      as: 'tracking',
+      targetKey: 'orderId',
+      foreignKey: 'orderId',
+    });
+
+
 
   };
 

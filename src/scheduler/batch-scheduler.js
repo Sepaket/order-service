@@ -12,10 +12,7 @@ const {
 } = require('../app/models');
 
 
-
-const creditUpdater = async () => {
-
-  // const t = await sequelize.transaction();
+const saldoUpdater = async () => {
 
   const orderHistory = await OrderHistory.findAll({
     include: [
@@ -39,45 +36,8 @@ const creditUpdater = async () => {
       isExecute: false,
     },
   });
-  const order = await Order.findAll({
-    include: [
-      {
-        model: OrderDetail,
-        as: 'detail',
-        required: true,
-        include: {
-          model: Seller,
-          as: 'seller',
-          required: true,
-          include: {
-            model: SellerDetail,
-            as: 'sellerDetail',
-            required: true,
-          },
-        },
-      },
 
-    ],
-    where: {
-      // isExecute: false,
-      // [Sequelize.Op.or]: [
-      //   {
-      //     status: {
-      //       [Sequelize.Op.notIn]: [
-      //         'DELIVERED', 'CANCELED',
-      //         'RETURN_TO_SELLER',
-      //       ],
-      //     },
-      //   },
-      // ],
-    },
-  });
-
-
-
-
-  console.log('order history legth : ' + orderHistory.length);
-const ids = [];
+  const ids = [];
   let sellerUpdateObject = Object.create(null);
   await orderHistory.forEach(async (item) => {
     ids.push(item.orderId);
@@ -97,14 +57,53 @@ const ids = [];
 
 
 
+
+  const dbTransaction = await sequelize.transaction()
+  try {
+
+
+    let updateResult = await OrderHistory.update(
+      { isExecute: true },
+      {
+        where: {
+          orderId: ids,
+        },
+
+      },
+      { transaction: dbTransaction },
+    );
+
+    for (const key in sellerUpdateObject) {
+      let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']);
+      let updateSeller = await SellerDetail.update(
+        { credit: newCredit },
+        {
+          where: {
+            sellerId: key,
+          },
+        },
+        { transaction: dbTransaction },
+      );
+    }
+    await dbTransaction.commit();
+  } catch (error) {
+    console.log(error);
+    await dbTransaction.rollback();
+  }
+
+
+}
+
+
+
+
+
+
+
+const creditUpdater = async () => {
+  let sellerUpdateObject = Object.create(null);
   const seller_keys = Object.keys(sellerUpdateObject);
-  console.log('Seller keys from orderhistories yang belum ter proses : ');
-  console.log(seller_keys);
   const creditHistories = await CreditHistory.findAll({
-    include: [
-
-    ],
-
     where: {
       [Sequelize.Op.or]: [
         {
@@ -112,11 +111,6 @@ const ids = [];
             {
               is_execute: {
                 [Sequelize.Op.is]: null,
-              },
-            },
-            {
-              seller_id: {
-                [Sequelize.Op.in]:seller_keys,
               },
             },
             {
@@ -135,11 +129,6 @@ const ids = [];
               },
             },
             {
-              seller_id: {
-                [Sequelize.Op.in]:seller_keys,
-              },
-            },
-            {
               status: {
                 [Sequelize.Op.in]:['COMPLETED', 'PAID'],
               },
@@ -153,13 +142,17 @@ const ids = [];
 
   });
 
-  console.log('creadit histori reno : ' + creditHistories.length);
-  // console.log();
 
 const historyIds = [];
   await creditHistories.forEach(async (item) => {
     historyIds.push(item.id);
-    // console.log(item.id);
+    if (sellerUpdateObject[item.sellerId] === undefined) {
+      sellerUpdateObject[item.sellerId] = [];
+      sellerUpdateObject[item.sellerId]['delta'] = 0;
+      sellerUpdateObject[item.sellerId]['ids'] = [];
+      sellerUpdateObject[item.sellerId]['credit'] = 0;
+      sellerUpdateObject[item.sellerId]['deltatopup'] = 0;
+    }
     let deltatopup = 0;
     if(item.topup === null) {
       deltatopup -= Number(item.withdraw);
@@ -168,71 +161,42 @@ const historyIds = [];
     }
 
     sellerUpdateObject[item.sellerId]['deltatopup'] += Number(deltatopup);
-    // console.log('result : ');
-    // console.log(updateResult);
-
-    // try {
-    //   await t.commit();
-    // } catch (error) {
-    //   // await t.rollback();
-    //   console.log(error);
-    // }
-
-
+  console.log('credit add : ' + item.id + ' amount : ' + deltatopup);
   });
 
 
+  const dbTransaction = await sequelize.transaction()
+  try {
 
 
-  let updateResult = await OrderHistory.update(
+    let creditUpdateResult = await CreditHistory.update(
       { isExecute: true },
       {
         where: {
-          orderId: ids,
+          id: historyIds,
         },
-
       },
-      // {
-      //   transaction: t,
-      // },
+      { transaction: dbTransaction },
     );
 
-  let creditUpdateResult = await CreditHistory.update(
-    { isExecute: true },
-    {
-      where: {
-        id: historyIds,
-      },
-
-    },
-    // {
-    //   transaction: t,
-    // },
-  );
-
-
-
-
-  for (const key in sellerUpdateObject) {
-  let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']) + Number(sellerUpdateObject[key]['deltatopup']);
-console.log ('new credit ' + key + ' : ' + newCredit + ' : ' + sellerUpdateObject[key]['deltatopup']);
-    let updateSeller = await SellerDetail.update(
-      { credit: newCredit },
-      {
-        where: {
-          sellerId: key,
+    for (const key in sellerUpdateObject) {
+      // let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']) + Number(sellerUpdateObject[key]['deltatopup']);
+      let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['deltatopup']);
+      let updateSeller = await SellerDetail.update(
+        { credit: newCredit },
+        {
+          where: {
+            sellerId: key,
+          },
         },
-
-      },
-      // {
-      //   transaction: t,
-      // },
-    );
-
+        { transaction: dbTransaction },
+      );
+    }
+    await dbTransaction.commit();
+  } catch (error) {
+    console.log(error);
+    await dbTransaction.rollback();
   }
-
-
-
   console.log('batch credit updater finish');
 };
 const processing = async () => {
@@ -269,13 +233,14 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/10 * * * *', async () => {
+const runner = cron.schedule('*/15 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
   try {
-    await processing();
-    await creditUpdater();
+    // await processing();
+    // await saldoUpdater();
+    // await creditUpdater();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);

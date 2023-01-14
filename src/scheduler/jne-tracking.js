@@ -7,12 +7,36 @@ const {
   OrderDetail,
   SellerDetail,
   OrderHistory,
+  TrackingHistory,
   Seller,
 } = require('../app/models');
 
 
 
+async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note) {
 
+
+  await OrderHistory.findOne({
+    where: { orderId: orderId}
+  }).then(async (result) => {
+    if (result === null) {
+      await OrderHistory.create({
+        orderId: orderId,
+        deltaCredit: deltaCredit,
+        isExecute: isExecute,
+        onHold: onHold,
+        note: note,
+      });
+    } else {
+      console.log('order history existed');
+
+    }
+
+  })
+
+
+
+}
 async function updateSaldo(calculated1, orderDetail) {
   // the updateSaldo is deprecated in favor of creditUpdater() calculation
   //     console.log('credit : ' + orderDetail.seller.sellerDetail.credit);
@@ -94,7 +118,6 @@ const creditUpdate = async () => {
         // updateSaldo(history.deltaCredit,history.orderDetail)
       }),
       );
-
   } catch (error) {
     throw new Error(error);
   }
@@ -140,20 +163,15 @@ const tracking = async () => {
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
-        // console.log('credit id : ' + item.detail.seller.sellerDetail.credit);
         if (!track?.error) {
           // const trackingStatus = track?.history[track?.history?.length - 1];
-          // console.log('POD STATUS :');
-          // console.log(track?.cnote.pod_status);
           // DIBAWAH INI KODE LAMA
           // const currentStatus = getLastStatus(trackingStatus?.code || '');
 
           // RENO
           const currentStatus = getLastStatus(track?.cnote.pod_code || '');
-
-
           // const currentStatus = getLastStatus(historical.code || '');
-          // console.log(`${item.resi  } : ${  currentStatus}`);
+
           track?.history?.forEach((historical) => {
             trackHistories.push({
               orderId: item?.id,
@@ -164,7 +182,38 @@ const tracking = async () => {
               currentStatus: getLastStatus(historical.code || ''),
             });
           });
+          await TrackingHistory.findOne({
+            where: { orderId: item.id }
+          }).then(async (result) => {
+            if (result === null) {
+              await TrackingHistory.create({
+                orderId: item.id,
+                cnoteRaw: JSON.stringify(track?.cnote),
+                detailRaw: JSON.stringify(track?.detail),
+                historyRaw: JSON.stringify(track?.history),
+                cnotePodDate: track.cnote.cnote_pod_date,
+                cnotePodStatus: track.cnote.pod_status,
+                cnotePodCode: track.cnote.pod_code,
+                cnoteLastStatus: track.cnote.last_status,
+                cnoteEstimateDelivery: track.cnote.estimate_delivery,
+              });
+            } else {
+              await TrackingHistory.update({
+                cnoteRaw: JSON.stringify(track?.cnote),
+                detailRaw: JSON.stringify(track?.detail),
+                historyRaw: JSON.stringify(track?.history),
+                  cnotePodDate: track.cnote.cnote_pod_date,
+                  cnotePodStatus: track.cnote.pod_status,
+                  cnotePodCode: track.cnote.pod_code,
+                  cnoteLastStatus: track.cnote.last_status,
+                  cnoteEstimateDelivery: track.cnote.estimate_delivery,
+              },
+                { where: { orderId: item.id } },
+                );
 
+            }
+
+          })
           Order.update(
             {
               status: currentStatus,
@@ -177,40 +226,26 @@ const tracking = async () => {
           // const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
           const orderDetail = item.detail;
           const log =  await OrderLog.findAll({ where: { orderId: item.id } });
-          // console.log(`${item.id} : ${item.resi} : ${currentStatus}`); //RENO
+
+
+
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-              await updateSaldo(calculated_1,orderDetail);
-            await OrderHistory.create({
-              orderId: item.id,
-              deltaCredit: calculated_1,
-              note: currentStatus,
-            });
-            // console.log('order history is created ' + item.orderId);
+              // await updateSaldo(calculated_1,orderDetail);
+              await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await OrderHistory.create({
-              orderId: item.id,
-              deltaCredit: calculated_1,
-              note: currentStatus,
-              isExecute: true,
-            });
-            // console.log('order history is created ' + item.orderId);
+            await addOrderHistory(item.id, calculated_1, true, false, currentStatus);
+
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
-            await updateSaldo(calculated_1,orderDetail);
-            await OrderHistory.create({
-              orderId: item.id,
-              deltaCredit: calculated_1,
-              note: currentStatus,
-              isExecute: false,
-            });
-            // console.log('order history is created ' + item.orderId);
+            // await updateSaldo(calculated_1,orderDetail);
+            await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
           }
 
 
@@ -247,7 +282,6 @@ const tracking = async () => {
         });
 
         if (!log) {
-          // console.log(`create ${  item.note}`);
           await OrderLog.create({
             orderId: item?.orderId,
             previousStatus: item?.previousStatus,
@@ -256,9 +290,6 @@ const tracking = async () => {
             note: item?.note,
           });
         }
-
-
-
 
       }),
     );

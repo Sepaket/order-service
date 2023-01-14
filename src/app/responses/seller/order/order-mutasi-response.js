@@ -11,6 +11,7 @@ const {
   Location,
   OrderLog,
   OrderHistory,
+  TrackingHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -25,6 +26,7 @@ module.exports = class {
     this.sellerAddress = SellerAddress;
     this.converter = snakeCaseConverter;
     this.orderHistory = OrderHistory;
+    this.trackingHistory = TrackingHistory;
     return this.process();
   }
 
@@ -32,22 +34,14 @@ module.exports = class {
     function getSellerReceivedAmount(item) {
       const amount = '';
       let ongkirReturned = 0.00;
-      // console.log(item.order.status);
-      // console.log(item.order);
       ongkirReturned = item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? 0.00 : parseFloat(item.seller_received_amount);
       if (item.order.isCod && (item.order.status === 'RETURN_TO_SELLER')) {
-        // console.log('didalam return to sller');
-        // console.log(item.shipping_calculated);
         ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
       if (item.order.isCod && (item.order.status === 'DELIVERED')) {
-        // console.log('didalam return to sller');
-        // console.log(item.shipping_calculated);
         ongkirReturned = 1 * parseFloat(item.seller_received_amount);
       }
       if (!(item.order.isCod)) {
-        // console.log('didalam return to sller');
-        // console.log(item.shipping_calculated);
         ongkirReturned = item.order.status === 'CANCELED' ? 0.00 : (-1 * parseFloat(item.shipping_calculated));
         // ongkirReturned = -1 * parseFloat(item.shipping_calculated);
       }
@@ -114,9 +108,27 @@ module.exports = class {
             {
               model: this.orderHistory,
               as: 'history',
-              required: true,
+              required: false,
               attributes: [
 'deltaCredit',
+              ],
+            },
+            {
+              model: this.trackingHistory,
+              as: 'tracking',
+              required: false,
+              attributes: [
+                'cnote_raw',
+                'detail_raw',
+                'history_raw',
+                'cnote_pod_date',
+                'cnote_pod_status',
+                'cnote_pod_code',
+                'cnote_last_status',
+                'cnote_estimate_delivery',
+                'createdAt',
+                'updatedAt',
+                'deletedAt',
               ],
             },
             {
@@ -133,8 +145,9 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
                 'status',
-                'updatedAt',
                 'createdAt',
+                'updatedAt',
+                'deletedAt',
               ],
             },
             {
