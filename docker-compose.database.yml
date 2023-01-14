@@ -20,11 +20,13 @@ services:
       PGTZ: "Asia/Jakarta"
     volumes:
       - ./db-data:/var/lib/postgresql/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     entrypoint: ["/bin/sh","-c"]
     command:
       - |
         apt-get update
-        apt-get install -yq tzdata
+        apt-get install tzdata
   adminer:
     image:  "adminer"
     ports:
