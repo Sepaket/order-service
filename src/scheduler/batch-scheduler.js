@@ -238,9 +238,9 @@ const runner = cron.schedule('*/15 * * * *', async () => {
   console.info('batch scheduler run');
 
   try {
-    // await processing();
-    // await saldoUpdater();
-    // await creditUpdater();
+    await processing();
+    await saldoUpdater();
+    await creditUpdater();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);
