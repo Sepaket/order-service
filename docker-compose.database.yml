@@ -20,6 +20,11 @@ services:
       PGTZ: "Asia/Jakarta"
     volumes:
       - ./db-data:/var/lib/postgresql/data
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - |
+        apt-get update
+        apt-get install -yq tzdata
   adminer:
     image:  "adminer"
     ports:
