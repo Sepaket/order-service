@@ -16,4 +16,7 @@ services:
       - /home/express/sepaket/public/file/admin
     ports:
       - 3000:3000
+    environment:
+      TZ: "Asia/Jakarta"
+      PGTZ: "Asia/Jakarta"
     command: "npm run start"

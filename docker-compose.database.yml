@@ -16,6 +16,8 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: "Asia/Jakarta"
+      PGTZ: "Asia/Jakarta"
     volumes:
       - ./db-data:/var/lib/postgresql/data
   adminer:
@@ -26,3 +28,6 @@ services:
     image: redis:alpine
     ports:
       - "6379"
+    environment:
+      TZ: "Asia/Jakarta"
+      PGTZ: "Asia/Jakarta"
