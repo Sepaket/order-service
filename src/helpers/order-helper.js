@@ -270,8 +270,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
     const seller = await SellerDetail.findOne({
       where: { sellerId: params.sellerId },
     });
-// console.log(params.items); //RENO
-//     console.log(queryOrder);
+
     const orders = await Order.bulkCreate(
       queryOrder,
       { transaction: dbTransaction },
