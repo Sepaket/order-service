@@ -12,6 +12,7 @@ const {
   OrderAddress,
   OrderDiscount,
   Ticket,
+  TrackingHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -28,6 +29,7 @@ module.exports = class {
     this.sellerAddress = SellerAddress;
     this.converter = snakeCaseConverter;
     this.ticket = Ticket;
+    this.trackingHistory = TrackingHistory;
     return this.process();
   }
 
@@ -68,6 +70,24 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
                 'status',
+              ],
+            },
+            {
+              model: this.trackingHistory,
+              as: 'tracking',
+              required: false,
+              attributes: [
+                'cnote_raw',
+                'detail_raw',
+                'history_raw',
+                'cnote_pod_date',
+                'cnote_pod_status',
+                'cnote_pod_code',
+                'cnote_last_status',
+                'cnote_estimate_delivery',
+                'createdAt',
+                'updatedAt',
+                'deletedAt',
               ],
             },
             {
