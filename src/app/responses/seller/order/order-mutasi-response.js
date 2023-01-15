@@ -116,7 +116,7 @@ module.exports = class {
             {
               model: this.trackingHistory,
               as: 'tracking',
-              required: false,
+              required: true,
               attributes: [
                 'cnote_raw',
                 'detail_raw',
@@ -242,7 +242,7 @@ module.exports = class {
 
     if (query?.filter_by === 'DATE') {
       filtered = {
-        createdAt: {
+        '$tracking.cnote_pod_date$': {
           [this.op.between]: [
             moment(query.date_start).startOf('day').format(),
             moment(query.date_end).endOf('day').format(),
@@ -253,7 +253,7 @@ module.exports = class {
 
     if (query.filter_by === 'MONTH') {
       filtered = {
-        createdAt: {
+        '$tracking.cnote_pod_date$': {
           [this.op.between]: [
             moment(query.date_start).startOf('month').format(),
             moment(query.date_end).endOf('month').format(),
@@ -263,7 +263,7 @@ module.exports = class {
     }
     if (query.filter_by === 'YEAR') {
       filtered = {
-        createdAt: {
+        '$tracking.cnote_pod_date$': {
           [this.op.between]: [
             moment(query.date_start).startOf('year').format(),
             moment(query.date_end).endOf('year').format(),
@@ -290,7 +290,6 @@ module.exports = class {
       // is_cod: true,
       status: {
         [this.op.notIn]: [
-          // 'WAITING_PICKUP',
           'PROCESSED',
           'WAITING_PICKUP',
           'CANCELED',

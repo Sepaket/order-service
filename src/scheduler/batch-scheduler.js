@@ -226,7 +226,6 @@ const processing = async () => {
       });
     });
 
-    console.log('batch looping finish');
   } catch (error) {
     throw new Error(error?.message);
   }
