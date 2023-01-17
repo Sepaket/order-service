@@ -171,7 +171,7 @@ module.exports = class {
             },
           ],
           where: {
-            // sellerId: seller.id,
+            sellerId: seller.id,
             orderId: params.id,
           },
         }).then(async (response) => {
@@ -180,7 +180,7 @@ module.exports = class {
           );
           // console.log(result)
           if (response != null) {
-            console.log('response is not null')
+            // console.log('response is not null')
 
 
             const orderLogs = await this.orderLog.findAll({

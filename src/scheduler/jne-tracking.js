@@ -51,6 +51,7 @@ async function updateSaldo(calculated1, orderDetail) {
 }
 
 const getLastStatus = (trackingStatus) => {
+  // console.log('tracking status : ' + trackingStatus);
   let currentStatus = '';
   if (orderStatus.PROCESSED.statuses.JNE.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.PROCESSED.text;
@@ -71,7 +72,7 @@ const getLastStatus = (trackingStatus) => {
   if (orderStatus.PROBLEM.statuses.JNE.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.PROBLEM.text;
   }
-
+  // console.log('curn : ' + currentStatus)
   return currentStatus;
 };
 const creditUpdate = async () => {
@@ -163,13 +164,28 @@ const tracking = async () => {
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
+
+
         if (!track?.error) {
           // const trackingStatus = track?.history[track?.history?.length - 1];
           // DIBAWAH INI KODE LAMA
           // const currentStatus = getLastStatus(trackingStatus?.code || '');
 
+        let currentStatus = '';
+
           // RENO
-          const currentStatus = getLastStatus(track?.cnote.pod_code || '');
+          if (track?.cnote.pod_code === null) {
+            currentStatus = 'PROCESSED';
+          } else {
+            currentStatus = getLastStatus(track?.cnote.pod_code || '');
+            // if (item.resi === 'SPKET67305290054') {
+            //   console.log('resi : ' + item.resi);
+            //   console.log(track?.cnote.pod_code);
+            //   console.log(track?.cnote.pod_status);
+            //   console.log(currentStatus);
+            // }
+          }
+
           // const currentStatus = getLastStatus(historical.code || '');
 
           track?.history?.forEach((historical) => {
@@ -181,6 +197,10 @@ const tracking = async () => {
               // podStatus: trackingStatus?.code,
               currentStatus: getLastStatus(historical.code || ''),
             });
+            // if (item.resi === 'SPKET67305290054') {
+            //   console.log('resi : ' + item.resi);
+            //   console.log(historical.code);
+            // }
           });
           await TrackingHistory.findOne({
             where: { orderId: item.id }
@@ -214,6 +234,7 @@ const tracking = async () => {
             }
 
           })
+
           Order.update(
             {
               status: currentStatus,
