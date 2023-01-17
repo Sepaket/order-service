@@ -299,11 +299,9 @@ module.exports = class {
       },
       // is_cod: true,
       status: {
-        [this.op.notIn]: [
-          'PROCESSED',
-          'WAITING_PICKUP',
-          'CANCELED',
-          'PROBLEM',
+        [this.op.in]: [
+          'DELIVERED',
+          'RETURN_TO_SELLER',
         ],
       },
     };
