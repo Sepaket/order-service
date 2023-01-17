@@ -175,8 +175,6 @@ module.exports = class {
             orderId: params.id,
           },
         }).then(async (response) => {
-          console.log('got order details : ' + params.id)
-          console.log('seller id  : ' + seller.id)
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );

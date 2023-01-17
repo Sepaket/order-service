@@ -274,10 +274,10 @@ module.exports = class {
     if (query.filter_by === 'ALL') {
       filtered = {
         '$tracking.cnote_pod_date$': {
-          // [this.op.between]: [
-          //   moment(query.date_start).startOf('year').format(),
-          //   moment(query.date_end).endOf('year').format(),
-          // ],
+          [this.op.between]: [
+            // moment(query.date_start).startOf('year').format(),
+            // moment(query.date_end).endOf('year').format(),
+          ],
         },
       };
     }

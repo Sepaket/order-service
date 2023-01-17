@@ -69,12 +69,10 @@ module.exports = {
 
 
   mutasi: async (request, response, next) => {
-    console.log('order mutasi');
     try {
       await MutasiValidator(request.query);
-
       const result = await new OrderMutasiResponse({ request });
-
+      console.log('validaso lewat 3');
       response.send({
         code: 200,
         message: 'OK',
@@ -86,12 +84,9 @@ module.exports = {
   },
 
   detail: async (request, response, next) => {
-    console.log('order detail');
     try {
       await OrderDetailValidator(request);
-
       const result = await new OrderDetailResponse({ request });
-
       response.send({
         code: 200,
         message: 'OK',
