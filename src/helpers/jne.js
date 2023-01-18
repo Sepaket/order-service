@@ -48,7 +48,7 @@ const payloadFormatter = (payload) => {
   payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
   payload['PICKUP_PIC'] = payload['PICKUP_PIC'].escapeSpecialCharsInJSONString();
   payload['PICKUP_NAME'] = payload['PICKUP_NAME'].escapeSpecialCharsInJSONString();
-  payload['SHIPPER_NAME'] = payload['SHIPPER_NAME'].escapeSpecialCharsInJSONString();
+  payload['SHIPPER_NAME'] = payload['SENDER_NAME'].escapeSpecialCharsInJSONString();
   payload['SHIPPER_CONTACT'] = payload['SHIPPER_CONTACT'].escapeSpecialCharsInJSONString();
   payload['SHIPPER_ADDR1'] = payload['SHIPPER_ADDR1'].escapeSpecialCharsInJSONString();
   payload['SHIPPER_ADDR2'] = payload['SHIPPER_ADDR2'].escapeSpecialCharsInJSONString();
@@ -76,7 +76,7 @@ const parameter = (payload) => new Promise((resolve, reject) => {
       pickup_name: this.sellerData?.name || '',
       pickup_date: payload.pickup_date.split('-').reverse().join('-'),
       pickup_time: payload.pickup_time,
-      pickup_pic: payload.sellerAddress?.picName || '',
+      pickup_pic: (payload.sellerAddress?.picName).escapeSpecialCharsInJSONString().slice(0,80) || '',
       pickup_pic_phone: payload.sellerAddress?.picPhoneNumber || '',
       pickup_address: payload.sellerAddress?.address || '',
       pickup_district: payload.origin?.district || '',
@@ -86,15 +86,15 @@ const parameter = (payload) => new Promise((resolve, reject) => {
       branch: payload.origin?.jneOriginCode || '',
       cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
       order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
-      shipper_name: payload.sender_name || '',
+      shipper_name: (payload.sender_name).escapeSpecialCharsInJSONString() || '',
       shipper_addr1: payload.sellerAddress?.address?.slice(0, 80) || '',
       shipper_city: payload.origin?.city || '',
       shipper_zip: payload.origin?.postalCode || '',
       shipper_region: payload.origin?.province || '',
       shipper_country: 'Indonesia',
-      shipper_contact: payload.sender_name,
+      shipper_contact: (payload.sender_name).escapeSpecialCharsInJSONString(),
       shipper_phone: this.sellerAddress?.picPhoneNumber || '',
-      receiver_name: payload.receiver_name,
+      receiver_name: (payload.receiver_name).escapeSpecialCharsInJSONString(),
       receiver_addr1: payload.receiver_address,
       receiver_city: payload.destination?.city || '',
       receiver_zip: payload.destination?.postalCode || '',
