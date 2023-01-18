@@ -87,7 +87,7 @@ const parameter = (payload) => new Promise((resolve, reject) => {
       cust_id: payload.is_cod ? process.env.JNE_CUSTOMER_COD : process.env.JNE_CUSTOMER_NCOD,
       order_id: `${shortid.generate()}${moment().format('YYMDHHmmss')}`,
       shipper_name: payload.sender_name || '',
-      shipper_addr1: payload.sellerAddress?.address? || '',
+      shipper_addr1: payload.sellerAddress?.address || '',
       shipper_city: payload.origin?.city || '',
       shipper_zip: payload.origin?.postalCode || '',
       shipper_region: payload.origin?.province || '',
