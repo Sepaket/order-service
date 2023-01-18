@@ -49,7 +49,7 @@ module.exports = class {
       return String(ongkirReturned.toFixed(2));
     }
 
-    const limit = 10;
+    let limit = 10;
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
@@ -78,6 +78,11 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
+        if (query.limit) {
+          limit = parseInt(query.limit, 10);
+        } else {
+          limit = null;
+        }
         this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
@@ -179,7 +184,7 @@ module.exports = class {
           ],
           where: whereCondition,
           order: [['id', 'DESC']],
-          limit: parseInt(query.limit, 10) || parseInt(limit, 10),
+          limit: limit,
           offset: nextPage,
         }).then((response) => {
           const result = this.converter.arrayToSnakeCase(
