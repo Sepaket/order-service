@@ -74,6 +74,7 @@ router.group('/balance', (route) => {
 
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
+  route.get('/all', Authorization, OrderController.listall);
   route.get('/batch', Authorization, OrderController.batch);
   route.post('/export', Authorization, OrderController.export);
   route.post('/print', Authorization, OrderController.print);

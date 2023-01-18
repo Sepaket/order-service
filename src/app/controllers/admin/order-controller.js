@@ -9,6 +9,7 @@ const OrderListResponse = require('../../responses/admin/order/order-list-respon
 const OrderDetailResponse = require('../../responses/admin/order/order-detail-response');
 const ExportResponse = require('../../responses/admin/order/order-export-response');
 const PrintResponse = require('../../responses/admin/order/order-print-response');
+const OrderListallResponse = require('../../responses/seller/order/order-listall-response');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -58,6 +59,24 @@ module.exports = {
       next(error);
     }
   },
+
+  listall: async (request, response, next) => {
+    try {
+      await OrderListValidator(request.query);
+
+      const result = await new OrderListallResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
 
   export: async (request, response, next) => {
     try {
