@@ -29,7 +29,7 @@ module.exports = class {
   }
 
   async process() {
-    const limit = 10;
+    const limit = null;
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
@@ -49,18 +49,18 @@ module.exports = class {
         this.orderDetail.findAll({
           attributes: [
             'orderId',
-            'totalItem',
-            'notes',
-            'weight',
-            'volume',
-            'goodsContent',
-            'shippingCharge',
-            'useInsurance',
-            'insuranceAmount',
-            'sellerReceivedAmount',
-            'codFee',
-            'goodsPrice',
-            'codFeeAdmin',
+            // 'totalItem',
+            // 'notes',
+            // 'weight',
+            // 'volume',
+            // 'goodsContent',
+            // 'shippingCharge',
+            // 'useInsurance',
+            // 'insuranceAmount',
+            // 'sellerReceivedAmount',
+            // 'codFee',
+            // 'goodsPrice',
+            // 'codFeeAdmin',
           ],
           include: [
             {
@@ -72,21 +72,21 @@ module.exports = class {
                 'receiverName',
               ],
             },
-            {
-              model: this.ticket,
-              as: 'ticket',
-              required: false,
-              attributes: [
-                'id',
-                'title',
-                'message',
-                'category',
-                'priority',
-                'status',
-                'created_at',
-                'updated_at'
-              ],
-            },
+            // {
+            //   model: this.ticket,
+            //   as: 'ticket',
+            //   required: false,
+            //   attributes: [
+            //     'id',
+            //     'title',
+            //     'message',
+            //     'category',
+            //     'priority',
+            //     'status',
+            //     'created_at',
+            //     'updated_at'
+            //   ],
+            // },
             {
               model: this.order,
               as: 'order',
@@ -95,46 +95,46 @@ module.exports = class {
               attributes: [
                 'orderCode',
                 'resi',
-                'orderDate',
-                'orderTime',
-                'expedition',
-                'serviceCode',
-                'isCod',
-                'status',
-                'updatedAt',
-                'createdAt',
+                // 'orderDate',
+                // 'orderTime',
+                // 'expedition',
+                // 'serviceCode',
+                // 'isCod',
+                // 'status',
+                // 'updatedAt',
+                // 'createdAt',
               ],
             },
-            {
-              model: this.sellerAddress,
-              as: 'sellerAddress',
-              required: false,
-              attributes: [
-                ['id', 'seller_address_id'],
-                'address',
-                'picName',
-                'picPhoneNumber',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
+            // {
+            //   model: this.sellerAddress,
+            //   as: 'sellerAddress',
+            //   required: false,
+            //   attributes: [
+            //     ['id', 'seller_address_id'],
+            //     'address',
+            //     'picName',
+            //     'picPhoneNumber',
+            //   ],
+            //   include: [
+            //     {
+            //       model: this.location,
+            //       as: 'location',
+            //       required: false,
+            //       attributes: [
+            //         ['id', 'location_id'],
+            //         'province',
+            //         'city',
+            //         'district',
+            //         'subDistrict',
+            //         'postalCode',
+            //       ],
+            //     },
+            //   ],
+            // },
           ],
           where: whereCondition,
           order: [['id', 'DESC']],
-          limit: parseInt(query.limit, 10) || parseInt(limit, 10),
+          // limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
         }).then((response) => {
           const result = this.converter.arrayToSnakeCase(

@@ -9,7 +9,7 @@ const OrderListResponse = require('../../responses/admin/order/order-list-respon
 const OrderDetailResponse = require('../../responses/admin/order/order-detail-response');
 const ExportResponse = require('../../responses/admin/order/order-export-response');
 const PrintResponse = require('../../responses/admin/order/order-print-response');
-const OrderListallResponse = require('../../responses/seller/order/order-listall-response');
+const OrderListallResponse = require('../../responses/admin/order/order-listall-response');
 
 module.exports = {
   batch: async (request, response, next) => {
