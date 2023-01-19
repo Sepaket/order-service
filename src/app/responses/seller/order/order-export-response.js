@@ -54,6 +54,8 @@ module.exports = class {
             'shippingCharge',
             'sellerReceivedAmount',
             'shippingCalculated',
+            'createdAt',
+            'updatedAt',
           ],
           include: [
             {
