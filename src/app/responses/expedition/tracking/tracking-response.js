@@ -24,7 +24,7 @@ module.exports = class {
   async process() {
     const { body } = this.request;
     const seller = await jwtSelector({ request: this.request });
-
+    // console.log(seller);
     return new Promise((resolve, reject) => {
       try {
         this.orderDetail.findOne({
@@ -40,7 +40,7 @@ module.exports = class {
             {
               model: this.trackingHistory,
               as: 'tracking',
-              required: true,
+              required: false,
               attributes: [
                 'cnote_raw',
                 'detail_raw',
@@ -60,6 +60,7 @@ module.exports = class {
             sellerId: seller.id,
           },
         }).then(async (response) => {
+          // console.log(response);
           const statuses = await this.orderLog.findAll({
             order: [['id', 'ASC']],
             attributes: [
