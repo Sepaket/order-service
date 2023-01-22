@@ -60,28 +60,32 @@ module.exports = class {
             sellerId: seller.id,
           },
         }).then(async (response) => {
-          // console.log(response);
-          const statuses = await this.orderLog.findAll({
-            order: [['id', 'ASC']],
-            attributes: [
-              ['id', 'status_id'],
-              'note',
-              'orderId',
-              'previousStatus',
-              'currentStatus',
-              'createdAt',
-            ],
-            where: {
-              orderId: response.orderId,
-            },
-          });
+          if (response === null) {
+            reject(httpErrors(404, 'No Data Found', { data: null }));
+          } else {
+            const statuses = await this.orderLog.findAll({
+              order: [['id', 'ASC']],
+              attributes: [
+                ['id', 'status_id'],
+                'note',
+                'orderId',
+                'previousStatus',
+                'currentStatus',
+                'createdAt',
+              ],
+              where: {
+                orderId: response.orderId,
+              },
+            });
 
-          const result = this.converter.arrayToSnakeCase(
-            JSON.parse(JSON.stringify(response)),
-          );
+            const result = this.converter.arrayToSnakeCase(
+              JSON.parse(JSON.stringify(response)),
+            );
 
-          if (statuses?.length > 0) resolve(result);
-          else reject(httpErrors(404, 'No Data Found', { data: null }));
+            if (statuses?.length > 0) resolve(result);
+            else reject(httpErrors(404, 'No Data Found', { data: null }));
+          }
+
         });
       } catch (error) {
         reject(error);
