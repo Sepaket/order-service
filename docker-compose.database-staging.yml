@@ -1,0 +1,40 @@
+version: "3.7"
+
+networks:
+  default:
+    external:
+      name:
+        local
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: sepaket_postgres
+    ports:
+      - 3111:5432
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: "Asia/Jakarta"
+      PGTZ: "Asia/Jakarta"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - |
+        apt-get update
+        apt-get install tzdata
+  adminer:
+    image:  "adminer"
+    ports:
+      - "8080:8080"
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379"
+    environment:
+      TZ: "Asia/Jakarta"
+      PGTZ: "Asia/Jakarta"

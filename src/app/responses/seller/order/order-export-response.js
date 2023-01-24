@@ -14,6 +14,7 @@ const {
   SellerAddress,
   OrderDiscount,
   Seller,
+  TrackingHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -30,6 +31,7 @@ module.exports = class {
     this.sellerAddress = SellerAddress;
     this.orderDiscount = OrderDiscount;
     this.seller = Seller;
+    this.trackingHistory = TrackingHistory,
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -77,11 +79,29 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
                 'status',
-                'pod_status',
+                // 'pod_status',
                 'orderDate',
                 'orderTime',
                 'createdAt',
                 'updatedAt',
+              ],
+            },
+            {
+              model: this.trackingHistory,
+              as: 'tracking',
+              required: false,
+              attributes: [
+                'cnote_raw',
+                'detail_raw',
+                'history_raw',
+                'cnote_pod_date',
+                'cnote_pod_status',
+                'cnote_pod_code',
+                'cnote_last_status',
+                'cnote_estimate_delivery',
+                'createdAt',
+                'updatedAt',
+                'deletedAt',
               ],
             },
             {
@@ -139,6 +159,51 @@ module.exports = class {
                     'district',
                     'subDistrict',
                     'postalCode',
+                    'jne_origin_code',
+                    'jne_destination_code',
+                    'sicepat_origin_code',
+                    'sicepat_destination_code',
+                    'ninja_origin_code',
+                    'ninja_destination_code',
+                  ],
+                },
+              ],
+            },
+            {
+              model: this.sellerAddress,
+              as: 'sellerAddress',
+              required: true,
+              attributes: [
+                ['id', 'seller_address_id'],
+                'name',
+                'picName',
+                'picPhoneNumber',
+                'address',
+                'hideInResi',
+                // 'senderPhone',
+                // 'receiverName',
+                // 'receiverPhone',
+                // 'receiverAddress',
+                // 'receiverAddressNote',
+              ],
+              include: [
+                {
+                  model: this.location,
+                  as: 'location',
+                  required: false,
+                  attributes: [
+                    ['id', 'location_id'],
+                    'province',
+                    'city',
+                    'district',
+                    'subDistrict',
+                    'postalCode',
+                    'jne_origin_code',
+                    'jne_destination_code',
+                    'sicepat_origin_code',
+                    'sicepat_destination_code',
+                    'ninja_origin_code',
+                    'ninja_destination_code',
                   ],
                 },
               ],
