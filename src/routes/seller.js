@@ -59,11 +59,15 @@ router.group('/reports', (route) => {
   route.get('/total-order', Authorization, ReportController.totalOrder);
   route.get('/waiting-for-pickup', Authorization, ReportController.waitingForPickup);
   route.get('/cod-processing', Authorization, ReportController.codProcessing);
+  route.get('/cod-processing-total', Authorization, ReportController.codProcessingTotal);
   route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);
+  route.get('/non-cod-processing-total', Authorization, ReportController.nonCodProcessingTotal);
   route.get('/percentage-processing', Authorization, ReportController.percentageProcessing);
   route.get('/cod-sent', Authorization, ReportController.codSent);
+  route.get('/cod-sent-total', Authorization, ReportController.codSentTotal);
   route.get('/cod-total', Authorization, ReportController.codTotal);
   route.get('/non-cod-sent', Authorization, ReportController.nonCodSent);
+  route.get('/non-cod-sent-total', Authorization, ReportController.nonCodSentTotal);
   route.get('/return-to-seller', Authorization, ReportController.returnToSeller);
   route.get('/need-attention', Authorization, ReportController.needAttention);
   route.get('/rate-retur', Authorization, ReportController.rateRetur);

@@ -14,25 +14,21 @@ module.exports = class {
   }
 
   async process() {
+    const referalCode = shortid.generate();
     const dbTransaction = await sequelize.transaction();
-    console.log("inside process");
     try {
       const parameterMapper = await this.mapper();
-      console.log("after mapper");
       const seller = await this.seller.create(
         { ...parameterMapper },
         { transaction: dbTransaction },
       );
-      console.log("after create");
       await this.sellerDetail.create(
-        { sellerId: seller.id },
+        { sellerId: seller.id, referalCode: referalCode},
         { transaction: dbTransaction },
       );
-      console.log("after sellerdetail create");
       await this.send();
       console.log('sending...');
       await dbTransaction.commit();
-      console.log("After db transact commit")
       return true;
     } catch (error) {
       console.log(error);

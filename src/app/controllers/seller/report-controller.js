@@ -2,11 +2,15 @@ const OrderTotalChartValidator = require('../../validators/seller/report/order-t
 
 const TotalOrderReponse = require('../../responses/seller/report/seller-report-total-order');
 const WaitingFormPickupReponse = require('../../responses/seller/report/seller-report-waiting-for-pickup');
+const CodProcessingTotalReponse = require('../../responses/seller/report/seller-report-cod-processing-total');
 const CodProcessingReponse = require('../../responses/seller/report/seller-report-cod-processing');
 const NonCodProcessingReponse = require('../../responses/seller/report/seller-report-non-cod-processing');
+const NonCodProcessingTotalReponse = require('../../responses/seller/report/seller-report-non-cod-processing-total');
 const PercentageProcessingReponse = require('../../responses/seller/report/seller-report-percentage-processing');
 const CodSentReponse = require('../../responses/seller/report/seller-report-cod-sent');
+const CodSentTotalReponse = require('../../responses/seller/report/seller-report-cod-sent-total');
 const NonCodSentReponse = require('../../responses/seller/report/seller-report-non-cod-sent');
+const NonCodSentTotalReponse = require('../../responses/seller/report/seller-report-non-cod-sent-total');
 const CodTotalReponse = require('../../responses/seller/report/seller-report-cod-total');
 const ReturnToSellerReponse = require('../../responses/seller/report/seller-report-return-to-seller');
 const NeedAttentionReponse = require('../../responses/seller/report/seller-report-need-attention');
@@ -49,6 +53,20 @@ module.exports = {
     }
   },
 
+  codProcessingTotal: async (request, response, next) => {
+    try {
+      const result = await new CodProcessingTotalReponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
 
   nonCodProcessing: async (request, response, next) => {
     try {
@@ -61,6 +79,21 @@ module.exports = {
         count : resultCount,
         data: resultCount,
         items : result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  nonCodProcessingTotal: async (request, response, next) => {
+    try {
+      await MutasiValidator(request.query);
+      const result = await new NonCodProcessingTotalReponse({ request });
+      const resultCount = result.length;
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
       });
     } catch (error) {
       next(error);
@@ -83,9 +116,26 @@ module.exports = {
 
   codSent: async (request, response, next) => {
     try {
-      console.log('cod sent response');
       await MutasiValidator(request.query);
       const result = await new CodSentReponse({ request });
+      // const resultCount = result.length;
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+        // count : resultCount,
+        // data: resultCount,
+        // items : result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  codSentTotal: async (request, response, next) => {
+    try {
+      await MutasiValidator(request.query);
+      const result = await new CodSentTotalReponse({ request });
       // const resultCount = result.length;
       response.send({
         code: 200,
@@ -122,7 +172,6 @@ module.exports = {
   nonCodSent: async (request, response, next) => {
     try {
       await MutasiValidator(request.query);
-      console.log('NON cod sent response');
       const result = await new NonCodSentReponse({ request });
       const resultCount = result.length;
       response.send({
@@ -131,6 +180,20 @@ module.exports = {
         count : resultCount,
         data: resultCount,
         items : result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  nonCodSentTotal: async (request, response, next) => {
+    try {
+      await MutasiValidator(request.query);
+      const result = await new NonCodSentTotalReponse({ request });
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
       });
     } catch (error) {
       next(error);

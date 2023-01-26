@@ -26,7 +26,6 @@ module.exports = class {
           },
         ],
       }).then((credential) => {
-        console.log('masuk sini');
         if (!credential) return reject(httpErrors(400, 'Email not found'));
         if (!credential.isNew) {
           console.log("ada maslaah di credential");
