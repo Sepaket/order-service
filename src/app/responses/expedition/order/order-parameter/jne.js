@@ -43,7 +43,7 @@ const parameterHandler = ({ payload }) => ({
   goods_amount: payload?.goodsAmount,
   insurance_flag: payload?.is_insurance ? 'Y' : 'N',
   special_ins: payload?.notes.slice(0, 55) || 'FRAGILE',
-  merchant_id: parseInt(`${payload?.seller?.id}${payload?.sellerLocation?.id}`, 10),
+  merchant_id: `${payload?.seller?.id}-${payload?.sellerLocation?.id}`,
   type: 'PICKUP',
   cod_flag: payload?.is_cod ? 'Y' : 'N',
   cod_amount: payload?.is_cod ? payload?.cod_value : 0,

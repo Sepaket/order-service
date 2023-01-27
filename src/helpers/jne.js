@@ -193,20 +193,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
 
 const createOrder = (payload) => new Promise((resolve) => {
   try {
-    // console.log(qs.stringify({
-    //   username: process.env.JNE_USERNAME,
-    //   api_key: process.env.JNE_APIKEY,
-    //   ...payload,
-    // }));
-    // console.log('jne.js - create order');
-    console.log('==============');
-    // var pars = this.parameter(payload);
-    // console.log(pars);
-    // payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
-
     const payloadFormatted = payloadFormatter(payload);
-    // console.log(parameter(payload));
-    // console.log(JSON.stringify(payload));
     const payloadStringify = qs.stringify({
       username: process.env.JNE_USERNAME,
       api_key: process.env.JNE_APIKEY,
