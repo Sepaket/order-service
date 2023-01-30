@@ -172,7 +172,7 @@ module.exports = class {
     const { query } = this.request;
     let filtered = {};
 
-    if (query?.filter_by === 'DATE') {
+
       console.log('DATE');
       filtered = {
         createdAt: {
@@ -182,29 +182,8 @@ module.exports = class {
           ],
         },
       };
-    }
 
-    if (query.filter_by === 'MONTH') {
-      filtered = {
-        createdAt: {
-          [this.op.between]: [
-            moment(query.date_start).startOf('month').format(),
-            moment(query.date_end).endOf('month').format(),
-          ],
-        },
-      };
-    }
 
-    if (query.filter_by === 'YEAR') {
-      filtered = {
-        createdAt: {
-          [this.op.between]: [
-            moment(query.date_start).startOf('year').format(),
-            moment(query.date_end).endOf('year').format(),
-          ],
-        },
-      };
-    }
 
 
     const condition = {

@@ -192,7 +192,6 @@ module.exports = class {
     //   };
     // }
 
-    if (query?.filter_by === 'DATE') {
       filtered = {
         createdAt: {
           [this.op.between]: [
@@ -201,29 +200,8 @@ module.exports = class {
           ],
         },
       };
-    }
 
-    if (query.filter_by === 'MONTH') {
-      filtered = {
-        createdAt: {
-          [this.op.between]: [
-            moment(query.start_date).startOf('month').format(),
-            moment(query.end_date).endOf('month').format(),
-          ],
-        },
-      };
-    }
 
-    if (query.filter_by === 'YEAR') {
-      filtered = {
-        createdAt: {
-          [this.op.between]: [
-            moment(query.start_date).startOf('year').format(),
-            moment(query.end_date).endOf('year').format(),
-          ],
-        },
-      };
-    }
 
     const condition = {
       [this.op.and]: {
