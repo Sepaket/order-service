@@ -87,9 +87,8 @@ module.exports = {
 
   nonCodProcessingTotal: async (request, response, next) => {
     try {
-      await MutasiValidator(request.query);
       const result = await new NonCodProcessingTotalReponse({ request });
-      const resultCount = result.length;
+      // const resultCount = result.length;
       response.send({
         code: 200,
         message: 'OK',
@@ -134,7 +133,7 @@ module.exports = {
 
   codSentTotal: async (request, response, next) => {
     try {
-      await MutasiValidator(request.query);
+      // await MutasiValidator(request.query);
       const result = await new CodSentTotalReponse({ request });
       // const resultCount = result.length;
       response.send({
@@ -188,7 +187,7 @@ module.exports = {
 
   nonCodSentTotal: async (request, response, next) => {
     try {
-      await MutasiValidator(request.query);
+      // await MutasiValidator(request.query);
       const result = await new NonCodSentTotalReponse({ request });
       response.send({
         code: 200,

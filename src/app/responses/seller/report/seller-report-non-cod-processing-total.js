@@ -15,6 +15,7 @@ const httpErrors = require('http-errors');
 
 module.exports = class {
   constructor({ request }) {
+    console.log('non cod processing total');
     this.request = request;
     this.order = Order;
     this.op = Sequelize.Op;
@@ -169,15 +170,15 @@ module.exports = class {
     });
   }
 
-querySearch() {
+  querySearch() {
   const { query } = this.request;
   let filtered = {};
   if (query?.filter_by === 'DATE') {
     filtered = {
       createdAt: {
         [this.op.between]: [
-          moment(query.date_start).startOf('day').format(),
-          moment(query.date_end).endOf('day').format(),
+          moment(query.start_date).startOf('day').format(),
+          moment(query.end_date).endOf('day').format(),
         ],
       },
     };
@@ -187,8 +188,8 @@ querySearch() {
     filtered = {
       createdAt: {
         [this.op.between]: [
-          moment(query.date_start).startOf('month').format(),
-          moment(query.date_end).endOf('month').format(),
+          moment(query.start_date).startOf('month').format(),
+          moment(query.end_date).endOf('month').format(),
         ],
       },
     };
@@ -198,8 +199,8 @@ querySearch() {
     filtered = {
       createdAt: {
         [this.op.between]: [
-          moment(query.date_start).startOf('year').format(),
-          moment(query.date_end).endOf('year').format(),
+          moment(query.start_date).startOf('year').format(),
+          moment(query.end_date).endOf('year').format(),
         ],
       },
     };

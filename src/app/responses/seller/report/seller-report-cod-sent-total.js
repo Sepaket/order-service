@@ -196,8 +196,8 @@ module.exports = class {
       filtered = {
         createdAt: {
           [this.op.between]: [
-            moment(query.date_start).startOf('day').format(),
-            moment(query.date_end).endOf('day').format(),
+            moment(query.start_date).startOf('day').format(),
+            moment(query.end_date).endOf('day').format(),
           ],
         },
       };
@@ -207,8 +207,8 @@ module.exports = class {
       filtered = {
         createdAt: {
           [this.op.between]: [
-            moment(query.date_start).startOf('month').format(),
-            moment(query.date_end).endOf('month').format(),
+            moment(query.start_date).startOf('month').format(),
+            moment(query.end_date).endOf('month').format(),
           ],
         },
       };
@@ -218,8 +218,8 @@ module.exports = class {
       filtered = {
         createdAt: {
           [this.op.between]: [
-            moment(query.date_start).startOf('year').format(),
-            moment(query.date_end).endOf('year').format(),
+            moment(query.start_date).startOf('year').format(),
+            moment(query.end_date).endOf('year').format(),
           ],
         },
       };
