@@ -87,6 +87,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
+    referralRate: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    referralRateType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    referredSellerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -137,29 +149,23 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
-
     model.OrderDetail.belongsTo(model.Ticket, {
       as: 'ticket',
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
 
-
-
-      // model.OrderDiscount.belongsTo(model.OrderDetail, {
-      //   as: 'orderDetail',
-      //   foreignKey: 'orderId',
-      //   targetKey: 'orderId',
-      // });
-
+    // model.OrderDiscount.belongsTo(model.OrderDetail, {
+    //   as: 'orderDetail',
+    //   foreignKey: 'orderId',
+    //   targetKey: 'orderId',
+    // });
 
     model.OrderDetail.belongsTo(model.OrderDiscount, {
       as: 'discount',
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
-
-
 
     model.OrderDetail.belongsTo(model.OrderBatch, {
       as: 'batch',
@@ -178,9 +184,6 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
-
-
-
   };
 
   return OrderDetail;

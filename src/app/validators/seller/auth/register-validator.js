@@ -1,4 +1,4 @@
-const joi = require('joi');
+ const joi = require('joi');
 const { Seller } = require('../../../models');
 
 const isDuplicate = async (request) => new Promise((resolve, reject) => {
@@ -22,6 +22,7 @@ const validator = joi.object({
     .required(),
   password_confirmation: joi.ref('password'),
   phone: joi.number().min(10).required(),
+  referral_code: joi.string(),
 });
 
 module.exports = (object) => validator.validateAsync(object, {

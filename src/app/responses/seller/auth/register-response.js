@@ -22,16 +22,20 @@ module.exports = class {
         { ...parameterMapper },
         { transaction: dbTransaction },
       );
-      await this.sellerDetail.create(
-        { sellerId: seller.id, referalCode: referalCode},
-        { transaction: dbTransaction },
-      );
-      await this.send();
-      console.log('sending...');
-      await dbTransaction.commit();
-      return true;
+
+      if (parameterMapper.referredSellerId == null) {
+        throw new Error('invalid referral code');
+      } else {
+        await this.sellerDetail.create(
+          { sellerId: seller.id, referalCode: referalCode, referredSellerId: parameterMapper.referredSellerId},
+          { transaction: dbTransaction },
+        );
+        await this.send();
+        await dbTransaction.commit();
+        return true;
+      }
+
     } catch (error) {
-      console.log(error);
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
@@ -39,13 +43,29 @@ module.exports = class {
 
   async mapper() {
     const { body } = this.request;
+    let referredSellerId;
+    if (body.referral_code != null) {
+      const isExists = await SellerDetail.findOne({
+        attributes: [
+          'id',
+          'sellerId',
+        ],
+        where: {
+          referalCode: body.referral_code,
+        },
+      });
 
+      if (isExists !== null) {
+        referredSellerId = isExists.sellerId;
+      }
+    }
     return {
       name: body.name,
       email: body.email,
       password: await hash({ payload: body.password }),
       phone: body.phone,
       isNew: true,
+      referredSellerId,
     };
   }
 
