@@ -102,7 +102,7 @@ module.exports = class {
                 'priority',
                 'status',
                 'created_at',
-                'updated_at'
+                'updated_at',
               ],
             },
             {
@@ -117,6 +117,7 @@ module.exports = class {
               model: this.sellerAddress,
               as: 'sellerAddress',
               required: false,
+              paranoid: false,
               attributes: [
                 ['id', 'seller_address_id'],
                 'address',
@@ -128,6 +129,7 @@ module.exports = class {
                 {
                   model: this.location,
                   as: 'location',
+                  paranoid: false,
                   required: false,
                   attributes: [
                     ['id', 'location_id'],
@@ -144,6 +146,7 @@ module.exports = class {
               model: this.orderAddress,
               as: 'receiverAddress',
               required: false,
+              paranoid: false,
               attributes: [
                 ['id', 'address_receiver_id'],
                 'senderName',
@@ -157,6 +160,7 @@ module.exports = class {
                 {
                   model: this.location,
                   as: 'location',
+                  paranoid: false,
                   required: false,
                   attributes: [
                     ['id', 'location_id'],
@@ -173,7 +177,7 @@ module.exports = class {
           where: {
             sellerId: seller.id,
             orderId: params.id,
-          },paranoid: false,
+          },
         }).then(async (response) => {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
@@ -181,7 +185,6 @@ module.exports = class {
           // console.log(result)
           if (response != null) {
             // console.log('response is not null')
-
 
             const orderLogs = await this.orderLog.findAll({
               attributes: [
@@ -243,20 +246,15 @@ module.exports = class {
             }
 
             result.shipping_charge = parseFloat(shippingCalculated);
-
           } else {
-            console.log('RESPONSE IS ELSE')
+            console.log('RESPONSE IS ELSE');
           }
-
-
-
-
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
         });
       } catch (error) {
-        console.log('this is error for detail response')
+        console.log('this is error for detail response');
         reject(error);
       }
     });
