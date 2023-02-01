@@ -22,7 +22,7 @@ const validator = joi.object({
     .required(),
   password_confirmation: joi.ref('password'),
   phone: joi.number().min(10).required(),
-  referral_code: joi.string(),
+  referral_code: joi.string().allow(null),
 });
 
 module.exports = (object) => validator.validateAsync(object, {

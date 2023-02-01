@@ -23,9 +23,6 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
-      if (parameterMapper.referredSellerId == null) {
-        throw new Error('invalid referral code');
-      } else {
         await this.sellerDetail.create(
           { sellerId: seller.id, referalCode: referalCode, referredSellerId: parameterMapper.referredSellerId},
           { transaction: dbTransaction },
@@ -33,8 +30,6 @@ module.exports = class {
         await this.send();
         await dbTransaction.commit();
         return true;
-      }
-
     } catch (error) {
       await dbTransaction.rollback();
       throw new Error(httpErrors(500, error.message, { data: false }));
@@ -57,7 +52,11 @@ module.exports = class {
 
       if (isExists !== null) {
         referredSellerId = isExists.sellerId;
+      } else {
+        throw new Error('invalid referral code');
       }
+    } else {
+
     }
     return {
       name: body.name,
