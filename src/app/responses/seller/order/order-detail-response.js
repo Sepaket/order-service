@@ -173,7 +173,7 @@ module.exports = class {
           where: {
             sellerId: seller.id,
             orderId: params.id,
-          },
+          },paranoid: false,
         }).then(async (response) => {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
