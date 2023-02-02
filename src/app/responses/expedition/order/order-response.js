@@ -97,7 +97,26 @@ module.exports = class {
 
       const seller = await this.seller.findOne({
         where: { id: sellerId.id },
-        include: [{ model: this.sellerDetail, as: 'sellerDetail' }],
+        include: [
+          { model: this.sellerDetail, as: 'sellerDetail',
+            include: [
+              {
+                model: this.seller,
+                as: 'referred',
+                required: false,
+                include: [
+                  {
+                    model: this.sellerDetail,
+                    as: 'referredDetail',
+                    required: false,
+
+                  },
+                ],
+
+              },
+            ],
+          },
+        ],
       });
 
       const sellerLocation = await this.address.findOne({
@@ -110,8 +129,24 @@ module.exports = class {
         where: { id: locationIds },
       });
 
+      console.log('this is the seller')
+      // console.log(seller);
+      let referralRate = null;
+      let referralRateType = null;
+      let referredSellerId = null;
+      if(seller.sellerDetail.referred !== null) {
+        // console.log(seller.sellerDetail.referred.referredDetail.rateReferal)
+        // console.log(seller.sellerDetail.referred.referredDetail)
+        referralRate = seller.sellerDetail.referred.referredDetail.rateReferal
+        referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType
+        referredSellerId = seller.sellerDetail.referred.id
+      } else {
+        console.log('NO REFERRAL')
+
+      }
+
+
       const sellerDiscount = seller.sellerDetail.discount;
-      console.log('Discount : ' + sellerDiscount);
       const sellerDiscountType = seller.sellerDetail.discountType;
       const sellerCodFee = seller.sellerDetail.codFee;
       const sellerCodFeeType = seller.sellerDetail.codFeeType;
@@ -131,7 +166,6 @@ module.exports = class {
       });
 
       if (globalDiscount) {
-        console.log('GLOBAL discount = TRUE');
         selectedDiscount = {
           value: globalDiscount?.value || 0,
           type: globalDiscount?.type || '',
@@ -139,16 +173,11 @@ module.exports = class {
       }
 
       if (sellerDiscount && sellerDiscount !== 0) {
-        console.log('seller discount = TRUE');
-        console.log('seller discount type = ' + sellerDiscountType);
         selectedDiscount = {
           value: sellerDiscount || 0,
           type: sellerDiscountType || '',
         };
       }
-
-
-    console.log('crete order selected discount : ' + selectedDiscount.value);
 
       let calculatedCredit = parseFloat(seller.sellerDetail.credit);
 
@@ -176,7 +205,6 @@ module.exports = class {
       });
 
       let increment = 1;
-      console.log('this is the start of increment');
       const response = await Promise.all(
 
 
@@ -258,9 +286,6 @@ module.exports = class {
               ) / 100;
             }
           }
-          console.log('cod fee' + codFeeCalculated);
-
-
           if (this.tax.vatType === 'PERCENTAGE') {
             vatCalculated = (
               parseFloat(shippingCharge) * parseFloat(this.tax.vat)
@@ -271,8 +296,7 @@ module.exports = class {
             codValueCalculated = codFeeCalculated + vatCalculated;
           }
 
-          console.log('crete order 2 selected discount : ' + selectedDiscount.value);
-          console.log('crete order 2 selected discount type : ' + selectedDiscount.type);
+
           if (selectedDiscount?.type === 'PERCENTAGE') {
             discountAmount = (
               parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
@@ -339,13 +363,14 @@ module.exports = class {
             origin,
             seller,
             resi,
+            referralRate,
+            referralRateType,
+            referredSellerId,
             ...item,
             ...body,
           };
 
-          // console.log("===PAYLOAD START===");
-          // console.log(payload);
-          // console.log("===PAYLOAD END 2===");
+
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
 
@@ -434,7 +459,6 @@ module.exports = class {
           { where: { id: batch.id } },
         );
       }
-      console.log(orderResponse);
       return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
@@ -451,10 +475,6 @@ module.exports = class {
   }
 
 
-  // Adess 200 (otomatis terpotong tidak perlu notif dan validasi)
-  // patokan 100 (otomatis terpotong tidak perlu notif dan validasi)
-  // isi paket 50 (otomatis terpotong tidak perlu notif dan validasi)
-  // catatan 100 (otomatis terpotong tidak perlu notif dan validasi)
 
   // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {

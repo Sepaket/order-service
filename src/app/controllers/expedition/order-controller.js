@@ -15,19 +15,12 @@ module.exports = {
     try {
       await CommonOrderValidator(request);
       let result;
-      // for (let i = 0; i < 10; i++) {
-        result = await new OrderResponse({ request });
-      // }
-      // const result = await new OrderResponse({ request });
-      // console.log(result);
-      // console.log(result.logs.failed_log.errors);
-      // console.log('result : ' + result);
-      // console.log(JSON.stringify(result, null, 2));
-      response.send({
-        code: 200,
-        message: 'OK',
-        data: result,
-      });
+      result = await new OrderResponse({ request });
+      // response.send({
+      //   code: 200,
+      //   message: 'OK',
+      //   data: result,
+      // });
     } catch (error) {
       console.log(error);
       // console.log("error - validator - reno ");

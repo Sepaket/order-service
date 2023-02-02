@@ -92,6 +92,12 @@ module.exports = (sequelize, DataTypes) => {
       as: 'seller',
     });
 
+    model.SellerDetail.belongsTo(model.Seller, {
+      as: 'referred',
+      foreignKey: 'referredSellerId',
+    });
+
+
     model.SellerDetail.belongsTo(model.Bank, {
       as: 'bank',
     });

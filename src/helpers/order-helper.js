@@ -200,7 +200,8 @@ const orderQuery = async (payload) => {
 
 const orderQueryDetail = async (payload) => {
   const calculateFee = await profitHandler(payload);
-
+  console.log("order query detail")
+  console.log(payload)
   const mapped = payload.items.map((item, idx) => ({
     batchId: item.batchId,
     sellerId: item.seller.id,
@@ -220,6 +221,9 @@ const orderQueryDetail = async (payload) => {
     isTrouble: false,
     codFeeAdmin: item.codFeeAdmin || 0,
     codFeeAdminType: '',
+    referralRate: item.referralRate,
+    referralRateType: item.referralRateType,
+    referredSellerId: item.referredSellerId
   }));
 
   return mapped;
@@ -266,7 +270,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 
   try {
     const queryOrder = await orderQuery(params.items);
-
+    // console.log(params)
     const seller = await SellerDetail.findOne({
       where: { sellerId: params.sellerId },
     });

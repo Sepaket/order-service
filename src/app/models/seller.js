@@ -70,6 +70,16 @@ module.exports = (sequelize, DataTypes) => {
       as: 'sellerDetail',
       foreignKey: 'sellerId',
     });
+    model.Seller.hasOne(model.SellerDetail, {
+      as: 'referredDetail',
+      foreignKey: 'sellerId',
+    });
+    // model.Seller.belongsTo(model.Seller, {
+    //   as: 'referred',
+    //   through: 'sellerDetail',
+    //   foreignKey: 'id'
+    // });
+
 
     model.Seller.hasOne(model.SellerAddress, {
       as: 'address',
