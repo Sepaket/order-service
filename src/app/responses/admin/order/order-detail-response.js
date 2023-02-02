@@ -78,6 +78,7 @@ module.exports = class {
               model: this.sellerAddress,
               as: 'sellerAddress',
               required: false,
+              paranoid: false,
               attributes: [
                 ['id', 'seller_address_id'],
                 'address',
