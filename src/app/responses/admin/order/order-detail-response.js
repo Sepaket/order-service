@@ -90,6 +90,7 @@ module.exports = class {
                   model: this.location,
                   as: 'location',
                   required: false,
+                  paranoid: false,
                   attributes: [
                     ['id', 'location_id'],
                     'province',
@@ -119,6 +120,7 @@ module.exports = class {
                   model: this.location,
                   as: 'location',
                   required: false,
+                  paranoid: false,
                   attributes: [
                     ['id', 'location_id'],
                     'province',

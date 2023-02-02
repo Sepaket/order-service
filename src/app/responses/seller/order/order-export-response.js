@@ -174,6 +174,7 @@ module.exports = class {
               model: this.sellerAddress,
               as: 'sellerAddress',
               required: true,
+              paranoid: false,
               attributes: [
                 ['id', 'seller_address_id'],
                 'name',
@@ -192,6 +193,7 @@ module.exports = class {
                   model: this.location,
                   as: 'location',
                   required: false,
+                  paranoid: false,
                   attributes: [
                     ['id', 'location_id'],
                     'province',
