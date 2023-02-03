@@ -10,22 +10,37 @@ const {
   TrackingHistory,
   Seller,
 } = require('../app/models');
+const { del } = require('express/lib/application');
 
 
 
-async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note) {
+async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note,orderDetail) {
 
 
   await OrderHistory.findOne({
     where: { orderId: orderId}
   }).then(async (result) => {
     if (result === null) {
+
+      const referralRate = orderDetail.referralRate;
+      const referralRateType = orderDetail.referralRateType;
+      const shippingCalculated = orderDetail.shippingCalculated;
+      let referralCredit = 0;
+      const referredId= orderDetail.referredSellerId;
+      console.log(referredId)
+      if (referralRateType === 'PERCENTAGE') {
+        referralCredit = referralRate * shippingCalculated / 100;
+      }
+
       await OrderHistory.create({
         orderId: orderId,
         deltaCredit: deltaCredit,
         isExecute: isExecute,
         onHold: onHold,
         note: note,
+        referralId: referredId,
+        referralCredit: referralCredit,
+        referralBonusExecuted: false
       });
     } else {
       console.log('order history existed');
@@ -251,22 +266,24 @@ const tracking = async () => {
 
 
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
+            console.log('order detail reno')
+            console.log(orderDetail)
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
               // await updateSaldo(calculated_1,orderDetail);
-              await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
+              await addOrderHistory(item.id, calculated_1, false, false, currentStatus, orderDetail);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, true, false, currentStatus);
+            await addOrderHistory(item.id, calculated_1, true, false, currentStatus,orderDetail);
 
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
+            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
           }
 
 
@@ -428,20 +445,20 @@ const force_retracking = async () => {
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
+            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, true, false, currentStatus);
+            await addOrderHistory(item.id, calculated_1, true, false, currentStatus,orderDetail);
 
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus);
+            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
           }
 
 

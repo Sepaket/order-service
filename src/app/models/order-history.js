@@ -33,6 +33,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    referralId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    referralCredit: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    referralBonusExecuted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -64,6 +77,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
       targetKey: 'orderId',
     });
+
+    model.OrderHistory.belongsTo(model.Seller, {
+      as: 'referred',
+      foreignKey: 'referralId',
+    });
+
     //
     // model.OrderHistory.belongsTo(model.SellerDetail, {
     //   through: OrderHistory

@@ -95,11 +95,6 @@ const saldoUpdater = async () => {
 }
 
 
-
-
-
-
-
 const creditUpdater = async () => {
   let sellerUpdateObject = Object.create(null);
   const seller_keys = Object.keys(sellerUpdateObject);
@@ -199,6 +194,128 @@ const historyIds = [];
   }
   console.log('batch credit updater finish');
 };
+
+
+
+
+const referralUpdater = async () => {
+  const orderHistory = await OrderHistory.findAll({
+    include: [
+      {
+        model: OrderDetail,
+        as: 'orderDetail',
+        required: true,
+        include: {
+          model: Seller,
+          as: 'seller',
+          required: true,
+          include: {
+            model: SellerDetail,
+            as: 'sellerDetail',
+            required: true,
+          },
+        },
+      },
+      {
+        model: Seller,
+        as: 'referred',
+        required: false,
+        include: [
+          {
+            model: SellerDetail,
+            as: 'referredDetail',
+            required: false,
+
+          },
+        ],
+
+      },
+    ],
+    where: {
+      [Sequelize.Op.and]: [
+        {
+          referralBonusExecuted: {
+            [Sequelize.Op.is]: false,
+          },
+        },
+        {
+          isExecute: {
+            [Sequelize.Op.is]: true,
+          },
+        }
+      ],
+
+    },
+  });
+
+  const ids = [];
+  let sellerUpdateObject = Object.create(null);
+  await orderHistory.forEach(async (item) => {
+    ids.push(item.orderId);
+
+    if (item.referred === null) {
+      // if (item.orderId == 6397) {
+        console.log(item.orderId + ' IS NULL')
+      //   console.log(item.referred)
+      // }
+
+    } else {
+      if (sellerUpdateObject[item.referred.id] === undefined) {
+        sellerUpdateObject[item.referred.id] = [];
+        sellerUpdateObject[item.referred.id]['ids'] = [];
+        sellerUpdateObject[item.referred.id]['delta'] = 0;
+      }
+
+      sellerUpdateObject[item.referred.id]['delta'] += Number(item.referralCredit);
+      sellerUpdateObject[item.referred.id]['credit'] = (item.referred.referredDetail.credit === 'NaN')? 0 : item.referred.referredDetail.credit;
+
+      sellerUpdateObject[item.referred.id]['ids'].push(item.orderId);
+    }
+
+
+  });
+
+
+  const dbTransaction = await sequelize.transaction()
+  try {
+
+
+    let updateResult = await OrderHistory.update(
+      { referralBonusExecuted: true },
+      {
+        where: {
+          orderId: ids,
+        },
+
+      },
+      { transaction: dbTransaction },
+    );
+
+    for (const key in sellerUpdateObject) {
+      console.log(key)
+      console.log(sellerUpdateObject[key]);
+      let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']);
+      let updateSeller = await SellerDetail.update(
+        { credit: newCredit },
+        {
+          where: {
+            sellerId: key,
+          },
+        },
+        { transaction: dbTransaction },
+      );
+    }
+    await dbTransaction.commit();
+  } catch (error) {
+    console.log(error);
+    await dbTransaction.rollback();
+  }
+
+};
+
+
+
+
 const processing = async () => {
   try {
     const batchs = await OrderBatch.findAll();
@@ -232,7 +349,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/15 * * * *', async () => {
+const runner = cron.schedule('*/10 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
@@ -240,6 +357,7 @@ const runner = cron.schedule('*/15 * * * *', async () => {
     await processing();
     await saldoUpdater();
     await creditUpdater();
+    await referralUpdater();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error.message);

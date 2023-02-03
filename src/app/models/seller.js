@@ -104,6 +104,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'creditHistory',
       foreignKey: 'sellerId',
     });
+
   };
 
   return Seller;
