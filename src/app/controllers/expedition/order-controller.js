@@ -16,11 +16,11 @@ module.exports = {
       await CommonOrderValidator(request);
       let result;
       result = await new OrderResponse({ request });
-      // response.send({
-      //   code: 200,
-      //   message: 'OK',
-      //   data: result,
-      // });
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
     } catch (error) {
       console.log(error);
       // console.log("error - validator - reno ");

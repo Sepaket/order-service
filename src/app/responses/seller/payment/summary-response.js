@@ -8,7 +8,9 @@ const {
   SellerDetail,
   OrderDetail,
   Order,
+  OrderHistory,
 } = require('../../../models');
+const sequelize = require('sequelize');
 
 module.exports = class {
   constructor({ request }) {
@@ -18,6 +20,7 @@ module.exports = class {
     this.credit = CreditHistory;
     this.orderDetail = OrderDetail;
     this.sellerDetail = SellerDetail;
+    this.orderHistory = OrderHistory;
     this.converter = snakeCaseConverter;
     return this.process();
   }
@@ -30,12 +33,13 @@ module.exports = class {
       this.search = search;
 
       const creditSeller = await this.creditSeller();
+      const creditReferral = await this.creditReferral();
       const topupPending = await this.creditPending({ status: 'PENDING', selector: 'topup' });
       const withdrawPending = await this.creditPending({ status: 'PENDING', selector: 'withdraw' });
       const totalTopup = await this.totalTransaction({ selector: 'topup', status: 'PAID' });
       const totalWithdraw = await this.totalTransaction({ selector: 'withdraw', status: 'COMPLETED' });
       const totalTopupValue = await this.totalCredit({ selector: 'topup', status: 'PAID' });
-      const totalWithdrawValue = await this.totalCredit({ selector: 'withdraw' , status: 'COMPLETED'});
+      const totalWithdrawValue = await this.totalCredit({ selector: 'withdraw', status: 'COMPLETED' });
       const orderCodProfitDone = await this.orderProfit({ status: 'DELIVERED', isCod: true });
       const orderCodProfitUndone = await this.orderProfit({ status: 'UNDELIVERED', isCod: true });
       const orderNonCodProfitDone = await this.orderProfit({ status: 'DELIVERED', isCod: false });
@@ -48,6 +52,10 @@ module.exports = class {
         credit: {
           raw: creditSeller || 0,
           formatted: formatCurrency(creditSeller, 'Rp.'),
+        },
+        credit_referral: {
+          raw: creditReferral || 0,
+          formatted: formatCurrency(creditReferral, 'Rp.'),
         },
         credit_pending: {
           raw: topupPending || 0,
@@ -109,8 +117,42 @@ module.exports = class {
           ...this.search,
         },
       });
-
       return seller?.credit;
+    } catch (error) {
+      throw new Error(error?.message);
+    }
+  }
+
+  async creditReferral() {
+    try {
+      console.log('1')
+
+      const referral = await this.orderHistory.sum(`referral_credit`, {
+        where: {
+          referralId: this.sellerId,
+          // status,
+          ...this.search,
+        },
+      });
+
+      //
+      // const referral = await this.orderHistory.findAll({
+      //   attributes: ['referral_id',
+      //     // [sequelize.fn('sum', sequelize.col('referral_credit')), 'referral_credit_total'],
+      //   ],
+      //   // group: ['referral_id'],
+      //   where: {
+      //     referralId: this.sellerId,
+      //     ...this.search,
+      //   },
+      //   // raw: true,
+      //   // order: sequelize.literal('referralId DESC'),
+      // });
+      // console.log('2')
+      // console.log(referral[0].referral_id)
+      console.log(referral)
+      // return referral[0]?.referral_credit_total;
+      return 0;
     } catch (error) {
       throw new Error(error?.message);
     }
@@ -154,7 +196,7 @@ module.exports = class {
       const credit = await this.credit.count({
         where: {
           sellerId: this.sellerId,
-          status : status,
+          status,
           ...condition,
           ...this.search,
         },
@@ -171,7 +213,7 @@ module.exports = class {
       const credit = await this.credit.sum(`${selector}`, {
         where: {
           sellerId: this.sellerId,
-          status : status,
+          status,
           ...this.search,
         },
       });
@@ -227,18 +269,15 @@ module.exports = class {
 
       let result = 0;
       order?.forEach((item) => {
-
         if (item.order.status === 'CANCELED') {
           console.log(item.order.status);
-        }
-          else if (item.order.status === 'RETURN_TO_SELLER') {
-            console.log(item.order.status);
-          }           else if (item.order.status === 'PROBLEM') {
+        } else if (item.order.status === 'RETURN_TO_SELLER') {
           console.log(item.order.status);
-        } else { //SISA NYA DISINI ADALAH WAIITING_PICKUP
+        } else if (item.order.status === 'PROBLEM') {
+          console.log(item.order.status);
+        } else { // SISA NYA DISINI ADALAH WAIITING_PICKUP
           result += parseFloat(item.sellerReceivedAmount);
         }
-
       });
 
       return parseFloat(result);
