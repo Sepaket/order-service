@@ -84,6 +84,7 @@ router.group('/payment', (route) => {
   route.post('/withdraw', Authorization, PaymentController.withdraw);
   route.post('/callback', PaymentController.callback);
   route.get('/history', Authorization, PaymentController.history);
+  route.get('/referral-history', Authorization, PaymentController.referralHistory);
   route.get('/summary', Authorization, PaymentController.summary);
 });
 

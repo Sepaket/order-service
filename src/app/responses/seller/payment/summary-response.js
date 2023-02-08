@@ -134,25 +134,8 @@ module.exports = class {
           ...this.search,
         },
       });
-
-      //
-      // const referral = await this.orderHistory.findAll({
-      //   attributes: ['referral_id',
-      //     // [sequelize.fn('sum', sequelize.col('referral_credit')), 'referral_credit_total'],
-      //   ],
-      //   // group: ['referral_id'],
-      //   where: {
-      //     referralId: this.sellerId,
-      //     ...this.search,
-      //   },
-      //   // raw: true,
-      //   // order: sequelize.literal('referralId DESC'),
-      // });
-      // console.log('2')
-      // console.log(referral[0].referral_id)
       console.log(referral)
-      // return referral[0]?.referral_credit_total;
-      return 0;
+      return referral || 0;
     } catch (error) {
       throw new Error(error?.message);
     }

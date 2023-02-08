@@ -8,6 +8,7 @@ const WithdrawValidator = require('../../validators/seller/payment/withdraw-vali
 const TopupResponse = require('../../responses/seller/payment/topup-response');
 const ConfirmationResponse = require('../../responses/seller/payment/confirmation-response');
 const HistoryResponse = require('../../responses/seller/payment/history-response');
+const ReferralHistoryResponse = require('../../responses/seller/payment/referral-history-response');
 const SummaryResponse = require('../../responses/seller/payment/summary-response');
 const WithdrawResponse = require('../../responses/seller/payment/withdraw-response');
 
@@ -63,6 +64,22 @@ module.exports = {
       await HistoryValidator(request.query);
 
       const result = await new HistoryResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  referralHistory: async (request, response, next) => {
+    try {
+      await HistoryValidator(request.query);
+
+      const result = await new ReferralHistoryResponse({ request });
 
       response.send({
         code: 200,
