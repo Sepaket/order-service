@@ -83,11 +83,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'referralId',
     });
 
-    model.OrderHistory.belongsTo(model.Seller, {
-      as: 'orderSeller',
-      through: 'orderDetail',
-      // foreignKey: 'referralId',
-    });
+    // model.OrderHistory.belongsTo(model.Seller, {
+    //   as: 'orderSeller',
+    //   through: 'orderDetail',
+    //   // foreignKey: 'referralId',
+    // });
 
 
 

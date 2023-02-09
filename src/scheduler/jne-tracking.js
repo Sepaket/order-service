@@ -16,12 +16,14 @@ const { del } = require('express/lib/application');
 
 async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note,orderDetail) {
 
-
+console.log(orderId);
+  console.log('start')
   await OrderHistory.findOne({
     where: { orderId: orderId}
   }).then(async (result) => {
+    console.log('inside here')
     if (result === null) {
-
+      console.log('order history is NULL')
       const referralRate = orderDetail.referralRate;
       const referralRateType = orderDetail.referralRateType;
       const shippingCalculated = orderDetail.shippingCalculated;
@@ -176,6 +178,8 @@ const tracking = async () => {
         ],
       },
     });
+
+    console.log('Order size : ' + order.length)
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
@@ -269,6 +273,8 @@ const tracking = async () => {
             console.log('order detail reno')
             console.log(orderDetail)
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
+            console.log('after caclulated_1')
+            console.log(calculated_1);
               // await updateSaldo(calculated_1,orderDetail);
               await addOrderHistory(item.id, calculated_1, false, false, currentStatus, orderDetail);
           }
