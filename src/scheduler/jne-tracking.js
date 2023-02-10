@@ -26,7 +26,8 @@ console.log(orderId);
       console.log('order history is NULL')
       const referralRate = orderDetail.referralRate;
       const referralRateType = orderDetail.referralRateType;
-      const shippingCalculated = orderDetail.shippingCalculated;
+      //shipping calculated di tambah kembali dengan codfreeadmin karena untuk perhitungan referal tidak menggunakan codfeeadmin
+      const shippingCalculated = orderDetail.shippingCalculated + orderDetail.codFeeAdmin;
       let referralCredit = 0;
       const referredId= orderDetail.referredSellerId;
       console.log(referredId)
