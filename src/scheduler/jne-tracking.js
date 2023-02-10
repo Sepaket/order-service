@@ -24,15 +24,21 @@ console.log(orderId);
     console.log('inside here')
     if (result === null) {
       console.log('order history is NULL')
-      const referralRate = orderDetail.referralRate;
+      const referralRate = Number(orderDetail.referralRate);
       const referralRateType = orderDetail.referralRateType;
       //shipping calculated di tambah kembali dengan codfreeadmin karena untuk perhitungan referal tidak menggunakan codfeeadmin
-      const shippingCalculated = orderDetail.shippingCalculated + orderDetail.codFeeAdmin;
+      const shippingCalculated = Number(orderDetail.shippingCalculated) - Number(orderDetail.codFeeAdmin);
       let referralCredit = 0;
-      const referredId= orderDetail.referredSellerId;
+      const referredId = orderDetail.referredSellerId;
       console.log(referredId)
+      console.log('==')
+      // console.log(orderDetail)
       if (referralRateType === 'PERCENTAGE') {
-        referralCredit = referralRate * shippingCalculated / 100;
+        console.log('calculate referral')
+        console.log(referralRate)
+        console.log(shippingCalculated)
+        referralCredit = referralRate * shippingCalculated / 100
+        console.log(referralCredit)
       }
 
       await OrderHistory.create({
