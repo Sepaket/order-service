@@ -11,6 +11,7 @@ module.exports = async (req, res, next) => {
   const token = authorizationHeader?.replace(/bearer/gi, '')?.replace(/ /g, '') || '';
 
   try {
+    console.log('REDIS SELLER AUTHENTICATION')
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     const seller = await Seller.findOne({ where: { id: decoded.id } });
     const valid = await getRedisData({ db: 0, key: `token-${seller?.email}` });
