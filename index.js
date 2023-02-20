@@ -10,16 +10,18 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 
-const batchScheduler = require('./src/scheduler/batch-scheduler');
-const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
-const trackingScheduler = require('./src/scheduler/tracking-scheduler');
-const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+// const batchScheduler = require('./src/scheduler/batch-scheduler');
+// const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
+// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+//
+// batchScheduler.start();
+// trackingScheduler.start();
+// cleanerNinjaTokenScheduler.start();
+// createOrderScheduler.start();
 
-batchScheduler.start();
-trackingScheduler.start();
-cleanerNinjaTokenScheduler.start();
-createOrderScheduler.start();
 
+const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
 // port load
 const port = process.env.APP_PORT || 6000;
 

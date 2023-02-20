@@ -11,9 +11,26 @@ const {
   sequelize,
 } = require('../app/models');
 
-const { setRedisData, getRedisData } = require('../../../../helpers/redis');
+const { setRedisData, getRedisData } = require('../helpers/redis');
 
 const authExpireCheck = async () => {
+console.log('auth expire check')
+
+  const valid = await getRedisData({ db: 0, key: `ninja_token` });
+  if (valid === null) {
+  console.log('VALID IS NULL')
+    setRedisData(
+      {
+        db: 0,
+        key: `ninja_token`,
+        timeout: 300,
+        data: 'this is ninja token',
+      },
+    );
+  } else {
+    console.log(valid)
+  }
+
 
 };
 
@@ -40,7 +57,7 @@ const routines = cron.schedule('*/10 * * * *', async () => {
   timezone: 'Asia/Jakarta',
 });
 
-const authRoutines = cron.schedule('*/10 * * * *', async () => {
+const authRoutines = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('ninja scheduler run');
 

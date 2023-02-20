@@ -30,6 +30,7 @@ module.exports = class {
               ['id', 'seller_detail_id'],
               'credit',
               'photo',
+              'referal_code',
             ],
             model: this.sellerDetail,
             as: 'sellerDetail',
