@@ -126,6 +126,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
+    console.log('expedition : '.expedition);
     // console.log('resi : ' + resi);
     resolve(resi);
   } catch (error) {

@@ -129,8 +129,6 @@ module.exports = class {
         where: { id: locationIds },
       });
 
-      console.log('this is the seller')
-      // console.log(seller);
       let referralRate = null;
       let referralRateType = null;
       let referredSellerId = null;
@@ -197,7 +195,6 @@ module.exports = class {
 
       var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
       // var nextId = batch.id * 1000000;
-      // console.log("under");
       var nextId = 0;
       // console.log(batch.id);
       const latestOrder = await this.order.findOne({
@@ -226,6 +223,10 @@ module.exports = class {
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
           } else if (body.type === 'SICEPAT'){
             sicepatResi += 1;
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+          } else if (body.type === 'NINJA'){
+            // sicepatResi += 1;
+            console.log('ninja')
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
 
