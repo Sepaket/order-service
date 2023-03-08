@@ -36,26 +36,13 @@ const jneExecutor = async (payload) => {
     console.log(payload.resi);
     if (created.status) {
 
-      // if (payload.resi === 'SPKET00008018119') {
-      //   if (payload.resi === 'SPKET00008012398') {
-        console.log('SUCCESSS');
-        // console.log(created);
-      // }
-      // console.log(created.status);
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
-      // if (payload.resi === 'SPKET00008018119') {
-      //   if (payload.resi === 'SPKET00008012398') {
         console.log('error status');
         console.log(created);
-        // console.log(payload.resi);
-        // console.log(created);
-        // console.log(payload.parameter);
-
-      // }
 
       // await errorCatcher({
       //   id: payload.id,
@@ -70,9 +57,11 @@ const jneExecutor = async (payload) => {
 };
 
 const ninjaExecutor = async (payload) => {
+  console.log('NINJA EXECUTOR');
   try {
     const created = await ninja.createOrder(JSON.parse(payload.parameter));
-
+    console.log('created');
+    console.log(created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -105,7 +94,7 @@ const runner = cron.schedule('*/10 * * * *', async () => {
       setTimeout(async () => {
         // if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
-        // if (item.expedition === 'NINJA') await ninjaExecutor(item);
+        if (item.expedition === 'NINJA') await ninjaExecutor(item);
       }, index * 20000);
     });
   } catch (error) {

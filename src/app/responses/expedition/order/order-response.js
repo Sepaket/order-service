@@ -216,8 +216,6 @@ module.exports = class {
           let parameter = null;
           // sicepatResi += 1;
           if (body.type === 'JNE') {
-
-
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
@@ -226,7 +224,7 @@ module.exports = class {
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'NINJA'){
             // sicepatResi += 1;
-            console.log('ninja')
+            console.log('ninja order')
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
 
@@ -240,6 +238,9 @@ module.exports = class {
               resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
             } else if (body.type === 'SICEPAT'){
               sicepatResi += 1;
+              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
+            } else if (body.type === 'NINJA'){
+              // sicepatResi += 1;
               resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             }
 
@@ -373,6 +374,8 @@ module.exports = class {
 
 
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
+          console.log('right before order validator');
+          console.log(codCondition);
           const messages = await orderValidator(payload);
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
@@ -380,6 +383,8 @@ module.exports = class {
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
+          console.log('PARAMETER');
+          console.log(parameter);
           if (messages?.length < 1) {
 
             querySuccess.push({

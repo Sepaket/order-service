@@ -15,8 +15,6 @@ const {
   TransactionFee,
 } = require('../../../models');
 
-
-
 module.exports = class {
   constructor({ request }) {
     this.jne = jne;
@@ -95,6 +93,8 @@ module.exports = class {
       }
 
       if (body.type === 'NINJA' && ninjaCondition) {
+        console.log(`origin code 1: ${this.origin.ninjaOriginCode} origin code 2 : ${this.origin.ninjaDestinationCode}`);
+        console.log(`destination code 1: ${this.destination.ninjaOriginCode}`);
         const ninjaPrices = await this.ninjaFee();
         if (ninjaPrices?.length > 0) fees.push(ninjaPrices);
       }
@@ -153,7 +153,6 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wromh');
     }
   }
-
 
   async jneFee() {
     try {
@@ -309,11 +308,11 @@ module.exports = class {
       const { body } = this.request;
       const price = await this.ninja.checkPrice({
         weight: body.weight,
-        origin: this.origin.ninjaOriginCode,
-        destination: this.destination.ninjaDestinationCode,
+        origin: `${this.origin.ninjaOriginCode},${this.origin.ninjaDestinationCode}`,
+        destination: `${this.destination.ninjaDestinationCode},${this.destination.ninjaDestinationCode}`,
         service: 'Standard',
       });
-
+      // console.log(`price : ${price}`);
       let discountApplied = this.selectedDiscount.value;
       if (this.selectedDiscount.type === 'PERCENTAGE') {
         discountApplied = (

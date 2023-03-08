@@ -51,6 +51,7 @@ module.exports = class {
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
+      console.log('converted ninja status : ' + converted.status);
       const resi = converted?.tracking_ref_no || converted?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({
         where: { resi },

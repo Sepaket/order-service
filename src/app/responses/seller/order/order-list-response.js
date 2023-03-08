@@ -72,21 +72,21 @@ module.exports = class {
                 'receiverName',
               ],
             },
-            {
-              model: this.ticket,
-              as: 'ticket',
-              required: false,
-              attributes: [
-                'id',
-                'title',
-                'message',
-                'category',
-                'priority',
-                'status',
-                'created_at',
-                'updated_at'
-              ],
-            },
+            // {
+            //   model: this.ticket,
+            //   as: 'ticket',
+            //   required: false,
+            //   attributes: [
+            //     'id',
+            //     'title',
+            //     'message',
+            //     'category',
+            //     'priority',
+            //     'status',
+            //     'created_at',
+            //     'updated_at'
+            //   ],
+            // },
             {
               model: this.order,
               as: 'order',
