@@ -51,7 +51,11 @@ module.exports = class {
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
-      console.log('converted ninja status : ' + converted.status);
+
+      const currentStatus = this.getLastStatus(converted.status.toLowerCase());
+      console.log('converted ninja status : ' + currentStatus);
+
+
       const resi = converted?.tracking_ref_no || converted?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({
         where: { resi },
@@ -62,7 +66,7 @@ module.exports = class {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
 
-      const currentStatus = this.getLastStatus(converted.status.toLowerCase());
+
       const currentSaldo = await this.seller.findOne({
         where: { sellerId: order.detail.sellerId },
       });

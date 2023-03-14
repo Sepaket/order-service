@@ -186,7 +186,6 @@ const tracking = async () => {
       },
     });
 
-    console.log('Order size : ' + order.length)
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });

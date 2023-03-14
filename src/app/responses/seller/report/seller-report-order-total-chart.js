@@ -33,14 +33,25 @@ module.exports = class {
   }
 
   getDataOnDate(date, isCode = true) {
+    // console.log(this.orderList);
     const getData = this.orderList?.filter((orderList) => {
       const orderListDate = moment(orderList.createdAt).format('Y-MM-DD');
+
       const searchDate = date.format('Y-MM-DD');
+      if (orderListDate === searchDate) {
+        console.log(orderListDate);
+        console.log(searchDate);
+        console.log(isCode);
+        console.log(orderList.id);
+        console.log("==============");
+      }
+
       return orderListDate === searchDate && orderList.isCod === isCode;
     });
-
     if (getData) {
       if (this.request.query.type === 'qty') {
+        // console.log(getData);
+        // console.log(getData?.length);
         return getData?.length;
       }
 
@@ -55,7 +66,9 @@ module.exports = class {
   }
 
   getCodOnDate(date) {
-    return this.getDataOnDate(date, true);
+    const r = this.getDataOnDate(date, true);
+    // console.log(r);
+    return r;
   }
 
   getNonCodOnDate(date) {
@@ -65,6 +78,7 @@ module.exports = class {
   async getOrders() {
     try {
       const seller = await jwtSelector({ request: this.request });
+      console.log(seller.id);
       const orderList = await this.order.findAll({
         attributes: ['id', 'isCod', 'createdAt'],
         where: {
@@ -78,6 +92,7 @@ module.exports = class {
       });
 
       if (orderList) this.orderList = orderList;
+      console.log(orderList.length);
     } catch (error) {
       throw new Error(error);
     }
