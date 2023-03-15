@@ -7,6 +7,7 @@ const {
   OrderLog,
   OrderDetail,
   SellerDetail,
+  NinjaTracking,
 } = require('../../../models');
 
 module.exports = class {
@@ -17,6 +18,7 @@ module.exports = class {
     this.status = ninjaStatus;
     this.seller = SellerDetail;
     this.orderDetail = OrderDetail;
+    this.ninjaTracking = NinjaTracking;
     return this.process();
   }
 
@@ -47,6 +49,11 @@ module.exports = class {
 
   async process() {
     const dbTransaction = await sequelize.transaction();
+    console.log('process ninja callback');
+    await this.ninjaTracking.create({
+      trackingRefNo: '1',
+      raw: 'ini raw',
+    });
 
     try {
       const { body, headers } = this.request;
