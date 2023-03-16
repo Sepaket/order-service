@@ -6,7 +6,31 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
+    shipperId: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     trackingRefNo: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    shipperRefNo: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    shipperOrderRefNo: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    previousStatus: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    trackingId: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
@@ -14,7 +38,42 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-
+    timestamp: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    comments: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    previousSize: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    newSize: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    previousMeasurements: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    newMeasurements: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    previousWeight: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    newWeight: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    webhookRequestId: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

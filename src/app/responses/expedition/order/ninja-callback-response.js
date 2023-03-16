@@ -50,15 +50,24 @@ module.exports = class {
   async process() {
     const dbTransaction = await sequelize.transaction();
     console.log('process ninja callback');
-    await this.ninjaTracking.create({
-      trackingRefNo: '1',
-      raw: 'ini raw',
-    });
 
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
 
+      await this.ninjaTracking.create({
+        shipperId: converted.shipper_id,
+        trackingRefNo: converted.tracking_ref_no,
+        shipperRefNo: converted.shipper_ref_no,
+        shipperOrderRefNo: converted.shipper_order_ref_no,
+        status: converted.status,
+        previousStatus: converted.previous_status,
+        trackingId: converted.tracking_id,
+        timestamp: converted.timestamp,
+        comments: converted.comments,
+
+        raw: JSON.stringify(converted),
+      });
       const currentStatus = this.getLastStatus(converted.status.toLowerCase());
       console.log('converted ninja status : ' + currentStatus);
 
