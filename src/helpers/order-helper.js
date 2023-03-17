@@ -72,12 +72,15 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
       expedition, currentResi, id, batchId,
     } = params;
     // console.log(`resimapper next Id to insert to orders : ${id}`);
-    // console.log(params);
+    const resitail = zerofill(currentResi.toString(), 10).substring(10, 4);
+    const batchno = zerofill(batchId.toString(), 4).substring(0, 4);
+    const idno = zerofill(id.toString(), 3);
     const ninjaResi = `
       ${process.env.NINJA_ORDER_PREFIX}
-      ${await random({ min: 10000, max: 99999, integer: true })}
-      ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
-      ${id.length > 1 ? id : `0${id}`}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1, 4)}
+      ${batchno}
+      ${idno}
+      ${await random({ min: 0, max: 9, integer: true })}
     `;
     /*
     reno
@@ -86,9 +89,14 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     timestamp di potong sampai 8 digit
     random 3 karakter
     id
-
     const jneResi-deprecated = `
       ${process.env.JNE_ORDER_PREFIX}
+      ${await random({ min: 10000, max: 99999, integer: true })}
+      ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
+      ${id.length > 1 ? id : `0${id}`}
+    `;
+        const ninjaResi-deprecated = `
+      ${process.env.NINJA_ORDER_PREFIX}
       ${await random({ min: 10000, max: 99999, integer: true })}
       ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
       ${id.length > 1 ? id : `0${id}`}
@@ -100,9 +108,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     //   ${await random({ min: 1000, max: 9999, integer: true })}
     // `;
 
-    const resitail = zerofill(currentResi.toString(), 10).substring(10, 4);
-    const batchno = zerofill(batchId.toString(), 4).substring(0, 4);
-    const idno = zerofill(id.toString(), 3);
+
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
       ${moment()?.format('x')?.valueOf()?.toString()
@@ -111,11 +117,7 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
       ${idno}
       ${await random({ min: 0, max: 9, integer: true })}
     `;
-    // console.log(resitail);
-    // console.log(currentResi);
-    console.log(`jne resi : ${jneResi}`);
 
-    // console.log('jneResi : ' + jneResi);
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
     const currentResiString = currentResi.toString();
     if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`000${currentResi}`}`;
@@ -126,8 +128,6 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
-    console.log('expedition : '.expedition);
-    // console.log('resi : ' + resi);
     resolve(resi);
   } catch (error) {
     reject(error);

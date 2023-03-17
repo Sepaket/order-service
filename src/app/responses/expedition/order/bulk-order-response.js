@@ -134,6 +134,11 @@ module.exports = class {
                 console.log(errorMessage);
                 errorMsgArray.push({message : errorMessage});
                 errorFlag = true;
+              } else if (body.type === 'NINJA' && body.service_code !== 'NINJACOD') {
+                errorMessage = 'cannot use ' + body.service_code + ' for COD';
+                console.log(errorMessage);
+                errorMsgArray.push({message : errorMessage});
+                errorFlag = true;
               }
             }
 

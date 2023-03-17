@@ -1,7 +1,8 @@
 const paramsMapper = ({ payload }) => ({
   requested_tracking_number: payload?.resi,
   service_type: 'Parcel',
-  service_level: payload?.service_code,
+  // service_level: payload?.service_code,
+  service_level: payload?.service_code === 'NINJACOD' ? 'Standard' : payload.service_code,
   from: {
     name: payload?.sender_name,
     phone_number: payload?.sender_phone,

@@ -20,14 +20,20 @@ module.exports = async (request, response, next) => {
         if (cod[item].service_code === 'REG19') {
           codItemIndex = item;
         }
-
-
+      } else if (cod[item].type === 'NINJA') {
+        if (cod[item].service_code === 'Standard') {
+          codItemIndex = item;
+        }
       }
     }
 
     if (cod[codItemIndex].type === 'JNE') {
       cod[codItemIndex].service_name = 'JNE COD';
       cod[codItemIndex].service_code = 'JNECOD';
+      result.data.push(cod[codItemIndex]);
+    } else if (cod[codItemIndex].type === 'NINJA') {
+      cod[codItemIndex].service_name = 'NINJA COD';
+      cod[codItemIndex].service_code = 'NINJACOD';
       result.data.push(cod[codItemIndex]);
     }
 

@@ -1,6 +1,10 @@
 const ninjaStatus = {
-  PROCESSED: [
+
+  WAITING_PICKUP: [
     'pending pickup',
+  ],
+
+  PROCESSED: [
     'successful pickup',
     'en-route to sorting hub',
     'arrived at sorting hub',

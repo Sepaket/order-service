@@ -214,7 +214,6 @@ module.exports = class {
             servCode = body.service_code;
           }
           let parameter = null;
-          // sicepatResi += 1;
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
@@ -491,6 +490,8 @@ module.exports = class {
     var servCode = payload?.service_code || null;
     if (payload.service_code === "JNECOD") {
       servCode = "REG19";
+    } else if (payload.service_code === "NINJACOD") {
+      servCode = "Standard";
     }
     return {
       resi: payload?.resi,
