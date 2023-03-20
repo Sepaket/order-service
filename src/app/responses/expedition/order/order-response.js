@@ -133,8 +133,6 @@ module.exports = class {
       let referralRateType = null;
       let referredSellerId = null;
       if(seller.sellerDetail.referred !== null) {
-        // console.log(seller.sellerDetail.referred.referredDetail.rateReferal)
-        // console.log(seller.sellerDetail.referred.referredDetail)
         referralRate = seller.sellerDetail.referred.referredDetail.rateReferal
         referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType
         referredSellerId = seller.sellerDetail.referred.id
@@ -208,8 +206,13 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
 
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          console.log(item.is_cod);
+          console.log('COD CONDITION');
+          console.log(codCondition);
           if (body.service_code === 'JNECOD'){
             servCode = 'REG19';
+          } if (body.service_code === 'NINJACOD'){
+            servCode = 'Standard';
           } else {
             servCode = body.service_code;
           }

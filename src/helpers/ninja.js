@@ -66,6 +66,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
     console.log('inside check price 0 ');
     const token = await localToken() || await tokenization();
     console.log('inside check price 1');
+    console.log(service);
     // console.log('inside ninja ${token}');
     const price = await axios.post(`${process.env.NINJA_BASE_URL}/1.0/public/price`, {
       weight,

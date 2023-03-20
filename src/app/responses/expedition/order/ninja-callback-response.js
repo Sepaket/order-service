@@ -7,7 +7,9 @@ const {
   OrderLog,
   OrderDetail,
   SellerDetail,
+  OrderHistory,
   NinjaTracking,
+  TrackingHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -19,11 +21,105 @@ module.exports = class {
     this.seller = SellerDetail;
     this.orderDetail = OrderDetail;
     this.ninjaTracking = NinjaTracking;
+    this.orderHistory = OrderHistory;
     return this.process();
   }
 
+  addTrackingData(converted) {
+    this.ninjaTracking.create({
+      shipperId: converted.shipper_id,
+      trackingRefNo: converted.tracking_ref_no,
+      shipperRefNo: converted.shipper_ref_no,
+      shipperOrderRefNo: converted.shipper_order_ref_no,
+      status: converted.status,
+      previousStatus: converted.previous_status,
+      trackingId: converted.tracking_id,
+      timestamp: converted.timestamp,
+      comments: converted.comments,
+
+      raw: JSON.stringify(converted),
+    });
+  }
+
+  async updateOrderHistory(resi,currentStatus) {
+    console.log('order : ');
+    // console.log(converted.tracking_ref_no);
+    if (currentStatus === 'WAITING_PICKUP') {
+
+    } else if (currentStatus === 'PROCESSED') {
+      console.log('this is processed');
+      // await this.addOrderHistory(converted, currentStatus, false, false);
+      //UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
+      // await this.updateOH(resi, currentStatus, false, false);
+    } else if (currentStatus === 'DELIVERED') {
+      console.log('this is DELIVERED');
+      await this.addOrderHistory(resi, currentStatus, false, false);
+    } else if (currentStatus === 'CANCELED') {
+      console.log('this is CANCELED');
+    } else if (currentStatus === 'RETURN_TO_SELLER') {
+      console.log('this is RETURN_TO_SELLER');
+      await this.addOrderHistory(resi, currentStatus, false, false);
+    } else if (currentStatus === 'PROBLEM') {
+
+    } else {
+      console.log('PROBLEM');
+    }
+  }
+
+  updateOH(resi, currentStatus, isExecute, onHold) {
+    console.log('update order history');
+
+  }
+
+  updateSellerDetail() {
+    console.log('update tracking history');
+  }
+
+  async addOrderHistory(resi, currentStatus, isExecute, onHold) {
+    await Order.findOne({
+      where: { resi },
+      include: [
+        { model: this.orderDetail, as: 'detail',
+        },
+        { model: this.orderHistory, as: 'history',
+        },
+      ],
+    }).then(async (result) => {
+      let deltaCredit = 0;
+      let referralCredit = 0;
+      if (result === null) {
+        console.log('Order not found');
+
+      } else {
+        if (result.history === null) {
+          deltaCredit = parseFloat(result.detail.shippingCalculated);
+          if (result?.detail?.referralRateType === 'PERCENTAGE') {
+            referralCredit = result.detail.referralRate * deltaCredit / 100
+          }
+          await OrderHistory.create({
+            orderId: result?.id,
+            deltaCredit,
+            isExecute,
+            onHold,
+            note: currentStatus,
+            referralId: result?.detail?.referredSellerId,
+            referralCredit,
+            referralBonusExecuted: false,
+          });
+        }
+      }
+
+    })
+
+  }
+
+
   getLastStatus(trackingStatus) {
     let currentStatus = '';
+    if (this.status.WAITING_PICKUP.indexOf(trackingStatus) !== -1) {
+      currentStatus = orderStatus.WAITING_PICKUP.text;
+    }
+
     if (this.status.PROCESSED.indexOf(trackingStatus) !== -1) {
       currentStatus = orderStatus.PROCESSED.text;
     }
@@ -49,28 +145,19 @@ module.exports = class {
 
   async process() {
     const dbTransaction = await sequelize.transaction();
-    console.log('process ninja callback');
 
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
 
-      await this.ninjaTracking.create({
-        shipperId: converted.shipper_id,
-        trackingRefNo: converted.tracking_ref_no,
-        shipperRefNo: converted.shipper_ref_no,
-        shipperOrderRefNo: converted.shipper_order_ref_no,
-        status: converted.status,
-        previousStatus: converted.previous_status,
-        trackingId: converted.tracking_id,
-        timestamp: converted.timestamp,
-        comments: converted.comments,
 
-        raw: JSON.stringify(converted),
-      });
+
       const currentStatus = this.getLastStatus(converted.status.toLowerCase());
-      console.log('converted ninja status : ' + currentStatus);
+      // add referral and order_histories here
+      //
 
+      await this.addTrackingData(converted);
+      await this.updateOrderHistory(converted.tracking_ref_no, currentStatus);
 
       const resi = converted?.tracking_ref_no || converted?.tracking_id?.split(`${process.env.NINJA_ORDER_PREFIX}C`)?.pop();
       const order = await this.order.findOne({
@@ -81,7 +168,6 @@ module.exports = class {
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
-
 
       const currentSaldo = await this.seller.findOne({
         where: { sellerId: order.detail.sellerId },
@@ -123,4 +209,6 @@ module.exports = class {
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
   }
+
+
 };

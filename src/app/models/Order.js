@@ -88,6 +88,10 @@ module.exports = (sequelize, DataTypes) => {
     //   through: 'detail'
     // });
 
+    model.Order.hasOne(model.OrderHistory, {
+      as: 'history',
+      foreignKey: 'orderId',
+    });
 
 
     model.Order.hasMany(model.OrderLog, {

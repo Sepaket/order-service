@@ -24,11 +24,10 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     } = payload;
     // console.log(payload);
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
-    console.log('shipping charge validate');
-    console.log(shippingCharge);
+    // console.log('shipping charge validate');
+    // console.log(shippingCharge);
     if (!shippingCharge)
     {
-
       error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
     }
 

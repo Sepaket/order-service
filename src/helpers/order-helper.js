@@ -161,6 +161,7 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
     }
 
     if (expedition === 'NINJA') {
+      console.log('NINJA find price');
       const prices = await ninja.checkPrice({
         origin: origin?.ninjaOriginCode + ',' + origin?.ninjaDestinationCode,
         destination: destination?.ninjaOriginCode + ',' + destination?.ninjaDestinationCode,

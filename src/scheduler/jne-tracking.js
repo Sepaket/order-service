@@ -13,15 +13,22 @@ const {
 const { del } = require('express/lib/application');
 
 
+async function updateOrderHistory() {
+  console.log("update tracking history");
+}
+async function updateOrder() {
+  console.log("update tracking history");
+}
+async function updateSellerDetail() {
+  console.log("update tracking history");
+}
+
 
 async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note,orderDetail) {
 
-console.log(orderId);
-  console.log('start')
   await OrderHistory.findOne({
     where: { orderId: orderId}
   }).then(async (result) => {
-    console.log('inside here')
     if (result === null) {
       console.log('order history is NULL')
       const referralRate = Number(orderDetail.referralRate);
@@ -30,8 +37,6 @@ console.log(orderId);
       const shippingCalculated = Number(orderDetail.shippingCalculated) - Number(orderDetail.codFeeAdmin);
       let referralCredit = 0;
       const referredId = orderDetail.referredSellerId;
-      console.log(referredId)
-      console.log('==')
       // console.log(orderDetail)
       if (referralRateType === 'PERCENTAGE') {
         console.log('calculate referral')
@@ -61,18 +66,6 @@ console.log(orderId);
 
 
 }
-async function updateSaldo(calculated1, orderDetail) {
-  // the updateSaldo is deprecated in favor of creditUpdater() calculation
-  //     console.log('credit : ' + orderDetail.seller.sellerDetail.credit);
-  //   const credit = orderDetail.seller.sellerDetail.credit === 'NaN' ? 0 : orderDetail.seller.sellerDetail.credit;
-  //   const calculated = parseFloat(credit) + calculated1;
-  //   console.log(orderDetail.orderId + ' credit : ' + credit);
-  //   SellerDetail.update(
-  //     { credit: parseFloat(calculated) },
-  //     { where: { sellerId: orderDetail.sellerId } },
-  //   );
-
-}
 
 const getLastStatus = (trackingStatus) => {
   // console.log('tracking status : ' + trackingStatus);
@@ -96,7 +89,6 @@ const getLastStatus = (trackingStatus) => {
   if (orderStatus.PROBLEM.statuses.JNE.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.PROBLEM.text;
   }
-  // console.log('curn : ' + currentStatus)
   return currentStatus;
 };
 const creditUpdate = async () => {
@@ -149,7 +141,6 @@ const creditUpdate = async () => {
 };
 
 const tracking = async () => {
-  console.log('inside JNE tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -189,30 +180,18 @@ const tracking = async () => {
     await Promise.all(
       order?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
-
-
         if (!track?.error) {
           // const trackingStatus = track?.history[track?.history?.length - 1];
           // DIBAWAH INI KODE LAMA
           // const currentStatus = getLastStatus(trackingStatus?.code || '');
-
         let currentStatus = '';
-
           // RENO
           if (track?.cnote.pod_code === null) {
             currentStatus = 'PROCESSED';
           } else {
             currentStatus = getLastStatus(track?.cnote.pod_code || '');
-            // if (item.resi === 'SPKET67305290054') {
-            //   console.log('resi : ' + item.resi);
-            //   console.log(track?.cnote.pod_code);
-            //   console.log(track?.cnote.pod_status);
-            //   console.log(currentStatus);
-            // }
           }
-
           // const currentStatus = getLastStatus(historical.code || '');
-
           track?.history?.forEach((historical) => {
             trackHistories.push({
               orderId: item?.id,
@@ -222,10 +201,6 @@ const tracking = async () => {
               // podStatus: trackingStatus?.code,
               currentStatus: getLastStatus(historical.code || ''),
             });
-            // if (item.resi === 'SPKET67305290054') {
-            //   console.log('resi : ' + item.resi);
-            //   console.log(historical.code);
-            // }
           });
           await TrackingHistory.findOne({
             where: { orderId: item.id }
@@ -273,15 +248,8 @@ const tracking = async () => {
           const orderDetail = item.detail;
           const log =  await OrderLog.findAll({ where: { orderId: item.id } });
 
-
-
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
-            console.log('order detail reno')
-            console.log(orderDetail)
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-            console.log('after caclulated_1')
-            console.log(calculated_1);
-              // await updateSaldo(calculated_1,orderDetail);
               await addOrderHistory(item.id, calculated_1, false, false, currentStatus, orderDetail);
           }
 
@@ -297,8 +265,6 @@ const tracking = async () => {
             // await updateSaldo(calculated_1,orderDetail);
             await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
           }
-
-
 
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {

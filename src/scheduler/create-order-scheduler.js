@@ -32,10 +32,7 @@ const jneExecutor = async (payload) => {
     console.log('jne executor');
     console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
-    // console.log(created);
-    console.log(payload.resi);
     if (created.status) {
-
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
@@ -60,8 +57,6 @@ const ninjaExecutor = async (payload) => {
   console.log('NINJA EXECUTOR');
   try {
     const created = await ninja.createOrder(JSON.parse(payload.parameter));
-    console.log('created');
-    console.log(created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
