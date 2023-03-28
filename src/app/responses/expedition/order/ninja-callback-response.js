@@ -45,10 +45,11 @@ module.exports = class {
     console.log('order : ');
     // console.log(converted.tracking_ref_no);
     if (currentStatus === 'WAITING_PICKUP') {
-
+      console.log(' WAITING PICKUP ');
+      await this.addOrderHistory(resi, currentStatus, false, false);
     } else if (currentStatus === 'PROCESSED') {
       console.log('this is processed');
-      // await this.addOrderHistory(converted, currentStatus, false, false);
+      await this.addOrderHistory(resi, currentStatus, false, false);
       //UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
       // await this.updateOH(resi, currentStatus, false, false);
     } else if (currentStatus === 'DELIVERED') {
@@ -106,6 +107,11 @@ module.exports = class {
             referralCredit,
             referralBonusExecuted: false,
           });
+        } else {
+          console.log('update history instead');
+          await result.history.update(
+            { note: currentStatus },
+          );
         }
       }
 

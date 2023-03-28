@@ -58,6 +58,7 @@ router.group('/order', (route) => {
 router.group('/reports', (route) => {
   route.get('/total-order', Authorization, ReportController.totalOrder);
   route.get('/waiting-for-pickup', Authorization, ReportController.waitingForPickup);
+  route.get('/dashboard-stats', Authorization, ReportController.dashboardStats);
   route.get('/cod-processing', Authorization, ReportController.codProcessing);
   route.get('/cod-processing-total', Authorization, ReportController.codProcessingTotal);
   route.get('/non-cod-processing', Authorization, ReportController.nonCodProcessing);

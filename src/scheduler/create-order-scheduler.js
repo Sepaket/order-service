@@ -87,7 +87,7 @@ const runner = cron.schedule('*/5 * * * *', async () => {
 
     orders?.forEach((item, index) => {
       setTimeout(async () => {
-        // if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
       }, index * 20000);

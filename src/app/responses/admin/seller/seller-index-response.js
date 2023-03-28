@@ -20,7 +20,7 @@ module.exports = class {
     const { query } = this.request;
     const search = this.querySearch();
     const nextPage = (
-      (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
+      (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(query.limit, 10)
     ) || parseInt(offset, 10);
     const total = await this.seller.count({ where: search });
 

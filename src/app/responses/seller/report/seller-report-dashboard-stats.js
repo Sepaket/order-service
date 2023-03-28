@@ -15,7 +15,6 @@ module.exports = class {
     return new Promise(async (resolve, reject) => {
       try {
         this.seller = await jwtSelector({ request: this.request });
-        console.log('waiting for pickup count');
         this.order.count({
           where: {
             '$detail.seller_id$': seller.id,

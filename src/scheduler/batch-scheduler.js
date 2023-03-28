@@ -34,6 +34,7 @@ const saldoUpdater = async () => {
     ],
     where: {
       isExecute: false,
+      note: 'DELIVERED',
     },
   });
 
@@ -242,6 +243,11 @@ const referralUpdater = async () => {
           isExecute: {
             [Sequelize.Op.is]: true,
           },
+        },
+        {
+          note: {
+            [Sequelize.Op.in]: ['DELIVERED'],
+          },
         }
       ],
 
@@ -254,10 +260,8 @@ const referralUpdater = async () => {
     ids.push(item.orderId);
 
     if (item.referred === null) {
-      // if (item.orderId == 6397) {
+
         console.log(item.orderId + ' IS NULL')
-      //   console.log(item.referred)
-      // }
 
     } else {
       if (sellerUpdateObject[item.referred.id] === undefined) {
@@ -265,8 +269,10 @@ const referralUpdater = async () => {
         sellerUpdateObject[item.referred.id]['ids'] = [];
         sellerUpdateObject[item.referred.id]['delta'] = 0;
       }
-
+      console.log('referral');
+      // console.log(item.referred);
       sellerUpdateObject[item.referred.id]['delta'] += Number(item.referralCredit);
+      console.log(sellerUpdateObject[item.referred.id]['delta']);
       sellerUpdateObject[item.referred.id]['credit'] = (item.referred.referredDetail.credit === 'NaN')? 0 : item.referred.referredDetail.credit;
 
       sellerUpdateObject[item.referred.id]['ids'].push(item.orderId);
@@ -276,7 +282,7 @@ const referralUpdater = async () => {
   });
 
 
-  const dbTransaction = await sequelize.transaction()
+  const db2Transaction = await sequelize.transaction()
   try {
 
 
@@ -288,7 +294,7 @@ const referralUpdater = async () => {
         },
 
       },
-      { transaction: dbTransaction },
+      { transaction: db2Transaction },
     );
 
     for (const key in sellerUpdateObject) {
@@ -302,13 +308,13 @@ const referralUpdater = async () => {
             sellerId: key,
           },
         },
-        { transaction: dbTransaction },
+        { transaction: db2Transaction },
       );
     }
-    await dbTransaction.commit();
+    await db2Transaction.commit();
   } catch (error) {
     console.log(error);
-    await dbTransaction.rollback();
+    await db2Transaction.rollback();
   }
 
 };
@@ -349,7 +355,7 @@ const processing = async () => {
 };
 
 // every 1 hour 0 */1 * * *
-const runner = cron.schedule('*/3 * * * *', async () => {
+const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('batch scheduler run');
 
