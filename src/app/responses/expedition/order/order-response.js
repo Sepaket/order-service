@@ -30,6 +30,7 @@ const {
   SellerDetail,
   SellerAddress,
   TransactionFee,
+  ResiTracker,
 } = require('../../../models');
 const { stringify } = require('querystring');
 
@@ -50,6 +51,7 @@ module.exports = class {
     this.insurance = Insurance;
     this.address = SellerAddress;
     this.sellerDetail = SellerDetail;
+    this.resiTracker = ResiTracker;
 
     return this.process();
   }
@@ -186,12 +188,21 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
+      console.log('LAST RESI =====================');
+      // let lastresi = await this.resiTracker.findOne({
+      //   where: { logisticsProvider: 'sicepat' },
+      // });
+      //
+      //
+      // console.log(lastresi);
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
 
       var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
+
+
       // var nextId = batch.id * 1000000;
       var nextId = 0;
       // console.log(batch.id);

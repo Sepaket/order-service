@@ -91,7 +91,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'sellerId',
     });
 
-    model.Seller.hasOne(model.OrderDetail, {
+    model.Seller.hasMany(model.OrderDetail, {
       as: 'orderDetail',
       foreignKey: 'sellerId',
     });
@@ -104,6 +104,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'creditHistory',
       foreignKey: 'sellerId',
     });
+
+    // model.Seller.hasMany(model.Order, {
+    //   as: 'order',
+    //   foreignKey: 'sellerId',
+    // });
 
   };
 

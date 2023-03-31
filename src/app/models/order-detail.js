@@ -131,17 +131,17 @@ module.exports = (sequelize, DataTypes) => {
 
     model.OrderDetail.belongsTo(model.Seller, {
       as: 'seller',
+      foreignKey: 'sellerId'
     });
 
     model.OrderDetail.belongsTo(model.SellerAddress, {
       as: 'sellerAddress',
     });
 
-    model.OrderDetail.belongsTo(model.OrderAddress, {
-      as: 'receiverAddress',
-      targetKey: 'orderId',
-      foreignKey: 'orderId',
-    });
+    // model.OrderDetail.hasOne(model.OrderBackground, {
+    //   as: 'background',
+    //   through: 'Orders',
+    // });
 
     model.OrderDetail.hasOne(model.OrderTax, {
       as: 'tax',

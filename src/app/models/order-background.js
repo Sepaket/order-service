@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
-  return sequelize.define('OrderBackground', schema, {
+  const OrderBackground =  sequelize.define('OrderBackground', schema, {
     timestamps: false,
     paranoid: false,
     underscored: true,
@@ -33,4 +33,22 @@ module.exports = (sequelize, DataTypes) => {
     charset: 'utf8',
     tableName: 'order_backgrounds',
   });
+
+
+
+  OrderBackground.associate = (model) => {
+    model.OrderBackground.belongsTo(model.Order, {
+      as: 'order',
+      foreignKey: 'resi',
+      // targetKey: 'resi',
+    });
+
+  };
+
+
+
+
+
+
+  return OrderBackground;
 };

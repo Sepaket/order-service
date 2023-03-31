@@ -7,13 +7,17 @@ const NinjaCancelResponse = require('../../responses/expedition/cancel/ninja-can
 const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat-cancel-response');
 
 module.exports = async (request, response, next) => {
+
+
   try {
     let result = null;
     console.log('cancelling order...');
     // console.log(request);
     const order = await CancelValidator(request);
-    const expedition = order?.id?.order?.expedition;
-
+    // const expedition = order?.id?.order?.expedition;
+    const expedition = order?.id?.expedition;
+    // console.log('==========');
+    // console.log(order.id.expedition);
     if (expedition === 'JNE') result = await new JneCancelResponse({ request });
     if (expedition === 'NINJA') result = await new NinjaCancelResponse({ request });
     if (expedition === 'SICEPAT') result = await new SicepatCancelResponse({ request });
@@ -26,4 +30,8 @@ module.exports = async (request, response, next) => {
   } catch (error) {
     next(error);
   }
+
+
+
+
 };

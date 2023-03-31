@@ -8,7 +8,8 @@ const { OrderBackground } = require('../app/models');
 const sicepatExecutor = async (payload) => {
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
-
+    console.log('SICEPAT ORDER CREATED');
+    console.log(created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -75,7 +76,7 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('*/5 * * * *', async () => {
+const runner = cron.schedule('*/3 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('create order scheduler run');
 
