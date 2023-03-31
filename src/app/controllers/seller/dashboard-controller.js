@@ -4,6 +4,7 @@ const CurrentDiscountResponse = require('../../responses/seller/dashboard/curren
 
 module.exports = {
   codTotal: async (request, response, next) => {
+    console.log('codtotal');
     try {
       await CodTotalValidator(request.query);
 
@@ -20,6 +21,7 @@ module.exports = {
   },
 
   currentDiscount: async (request, response, next) => {
+    console.log('current discount');
     try {
       const result = await new CurrentDiscountResponse({ request });
 
