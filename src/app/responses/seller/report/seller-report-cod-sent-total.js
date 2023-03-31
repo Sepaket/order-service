@@ -78,15 +78,15 @@ module.exports = class {
             'shippingCalculated',
           ],
           include: [
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'receiverName',
-              ],
-            },
+            // {
+            //   model: this.orderAddress,
+            //   as: 'receiverAddress',
+            //   required: true,
+            //   attributes: [
+            //     ['id', 'receiver_id'],
+            //     'receiverName',
+            //   ],
+            // },
             {
               model: this.order,
               as: 'order',
