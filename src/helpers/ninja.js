@@ -131,8 +131,9 @@ const tracking = (payload) => new Promise(async (resolve) => {
 const cancel = (payload) => new Promise(async (resolve, reject) => {
   const { resi } = payload;
   const token = await localToken() || await tokenization();
-
-  axios.delete(`${process.env.NINJA_BASE_URL}/2.2/orders/${resi}`, {
+  console.log(resi);
+  console.log(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`);
+  axios.delete(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

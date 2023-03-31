@@ -189,11 +189,12 @@ module.exports = class {
         });
       }
       console.log('LAST RESI =====================');
-      // let lastresi = await this.resiTracker.findOne({
-      //   where: { logisticsProvider: 'sicepat' },
-      // });
-      //
-      //
+      // let lastresi = await ResiTracker.findAll();
+      let lastresi = await ResiTracker.findOne({
+        where: { logisticsProvider: 'sicepat' },
+      });
+
+      console.log(lastresi);
       // console.log(lastresi);
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
@@ -227,37 +228,10 @@ module.exports = class {
           } else {
             servCode = body.service_code;
           }
+
+
           let parameter = null;
-          if (body.type === 'JNE') {
-            nextId = latestOrder.id + increment;
-            // console.log(`index = ${  index  } nextId ${  nextId}`);
-            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
-          } else if (body.type === 'SICEPAT'){
-            sicepatResi += 1;
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'NINJA'){
-            // sicepatResi += 1;
-            console.log('ninja order')
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          }
 
-          const resiIsExist = await this.order.findOne({
-            where: { resi, expedition: body.type },
-          });
-
-          if (resiIsExist) {
-            if (body.type === 'JNE') {
-              nextId = nextId + 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
-            } else if (body.type === 'SICEPAT'){
-              sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            } else if (body.type === 'NINJA'){
-              // sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            }
-
-          }
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);
@@ -364,6 +338,36 @@ module.exports = class {
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
 
+          if (body.type === 'JNE') {
+            nextId = latestOrder.id + increment;
+            // console.log(`index = ${  index  } nextId ${  nextId}`);
+            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
+          } else if (body.type === 'SICEPAT'){
+            sicepatResi += 1;
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+          } else if (body.type === 'NINJA'){
+            // sicepatResi += 1;
+            console.log('ninja order')
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+          }
+
+          const resiIsExist = await this.order.findOne({
+            where: { resi, expedition: body.type },
+          });
+
+          if (resiIsExist) {
+            if (body.type === 'JNE') {
+              nextId = nextId + 1;
+              resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
+            } else if (body.type === 'SICEPAT'){
+              sicepatResi += 1;
+              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
+            } else if (body.type === 'NINJA'){
+              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
+            }
+
+          }
+
           const payload = {
             codFeeAdmin: codValueCalculated,
             discuontSelected: discountAmount,
@@ -398,6 +402,7 @@ module.exports = class {
 
           console.log('PARAMETER');
           console.log(parameter);
+
           if (messages?.length < 1) {
 
             querySuccess.push({

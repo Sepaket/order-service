@@ -75,32 +75,26 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     const resitail = zerofill(currentResi.toString(), 10).substring(10, 4);
     const batchno = zerofill(batchId.toString(), 4).substring(0, 4);
     const idno = zerofill(id.toString(), 3);
-    const ninjaResi = `
-      ${process.env.NINJA_ORDER_PREFIX}
-      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1, 4)}
-      ${batchno}
-      ${idno}
-      ${await random({ min: 0, max: 9, integer: true })}
-    `;
+
     /*
-    reno
-    untuk generation jneResi :
-    JNE PREFIX
-    timestamp di potong sampai 8 digit
-    random 3 karakter
-    id
-    const jneResi-deprecated = `
-      ${process.env.JNE_ORDER_PREFIX}
-      ${await random({ min: 10000, max: 99999, integer: true })}
-      ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
-      ${id.length > 1 ? id : `0${id}`}
-    `;
-        const ninjaResi-deprecated = `
-      ${process.env.NINJA_ORDER_PREFIX}
-      ${await random({ min: 10000, max: 99999, integer: true })}
-      ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
-      ${id.length > 1 ? id : `0${id}`}
-    `;
+reno
+untuk generation jneResi :
+JNE PREFIX
+timestamp di potong sampai 8 digit
+random 3 karakter
+id
+const jneResi-deprecated = `
+  ${process.env.JNE_ORDER_PREFIX}
+  ${await random({ min: 10000, max: 99999, integer: true })}
+  ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
+  ${id.length > 1 ? id : `0${id}`}
+`;
+    const ninjaResi-deprecated = `
+  ${process.env.NINJA_ORDER_PREFIX}
+  ${await random({ min: 10000, max: 99999, integer: true })}
+  ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
+  ${id.length > 1 ? id : `0${id}`}
+`;
 */
     // const jneResi = `
     //   ${process.env.JNE_ORDER_PREFIX}
@@ -108,6 +102,16 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     //   ${await random({ min: 1000, max: 9999, integer: true })}
     // `;
 
+
+
+
+    const ninjaResi = `
+      ${process.env.NINJA_ORDER_PREFIX}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1, 4)}
+      ${batchno}
+      ${idno}
+      ${await random({ min: 0, max: 9, integer: true })}
+    `;
 
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
@@ -367,12 +371,20 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
   // console.log('order success logger');
   const dbTransaction = await sequelize.transaction();
+  // console.log('console log parameter');
+  // console.log(parameter[0].requested_tracking_number);
 
+  // split(process.env.SICEPAT_CUSTOMER_ID)?.pop()
   try {
     const queryMapped = parameter.map((item) => {
       const payload = { ...item };
       delete payload.type;
 
+      let track_no = payload.requested_tracking_number;
+
+      let ninja_resi_no = track_no.split(process.env.JNE_ORDER_PREFIX)?.pop();
+
+      payload.requested_tracking_number = ninja_resi_no;
       return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
         resi: item.resi,
