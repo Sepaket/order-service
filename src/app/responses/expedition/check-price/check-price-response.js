@@ -204,11 +204,27 @@ module.exports = class {
             (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
           ) - parseFloat(discountApplied);
         }
+        let servCode = item.service_code;
+        let servDisplay = item.service_display;
+        if (item.service_code === 'CTCYES19') {
+          servCode = 'YES19';
+        }
+        if (item.service_display === 'CTCYES') {
+          servDisplay = 'YES';
+        }
+
+        if (item.service_code === 'CTCSPS19') {
+          servCode = 'SPS19';
+        }
+        if (item.service_display === 'CTCSPS') {
+          servDisplay = 'SPS';
+        }
+
 
         return {
           weight: body.weight,
-          serviceName: item.service_display === 'CTC' ? 'JNE REG' : item.service_display,
-          serviceCode: item.service_code === 'CTC19' ? 'REG19' : item.service_code,
+          serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
+          serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
           availableCod: codCondition,
           estimation: `${item.etd_from} - ${item.etd_thru}`,
           estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,

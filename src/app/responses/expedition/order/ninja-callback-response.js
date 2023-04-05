@@ -100,7 +100,7 @@ module.exports = class {
         if (result.history === null) {
           deltaCredit = parseFloat(result.detail.shippingCalculated);
           if (result?.detail?.referralRateType === 'PERCENTAGE') {
-            referralCredit = result.detail.referralRate * deltaCredit / 100
+            referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100
           }
 
           if ((currentStatus === 'DELIVERED') && (!result?.is_cod)) {

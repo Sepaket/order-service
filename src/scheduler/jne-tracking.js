@@ -24,7 +24,7 @@ async function updateSellerDetail() {
 }
 
 
-async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note,orderDetail) {
+async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,note,orderDetail) {
 
   await OrderHistory.findOne({
     where: { orderId: orderId}
@@ -50,6 +50,8 @@ async function addOrderHistory(orderId, deltaCredit, isExecute, onHold,note,orde
         orderId: orderId,
         deltaCredit: deltaCredit,
         isExecute: isExecute,
+        isCod:isCod,
+        provider:'JNE',
         onHold: onHold,
         note: note,
         referralId: referredId,
@@ -250,20 +252,20 @@ const tracking = async () => {
 
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-              await addOrderHistory(item.id, calculated_1, false, false, currentStatus, orderDetail);
+              await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus, orderDetail);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
-            calculated_1 = parseFloat(orderDetail.shippingCalculated);
+            calculated_1 = 0;
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, true, false, currentStatus,orderDetail);
+            await addOrderHistory(item.id, item.isCod,calculated_1, true, false, currentStatus,orderDetail);
 
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
+            await addOrderHistory(item.id,item.isCod, calculated_1, false, false, currentStatus,orderDetail);
           }
 
 
@@ -423,20 +425,20 @@ const force_retracking = async () => {
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
+            await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus,orderDetail);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, true, false, currentStatus,orderDetail);
+            await addOrderHistory(item.id, item.isCod,calculated_1, true, false, currentStatus,orderDetail);
 
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, calculated_1, false, false, currentStatus,orderDetail);
+            await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus,orderDetail);
           }
 
 
