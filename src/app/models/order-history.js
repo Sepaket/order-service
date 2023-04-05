@@ -29,7 +29,16 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: true,
     },
+    isCod: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
     note: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    provider: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

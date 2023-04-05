@@ -53,12 +53,17 @@ module.exports = class {
       //UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
       // await this.updateOH(resi, currentStatus, false, false);
     } else if (currentStatus === 'DELIVERED') {
+      //NON COD berarti tidak ada proses penambahan saldo
+      // COD ada addorderhistory
       console.log('this is DELIVERED');
       await this.addOrderHistory(resi, currentStatus, false, false);
     } else if (currentStatus === 'CANCELED') {
       console.log('this is CANCELED');
+      //kalau NONCOD berarti ongkir dikembalikan
+      //kalau COD tidak ada
     } else if (currentStatus === 'RETURN_TO_SELLER') {
       console.log('this is RETURN_TO_SELLER');
+      //COD dan NONCOD ongkir tidak dikembalikan
       await this.addOrderHistory(resi, currentStatus, false, false);
     } else if (currentStatus === 'PROBLEM') {
 
@@ -97,11 +102,19 @@ module.exports = class {
           if (result?.detail?.referralRateType === 'PERCENTAGE') {
             referralCredit = result.detail.referralRate * deltaCredit / 100
           }
+
+          if ((currentStatus === 'DELIVERED') && (!result?.is_cod)) {
+            deltaCredit = 0;
+          }
+
+
           await OrderHistory.create({
             orderId: result?.id,
             deltaCredit,
             isExecute,
             onHold,
+            isCod: result?.is_cod,
+            provider: result?.expedition,
             note: currentStatus,
             referralId: result?.detail?.referredSellerId,
             referralCredit,

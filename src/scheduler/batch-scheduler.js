@@ -9,6 +9,7 @@ const {
   Seller,
   SellerDetail,
   sequelize,
+  ActivityLog,
 } = require('../app/models');
 
 
@@ -172,6 +173,11 @@ const historyIds = [];
           id: historyIds,
         },
       },
+      { transaction: dbTransaction },
+    );
+
+    let activityLog = await ActivityLog.create(
+      { action: 'credit history update'  },
       { transaction: dbTransaction },
     );
 
