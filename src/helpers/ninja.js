@@ -84,8 +84,10 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    resolve(price?.data?.data?.total_fee);
+    const displayPrice = price?.data?.data?.total_fee + (price?.data?.data?.total_fee * 35 / 100);
+    // console.log(price?.data?.data?.total_fee);
+    // console.log(Math.round(displayPrice/100)*100);
+    resolve(Math.round(displayPrice/100)*100);
   } catch (error) {
     resolve(null);
   }
