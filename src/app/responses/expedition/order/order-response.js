@@ -197,6 +197,7 @@ module.exports = class {
       console.log(lastresi);
       // console.log(lastresi);
 
+
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
@@ -240,6 +241,8 @@ module.exports = class {
             return location.id === locationId;
           });
 
+          console.log('shipping charge');
+          console.log(servCode);
           const shippingCharge = await shippingFee({
             origin,
             destination,
@@ -247,7 +250,7 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
-
+          console.log(shippingCharge);
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
 
@@ -401,7 +404,7 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           console.log('PARAMETER');
-          console.log(parameter);
+          // console.log(parameter);
 
           if (messages?.length < 1) {
 
@@ -423,18 +426,26 @@ module.exports = class {
             });
             result.push(resultResponse);
           }
+
           return error?.shift();
           // return error;
         }),
       );
-      if (querySuccess?.length > 0) {
 
+
+      if (querySuccess?.length > 0) {
         await orderSuccessLogger(querySuccess);
+        console.log('reno J');
+
         await orderLogger({
           items: queryrLogger,
           sellerId: seller.id,
         });
+        console.log('reno K');
+
       }
+
+
       const filtered = response?.filter((item) => item);
       const orderResponse = {
         info: {
@@ -483,6 +494,7 @@ module.exports = class {
           { where: { id: batch.id } },
         );
       }
+
       return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
