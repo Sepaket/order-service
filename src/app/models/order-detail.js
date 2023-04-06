@@ -143,12 +143,12 @@ module.exports = (sequelize, DataTypes) => {
     //   through: 'Orders',
     // });
 
-    model.OrderDetail.hasOne(model.OrderAddress, {
-      as: 'receiverAddress',
-      // through: 'Orders',
-      // targetKey: 'orderId',
-      foreignKey: 'orderId',
-    });
+    // model.OrderDetail.hasOne(model.OrderAddress, {
+    //   as: 'receiverAddress',
+    //   // through: 'Orders',
+    //   // targetKey: 'orderId',/
+    //   foreignKey: 'orderId',
+    // });
 
 
     model.OrderDetail.hasOne(model.OrderTax, {

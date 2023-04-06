@@ -83,6 +83,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'orderId',
     });
 
+    model.Order.hasOne(model.OrderAddress, {
+      as: 'receiverAddress',
+      foreignKey: 'orderId',
+    });
+
+
     // model.Order.belongsTo(model.Seller, {
     //   as: 'seller',
     //   through: 'detail'
