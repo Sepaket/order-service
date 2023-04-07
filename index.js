@@ -13,7 +13,7 @@ const errorHandler = require('./src/app/middlewares/errorHandler');
 const batchScheduler = require('./src/scheduler/batch-scheduler');
 const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
-// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
 
 // batchScheduler.start();
