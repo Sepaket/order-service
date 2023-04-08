@@ -86,6 +86,39 @@ module.exports = class {
                 'createdAt',
                 'updatedAt',
               ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: false,
+                  paranoid: false,
+                  attributes: [
+                    ['id', 'address_receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      paranoid: false,
+                      required: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: this.trackingHistory,
@@ -133,41 +166,6 @@ module.exports = class {
               attributes: [
                 'name','email',
                 'phone',
-              ],
-            },
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'senderName',
-                'senderPhone',
-                'receiverName',
-                'receiverPhone',
-                'receiverAddress',
-                'receiverAddressNote',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                    'jne_origin_code',
-                    'jne_destination_code',
-                    'sicepat_origin_code',
-                    'sicepat_destination_code',
-                    'ninja_origin_code',
-                    'ninja_destination_code',
-                  ],
-                },
               ],
             },
             {

@@ -63,15 +63,15 @@ module.exports = class {
             'codFeeAdmin',
           ],
           include: [
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'receiverName',
-              ],
-            },
+            // {
+            //   model: this.orderAddress,
+            //   as: 'receiverAddress',
+            //   required: true,
+            //   attributes: [
+            //     ['id', 'receiver_id'],
+            //     'receiverName',
+            //   ],
+            // },
             // {
             //   model: this.ticket,
             //   as: 'ticket',
@@ -103,6 +103,39 @@ module.exports = class {
                 'status',
                 'updatedAt',
                 'createdAt',
+              ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: false,
+                  paranoid: false,
+                  attributes: [
+                    ['id', 'address_receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      paranoid: false,
+                      required: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
               ],
             },
             {
