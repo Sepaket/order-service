@@ -1,6 +1,8 @@
 const moment = require('moment');
 const httpErrors = require('http-errors');
-const { Sequelize } = require('sequelize');
+const { Sequelize,
+  Op
+} = require('sequelize');
 const { OrderBatch, Seller } = require('../../../models');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const jwtSelector = require('../../../../helpers/jwt-selector');
@@ -21,7 +23,11 @@ module.exports = class {
     const { query } = this.request;
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
-    const total = await this.batch.count({ where: { sellerId: seller.id } });
+    const total = await this.batch.count({ where: { sellerId: seller.id,
+      totalOrder : {
+        [Op.gt]: 0,
+      }
+      } });
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
@@ -50,7 +56,10 @@ module.exports = class {
               ],
             },
           ],
-          where: { ...search, sellerId: seller.id },
+          where: { ...search, sellerId: seller.id,
+            totalOrder : {
+              [Op.gt]: 0,
+            }},
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
@@ -94,6 +103,9 @@ module.exports = class {
     const condition = {
       [this.op.or]: {
         batchCode: { [this.op.substring]: query?.keyword || '' },
+      },
+      [this.op.gt]: {
+        totalOrder: 0,
       },
     };
 
