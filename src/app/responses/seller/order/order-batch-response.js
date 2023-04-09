@@ -104,9 +104,9 @@ module.exports = class {
       [this.op.or]: {
         batchCode: { [this.op.substring]: query?.keyword || '' },
       },
-      [this.op.gt]: {
-        totalOrder: 0,
-      },
+      // [this.op.gt]: {
+      //   totalOrder: 0,
+      // },
     };
 
     if (query?.date_start && query?.date_end) {
