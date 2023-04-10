@@ -222,9 +222,11 @@ module.exports = class {
             console.log('masuk ke jnecod');
             servCode = 'REG19';
             console.log(servCode);
-          }
-          if (body.service_code === 'NINJACOD'){
+          } else if (body.service_code === 'NINJACOD'){
             servCode = 'Standard';
+          } else {
+            console.log('in herte');
+            servCode = body.service_code;
           }
 
           let parameter = null;
