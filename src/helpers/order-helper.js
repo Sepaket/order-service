@@ -157,8 +157,11 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
       });
 
       const service = await prices?.find((item) => {
-        console.log(item);
-        if (item.service_code === 'CTC19' && serviceCode === 'JNECOD') return item;
+        // console.log(item);
+        if (item.service_code === 'CTC19' && serviceCode === 'JNECOD') {
+          console.log('jnecod dan ctc19');
+          return item;
+        }
         // if (item.service_code === 'CTCYES19' && serviceCode === 'REG19') return item;
         if (item.service_code === 'CTC19' && serviceCode === 'REG19') return item;
         return item.service_code === serviceCode;

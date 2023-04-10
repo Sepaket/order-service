@@ -194,9 +194,6 @@ module.exports = class {
         where: { logisticsProvider: 'sicepat' },
       });
 
-      console.log(lastresi);
-      // console.log(lastresi);
-
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
@@ -204,10 +201,8 @@ module.exports = class {
 
       var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
 
-
-      // var nextId = batch.id * 1000000;
       var nextId = 0;
-      // console.log(batch.id);
+
       const latestOrder = await this.order.findOne({
         order: [['id', 'DESC']],
       });
@@ -219,20 +214,21 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
 
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          console.log(item.is_cod);
-          console.log('COD CONDITION');
-          console.log(codCondition);
+          // console.log(item.is_cod);
+          // console.log('COD CONDITION');
+          // console.log(codCondition);
+          console.log(servCode);
           if (body.service_code === 'JNECOD'){
+            console.log('masuk ke jnecod');
             servCode = 'REG19';
-          } if (body.service_code === 'NINJACOD'){
+            console.log(servCode);
+          }
+          if (body.service_code === 'NINJACOD'){
             servCode = 'Standard';
-          } else {
-            servCode = body.service_code;
           }
 
-
           let parameter = null;
-
+          console.log(servCode);
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);

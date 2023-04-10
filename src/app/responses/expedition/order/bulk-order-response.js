@@ -229,6 +229,7 @@ module.exports = class {
         console.log(body.service_code);
 
         const service = await prices?.find((item) => item.service_code === body.service_code);
+        let servCode = '';
         // if (body.service_code === 'CTCYES19') {
         //   servCode = 'YES19';
         // }
