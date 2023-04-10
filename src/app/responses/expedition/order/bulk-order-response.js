@@ -226,27 +226,25 @@ module.exports = class {
           weight,
         });
         console.log('JNE');
-        console.log(prices);
-        let servCode = '';
-        if (body.service_code === 'CTCYES19') {
-          servCode = 'YES19';
-        }
-        if (body.service_code === 'CTCYES') {
-          servCode = 'YES';
-        }
+        console.log(body.service_code);
 
-        if (body.service_code === 'CTCSPS19') {
-          servCode = 'SPS19';
-        }
-        if (body.service_code === 'CTC19') {
-          servCode = 'REG19';
-        }
-        if (body.service_code === 'JNECOD') {
-          servCode = 'REG19';
-        }
-
-        const service = await prices?.find((item) => item.service_code === servCode);
-        console.log(service);
+        const service = await prices?.find((item) => item.service_code === body.service_code);
+        // if (body.service_code === 'CTCYES19') {
+        //   servCode = 'YES19';
+        // }
+        // if (body.service_code === 'CTCYES') {
+        //   servCode = 'YES';
+        // }
+        //
+        // if (body.service_code === 'CTCSPS19') {
+        //   servCode = 'SPS19';
+        // }
+        // if (body.service_code === 'CTC19') {
+        //   servCode = 'REG19';
+        // }
+        // if (body.service_code === 'JNECOD') {
+        //   servCode = 'REG19';
+        // }
 
         shippingFee = service?.price || 0;
       }
