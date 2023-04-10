@@ -99,14 +99,12 @@ module.exports = class {
   }
 
   querySearch() {
+    console.log('query search');
     const { query } = this.request;
     const condition = {
       [this.op.or]: {
         batchCode: { [this.op.substring]: query?.keyword || '' },
       },
-      // [this.op.gt]: {
-      //   totalOrder: 0,
-      // },
     };
 
     if (query?.date_start && query?.date_end) {

@@ -80,6 +80,38 @@ module.exports = class {
                 'createdAt',
                 'updatedAt',
               ],
+              include : [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: true,
+                  attributes: [
+                    ['id', 'receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      required: false,
+                      paranoid: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: this.seller,
@@ -110,36 +142,7 @@ module.exports = class {
                 'value',
               ],
             },
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'senderName',
-                'senderPhone',
-                'receiverName',
-                'receiverPhone',
-                'receiverAddress',
-                'receiverAddressNote',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  paranoid: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
+
           ],
           where: { ...search },
           order: [['id', 'DESC']],
