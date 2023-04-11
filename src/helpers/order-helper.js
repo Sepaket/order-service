@@ -162,7 +162,8 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
           console.log('jnecod dan ctc19');
           return item;
         }
-        // if (item.service_code === 'CTCYES19' && serviceCode === 'REG19') return item;
+        if (item.service_code === 'CTCYES19' && serviceCode === 'YES19') return item;
+        if (item.service_code === 'CTCSPS19' && serviceCode === 'SPS19') return item;
         if (item.service_code === 'CTC19' && serviceCode === 'REG19') return item;
         return item.service_code === serviceCode;
       });

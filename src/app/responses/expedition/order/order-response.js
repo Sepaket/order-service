@@ -248,6 +248,7 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
+          console.log('shipping charge');
           console.log(shippingCharge);
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
