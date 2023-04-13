@@ -20,6 +20,7 @@ const NotificationController = require('../app/controllers/admin/notification-co
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
+  route.get('/getreferralcode', AuthController.getreferralcode);
 });
 
 router.group('/profile', (route) => {

@@ -61,6 +61,37 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
               ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: true,
+                  attributes: [
+                    ['id', 'receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      required: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: this.sellerAddress,
@@ -87,39 +118,12 @@ module.exports = class {
                 },
               ],
             },
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'senderName',
-                'senderPhone',
-                'receiverName',
-                'receiverPhone',
-                'receiverAddress',
-                'receiverAddressNote',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
+
           ],
           where: { ...search },
           order: [['id', 'DESC']],
         }).then((response) => {
+
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
@@ -128,7 +132,7 @@ module.exports = class {
             const totalAmount = item.order.isCod
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
-
+            // console.log(item.order.receiverAddress);
             return {
               resi: item.order.resi,
               order_id: item.order_id,
@@ -150,11 +154,11 @@ module.exports = class {
                 },
               },
               receiver: {
-                name: item?.receiver_address?.receiverName || '',
-                phone: item?.receiver_address?.receiverPhone || '',
-                address: item?.receiver_address?.receiverAddress || '',
-                address_note: item?.receiver_address?.receiverAddressNote || '',
-                location: this.converter.arrayToSnakeCase(item?.receiver_address?.location) || null,
+                name: item?.order?.receiverAddress?.receiverName || '',
+                phone: item?.order?.receiverAddress?.receiverPhone || '',
+                address: item?.order?.receiverAddress?.receiverAddress || '',
+                address_note: item?.order?.receiverAddress?.receiverAddressNote || '',
+                location: this.converter.arrayToSnakeCase(item?.order?.receiverAddress?.location) || null,
               },
               sender: {
                 name: item?.receiver_address?.senderName || '',

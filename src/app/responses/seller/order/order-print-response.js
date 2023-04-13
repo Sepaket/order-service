@@ -66,6 +66,38 @@ module.exports = class {
                 'serviceCode',
                 'isCod',
               ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: true,
+                  attributes: [
+                    ['id', 'receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                    'hideInResi',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      required: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: this.sellerAddress,
@@ -91,36 +123,7 @@ module.exports = class {
                 },
               ],
             },
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'senderName',
-                'senderPhone',
-                'receiverName',
-                'receiverPhone',
-                'receiverAddress',
-                'receiverAddressNote',
-                'hideInResi',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
+
           ],
           where: { ...search, sellerId: seller.id },
           order: [['id', 'DESC']],
@@ -133,9 +136,9 @@ module.exports = class {
             const totalAmount = item.order.isCod
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
-console.log(item);
-            const truncatedAddress = (item?.receiver_address?.receiverAddress).substring(0,200) || null;
-            const truncatedAddressNote = (item?.receiver_address?.receiverAddressNote).substring(0,100) || null;
+
+            const truncatedAddress = (item?.order?.receiverAddress?.receiverAddress).substring(0,200) || null;
+            const truncatedAddressNote = (item?.order?.receiverAddress?.receiverAddressNote).substring(0,100) || null;
             const truncatedGoodsContent = (item?.goods_content).substring(0,50) || null;
             const truncatedGoodsNotes = (item?.notes).substring(0,100) || null;
 
@@ -161,11 +164,13 @@ console.log(item);
                 },
               },
               receiver: {
-                name: item?.receiver_address?.receiverName || '',
-                phone: item?.receiver_address?.receiverPhone || '',
+
+                name: item?.order?.receiverAddress?.receiverName || '',
+                phone: item?.order?.receiverAddress?.receiverPhone || '',
                 address: truncatedAddress || '',
                 address_note: truncatedAddressNote || '',
-                location: this.converter.arrayToSnakeCase(item?.receiver_address?.location) || null,
+                location: this.converter.arrayToSnakeCase(item?.order?.receiverAddress?.location) || null,
+
               },
               sender: {
                 name: item?.receiver_address?.senderName || '',
