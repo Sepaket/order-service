@@ -101,15 +101,7 @@ module.exports = class {
             'shippingCalculated',
           ],
           include: [
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'receiverName',
-              ],
-            },
+
             {
               model: this.orderHistory,
               as: 'history',
@@ -153,6 +145,17 @@ module.exports = class {
                 'createdAt',
                 'updatedAt',
                 'deletedAt',
+              ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: true,
+                  attributes: [
+                    ['id', 'receiver_id'],
+                    'receiverName',
+                  ],
+                },
               ],
             },
             {
