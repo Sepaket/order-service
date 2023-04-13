@@ -160,8 +160,8 @@ module.exports = class {
                 location: this.converter.arrayToSnakeCase(item?.order?.receiverAddress?.location) || null,
               },
               sender: {
-                name: item?.receiver_address?.senderName || '',
-                phone: item?.receiver_address?.senderPhone || '',
+                name: item?.order?.receiver_address?.senderName || '',
+                phone: item?.order?.receiver_address?.senderPhone || '',
                 hide_address: item.seller_address?.hideInResi,
                 address: item?.seller_address?.address || '',
                 address_note: '',

@@ -173,9 +173,9 @@ module.exports = class {
 
               },
               sender: {
-                name: item?.receiver_address?.senderName || '',
-                phone: item?.receiver_address?.senderPhone || '',
-                hide_address: item.receiver_address?.hideInResi,
+                name: item?.order?.receiver_address?.senderName || '',
+                phone: item?.order?.receiver_address?.senderPhone || '',
+                hide_address: item.order?.receiver_address?.hideInResi,
                 address: item?.seller_address?.address || '',
                 address_note: '',
                 location: this.converter.arrayToSnakeCase(item?.seller_address?.location) || null,
