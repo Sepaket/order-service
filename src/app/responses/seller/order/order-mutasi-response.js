@@ -197,7 +197,7 @@ module.exports = class {
           const mapped = result?.map((item) => ({
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
-            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            receiver_address: this.converter.objectToSnakeCase(item?.order.receiverAddress) || null,
             seller_received_amount: getSellerReceivedAmount(item),
             // item.order.status === 'CANCELED' || 'WAITING_PICKUP' || 'PROCESSED' ? '0.00' : item.seller_received_amount,
             seller_address: {
