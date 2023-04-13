@@ -131,7 +131,7 @@ module.exports = class {
             const totalAmount = item.order.isCod
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
-            // console.log(item.order.receiverAddress);
+            console.log(item.order.receiverAddress);
             return {
               resi: item.order.resi,
               order_id: item.order_id,
@@ -160,8 +160,8 @@ module.exports = class {
                 location: this.converter.arrayToSnakeCase(item?.order?.receiverAddress?.location) || null,
               },
               sender: {
-                name: item?.order?.receiver_address?.senderName || '',
-                phone: item?.order?.receiver_address?.senderPhone || '',
+                name: item?.order?.receiverAddress?.senderName || '',
+                phone: item?.order?.receiverAddress?.senderPhone || '',
                 hide_address: item.seller_address?.hideInResi,
                 address: item?.seller_address?.address || '',
                 address_note: '',
