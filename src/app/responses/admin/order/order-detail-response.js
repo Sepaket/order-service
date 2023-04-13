@@ -67,6 +67,38 @@ module.exports = class {
                 'isCod',
                 'status',
               ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: false,
+                  attributes: [
+                    ['id', 'address_receiver_id'],
+                    'senderName',
+                    'senderPhone',
+                    'receiverName',
+                    'receiverPhone',
+                    'receiverAddress',
+                    'receiverAddressNote',
+                  ],
+                  include: [
+                    {
+                      model: this.location,
+                      as: 'location',
+                      required: false,
+                      paranoid: false,
+                      attributes: [
+                        ['id', 'location_id'],
+                        'province',
+                        'city',
+                        'district',
+                        'subDistrict',
+                        'postalCode',
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: this.discount,
@@ -87,36 +119,6 @@ module.exports = class {
                 'picName',
                 'picPhoneNumber',
                 'hideInResi',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  paranoid: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: false,
-              attributes: [
-                ['id', 'address_receiver_id'],
-                'senderName',
-                'senderPhone',
-                'receiverName',
-                'receiverPhone',
-                'receiverAddress',
-                'receiverAddressNote',
               ],
               include: [
                 {
@@ -174,12 +176,12 @@ module.exports = class {
               result?.seller_address,
             ) || null;
 
-            result.receiver_address = await this.converter.objectToSnakeCase(
-              result?.receiver_address,
+            result.order.receiver_address = await this.converter.objectToSnakeCase(
+              result?.order?.receiver_address,
             ) || null;
 
-            result.receiver_address.location = await this.converter.objectToSnakeCase(
-              result?.receiver_address?.location,
+            result.order.receiver_address.location = await this.converter.objectToSnakeCase(
+              result?.order?.receiver_address?.location,
             ) || null;
 
             result.seller_address.location = await this.converter.objectToSnakeCase(

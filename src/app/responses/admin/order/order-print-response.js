@@ -123,7 +123,6 @@ module.exports = class {
           where: { ...search },
           order: [['id', 'DESC']],
         }).then((response) => {
-
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );

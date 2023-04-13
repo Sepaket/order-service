@@ -63,15 +63,7 @@ module.exports = class {
             // 'codFeeAdmin',
           ],
           include: [
-            {
-              model: this.orderAddress,
-              as: 'receiverAddress',
-              required: true,
-              attributes: [
-                ['id', 'receiver_id'],
-                'receiverName',
-              ],
-            },
+
             // {
             //   model: this.ticket,
             //   as: 'ticket',
@@ -103,6 +95,17 @@ module.exports = class {
                 // 'status',
                 // 'updatedAt',
                 // 'createdAt',
+              ],
+              include: [
+                {
+                  model: this.orderAddress,
+                  as: 'receiverAddress',
+                  required: true,
+                  attributes: [
+                    ['id', 'receiver_id'],
+                    'receiverName',
+                  ],
+                },
               ],
             },
             // {
@@ -144,7 +147,7 @@ module.exports = class {
           const mapped = result?.map((item) => ({
             ...item,
             order: this.converter.objectToSnakeCase(item?.order) || null,
-            receiver_address: this.converter.objectToSnakeCase(item?.receiver_address) || null,
+            receiver_address: this.converter.objectToSnakeCase(item?.order?.receiver_address) || null,
             seller_address: {
               ...item.seller_address,
               location: this.converter.objectToSnakeCase(item?.seller_address?.location) || null,

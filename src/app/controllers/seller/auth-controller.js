@@ -33,8 +33,9 @@ module.exports = {
 
   login: async (request, response, next) => {
     try {
+      console.log('before login validator');
       await LoginValidator(request.body);
-
+      console.log('after login validator');
       const result = await new LoginResponse({ request });
 
       response.send({
