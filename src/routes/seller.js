@@ -18,6 +18,7 @@ const TicketController = require('../app/controllers/seller/ticket-controller');
 router.group('/auth', (route) => {
   route.post('/register', AuthController.register);
   route.post('/login', AuthController.login);
+  route.post('/phonelogin', AuthController.phonelogin);
   route.post('/social', AuthController.social);
   route.get('/activate/:token', AuthController.activateEmail);
   route.post('/forgot-password', AuthController.forgotPassword);

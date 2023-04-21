@@ -31,11 +31,13 @@ module.exports = class {
           include: [{ model: this.orderDetail, as: 'detail', required: true }],
         });
 
-        if (order && order.status === 'CANCELED') throw new Error('Order ini sudah di batalkan');
+        if (order && order.status === 'CANCELED') {
+          throw new Error('Order ini sudah di batalkan');
+        } else {
+          await this.sicepat.cancel({ resi: order.resi });
 
-        await this.sicepat.cancel({ resi: order.resi });
-
-        this.insertLog(order);
+          this.insertLog(order);
+        }
 
         resolve(true);
       } catch (error) {

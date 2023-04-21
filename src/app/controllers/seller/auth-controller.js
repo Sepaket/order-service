@@ -1,5 +1,6 @@
 // validator
 const LoginValidator = require('../../validators/seller/auth/login-validator');
+const PhoneloginValidator = require('../../validators/seller/auth/phonelogin-validator');
 const RegisterValidator = require('../../validators/seller/auth/register-validator');
 const SocialValidator = require('../../validators/seller/auth/social-validator');
 const ForgotPasswordValidator = require('../../validators/seller/auth/forgot-password-validator');
@@ -36,6 +37,25 @@ module.exports = {
       console.log('before login validator');
       await LoginValidator(request.body);
       console.log('after login validator');
+
+      const result = await new LoginResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  phonelogin: async (request, response, next) => {
+    try {
+
+      await PhoneloginValidator(request.body);
+      console.log('after phone login validator');
+
       const result = await new LoginResponse({ request });
 
       response.send({

@@ -53,6 +53,7 @@
     "http-errors": "^2.0.0",
     "husky": "^3.1.0",
     "joi": "^17.6.0",
+    "joi-phone-number": "^5.1.1",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
     "moment": "^2.29.3",

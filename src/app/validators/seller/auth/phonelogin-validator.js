@@ -30,7 +30,7 @@ const phoneoremail = async ({ params, identifier }) => new Promise((resolve, rej
 
 const validator = joi.object({
   // email: joi.string().external((request) => phoneoremail({ params: request, identifier: 'phone' })),
-  email: joi.string().email().required().external((request) => isExist({ params: request, identifier: 'email' })),
+  email: joi.string().email().required().external((request) => isExist({ params: request, identifier: 'phone' })),
   password: joi.string().required(),
 });
 

@@ -13,27 +13,23 @@ const getLastStatus = (trackingStatus) => {
   if (orderStatus.PROCESSED.statuses.SICEPAT.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.PROCESSED.text;
   }
-
   if (orderStatus.DELIVERED.statuses.SICEPAT.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.DELIVERED.text;
   }
-
   if (orderStatus.CANCELED.statuses.SICEPAT.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.CANCELED.text;
   }
-
   if (orderStatus.RETURN_TO_SELLER.statuses.SICEPAT.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.RETURN_TO_SELLER.text;
   }
-
   if (orderStatus.PROBLEM.statuses.SICEPAT.indexOf(trackingStatus) !== -1) {
     currentStatus = orderStatus.PROBLEM.text;
   }
-
   return currentStatus;
 };
 
 const tracking = async () => {
+  console.log('enter sicepat tracking')
   try {
     const trackHistories = [];
     const order = await Order.findAll({
