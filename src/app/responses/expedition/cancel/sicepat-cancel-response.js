@@ -34,9 +34,14 @@ module.exports = class {
         if (order && order.status === 'CANCELED') {
           throw new Error('Order ini sudah di batalkan');
         } else {
-          await this.sicepat.cancel({ resi: order.resi });
-
-          this.insertLog(order);
+          console.log('nin');
+          try {
+            await this.sicepat.cancel({ resi: order.resi });
+          } catch (error) {
+            console.log('NINA ERROR');
+          }
+          // console.log(cancelresponse);
+          await this.insertLog(order);
         }
 
         resolve(true);
@@ -66,6 +71,8 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
+      console.log('before background update');
+      console.log(order.resi);
       await this.background.update(
         { isExecute: true },
         { where: { resi: order.resi } },
