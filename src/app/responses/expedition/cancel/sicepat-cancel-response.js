@@ -34,11 +34,10 @@ module.exports = class {
         if (order && order.status === 'CANCELED') {
           throw new Error('Order ini sudah di batalkan');
         } else {
-          console.log('nin');
           try {
             await this.sicepat.cancel({ resi: order.resi });
           } catch (error) {
-            console.log('NINA ERROR');
+            console.log('canceling sicepat order error');
           }
           // console.log(cancelresponse);
           await this.insertLog(order);

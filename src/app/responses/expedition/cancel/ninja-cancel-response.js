@@ -31,11 +31,18 @@ module.exports = class {
           include: [{ model: this.orderDetail, as: 'detail', required: true }],
         });
 
-        if (order && order.status === 'CANCELED') throw new Error('Order ini sudah di batalkan');
-
-        await this.ninja.cancel({ resi: order.resi });
-
-        this.insertLog(order);
+        if (order && order.status === 'CANCELED') {
+          throw new Error('Order ini sudah di batalkan');
+        } else {
+          console.log('canceling ninja order');
+          try {
+            await this.ninja.cancel({ resi: order.resi });
+          } catch (error) {
+            console.log('cancling ninja order error');
+          }
+          // console.log(cancelresponse);
+          await this.insertLog(order);
+        }
 
         resolve(true);
       } catch (error) {
