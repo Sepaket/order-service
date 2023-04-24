@@ -48,15 +48,31 @@ const sicepatServiceStatus = [
   { code: 'SICEPATCOD', name: 'Sicepat COD', type: 'SICEPAT' },
 ];
 
+const sapServiceStatus = [
+  { code: 'UDRREG', name: 'SAP REG', type: 'SAP' },
+  { code: 'UDRONS', name: 'SAP ODS', type: 'SAP' },
+  { code: 'UDRSDS', name: 'SAP SDS', type: 'SAP' },
+  { code: 'UDRURG', name: 'SAP URGENT', type: 'SAP' },
+  { code: 'DRGREG', name: 'SAP REGULAR DARAT', type: 'SAP' },
+  { code: 'CRLREG', name: 'SAP REGULAR LAUT', type: 'SAP' },
+  { code: 'ITCREG', name: 'SAP CITY REGULAR', type: 'SAP' },
+  { code: 'ITCODS', name: 'SAP CITY URGENT', type: 'SAP' },
+  { code: 'TRC01', name: 'SAP TRUCKING', type: 'SAP' },
+  { code: 'CRCODS', name: 'SAP ODS CC', type: 'SAP' },
+  { code: 'ATM', name: 'SAP ATM', type: 'SAP' },
+];
+
 const serviceCode = {
   JNE: jneServiceStatus,
   SICEPAT: sicepatServiceStatus,
   NINJA: ninjaServiceStatus,
+  SAP: sapServiceStatus,
   IDEXPRESS: idxServiceStatus,
   ALL: [
     ...jneServiceStatus,
     ...sicepatServiceStatus,
     ...ninjaServiceStatus,
+    ...sapServiceStatus,
     ...idxServiceStatus,
   ],
 };

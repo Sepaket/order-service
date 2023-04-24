@@ -224,6 +224,8 @@ module.exports = class {
             console.log(servCode);
           } else if (body.service_code === 'NINJACOD'){
             servCode = 'Standard';
+          } else if (body.service_code === 'SICEPATCOD') {
+            servCode = 'SIUNT';
           } else {
             console.log('in herte');
             servCode = body.service_code;

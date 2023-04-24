@@ -3,6 +3,7 @@ const jne = require('../../../../helpers/jne');
 const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const sicepat = require('../../../../helpers/sicepat');
+const sap = require('../../../../helpers/sap');
 const idexpress = require('../../../../helpers/idexpress');
 const { idxServiceStatus } = require('../../../../constant/status');
 const jwtSelector = require('../../../../helpers/jwt-selector');
@@ -20,6 +21,7 @@ module.exports = class {
     this.jne = jne;
     this.tax = tax;
     this.ninja = ninja;
+    this.sap = sap;
     this.request = request;
     this.sicepat = sicepat;
     this.location = Location;
@@ -76,6 +78,9 @@ module.exports = class {
       const ninjaCondition = (
         this.origin.ninjaOriginCode !== '' && this.destination.ninjaDestinationCode !== ''
       );
+      const sapCondition = (
+        this.origin.sapOriginCode !== '' && this.destination.sapDestinationCode !== ''
+      );
 
       const idxCondition = (
         this.origin.idexpressOriginCode !== '' && this.destination.idexpressDestinationCode !== ''
@@ -88,6 +93,7 @@ module.exports = class {
       }
 
       if (body.type === 'SICEPAT' && sicepatCondition) {
+        console.log('sicepat & condition');
         const sicepatPrices = await this.sicepatFee();
         if (sicepatPrices?.length > 0) fees.push(sicepatPrices);
       }
@@ -109,11 +115,13 @@ module.exports = class {
         let jnePrices = [];
         let sicepatPrices = [];
         let ninjaPrices = [];
+        let sapPrices = [];
         let idxPrices = [];
 
         if (jneCondition) jnePrices = await this.jneFee();
         if (sicepatCondition) sicepatPrices = await this.sicepatFee();
         if (ninjaCondition) ninjaPrices = await this.ninjaFee();
+        // if (sapCondition) sapPrices = await this.sapFee();
         if (idxCondition) idxPrices = await this.idxFee();
 
         result = result.concat(jnePrices);

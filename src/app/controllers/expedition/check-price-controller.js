@@ -14,7 +14,7 @@ module.exports = async (request, response, next) => {
     var cod = JSON.parse(JSON.stringify(items));
     var codItemIndex = 0;
 
-
+    // console.log(result);
     for (item in cod) {
       if (cod[item].type === 'JNE') {
         if (cod[item].service_code === 'REG19') {
@@ -25,7 +25,13 @@ module.exports = async (request, response, next) => {
           codItemIndex = item;
         }
       }
+      else if (cod[item].type === 'SICEPAT') {
+        if (cod[item].service_code === 'SIUNT') {
+          codItemIndex = item;
+        }
+      }
     }
+
 
     if (cod[codItemIndex].type === 'JNE') {
       cod[codItemIndex].service_name = 'JNE COD';
@@ -34,6 +40,10 @@ module.exports = async (request, response, next) => {
     } else if (cod[codItemIndex].type === 'NINJA') {
       cod[codItemIndex].service_name = 'NINJA COD';
       cod[codItemIndex].service_code = 'NINJACOD';
+      result.data.push(cod[codItemIndex]);
+    } else if (cod[codItemIndex].type === 'SICEPAT') {
+      cod[codItemIndex].service_name = 'SICEPAT COD';
+      cod[codItemIndex].service_code = 'SICEPATCOD';
       result.data.push(cod[codItemIndex]);
     }
 

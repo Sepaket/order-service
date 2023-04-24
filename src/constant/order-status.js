@@ -1,6 +1,7 @@
 const jneStatus = require('./jne-status');
 const sicepatStatus = require('./sicepat-status');
 const ninjaStatus = require('./ninja-status');
+const sapStatus = require('./sap-status');
 const idxStatus = require('./idx-status');
 
 const orderStatus = {
@@ -14,6 +15,7 @@ const orderStatus = {
       JNE: jneStatus.PROCESSED,
       SICEPAT: sicepatStatus.PROCESSED,
       NINJA: ninjaStatus.PROCESSED,
+      SAP: sapStatus.PROCESSED,
       IDEXPRESS: idxStatus.PROCESSED,
     },
   },
@@ -23,6 +25,7 @@ const orderStatus = {
       JNE: jneStatus.DELIVERED,
       SICEPAT: sicepatStatus.DELIVERED,
       NINJA: ninjaStatus.DELIVERED,
+      SAP: sapStatus.DELIVERED,
       IDEXPRESS: idxStatus.DELIVERED,
     },
   },
@@ -32,6 +35,7 @@ const orderStatus = {
       JNE: jneStatus.CANCELED,
       SICEPAT: sicepatStatus.CANCELED,
       NINJA: ninjaStatus.CANCELED,
+      SAP: sapStatus.CANCELED,
       IDEXPRESS: idxStatus.CANCELED,
     },
   },
@@ -41,6 +45,7 @@ const orderStatus = {
       JNE: jneStatus.RETURN_TO_SELLER,
       SICEPAT: sicepatStatus.RETURN_TO_SELLER,
       NINJA: ninjaStatus.RETURN_TO_SELLER,
+      SAP: sapStatus.RETURN_TO_SELLER,
       IDEXPRESS: idxStatus.RETURN_TO_SELLER,
     },
   },
@@ -50,6 +55,7 @@ const orderStatus = {
       JNE: jneStatus.PROBLEM,
       SICEPAT: sicepatStatus.PROBLEM,
       NINJA: ninjaStatus.PROBLEM,
+      SAP: sapStatus.PROBLEM,
       IDEXPRESS: idxStatus.PROBLEM,
     },
   },
