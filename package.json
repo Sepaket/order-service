@@ -18,7 +18,8 @@
     "seed:undo": "npx sequelize-cli db:seed:undo",
     "seed:undo:all": "npx sequelize-cli db:seed:undo:all",
     "reset:db": "npm run migrate:undo:all && npm run migrate && npm run seed",
-    "db:sync": "npx sequelize-cli db:seed --seed 20220928122416-FixSyncSeeder.js"
+    "db:sync": "npx sequelize-cli db:seed --seed 20220928122416-FixSyncSeeder.js",
+    "prepare": "husky install"
   },
   "husky": {
     "hooks": {
@@ -51,7 +52,6 @@
     "google-auth-library": "^8.0.3",
     "helmet": "^5.1.0",
     "http-errors": "^2.0.0",
-    "husky": "^3.1.0",
     "joi": "^17.6.0",
     "joi-phone-number": "^5.1.1",
     "jsonwebtoken": "^8.5.1",
@@ -79,9 +79,11 @@
     "@babel/core": "^7.18.2",
     "@babel/plugin-proposal-optional-chaining": "^7.17.12",
     "@babel/preset-env": "^7.18.2",
-    "eslint": "^7.32.0",
+    "eslint": "^8.39.0",
     "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.24.1",
+    "husky": "^8.0.3",
     "sequelize-cli": "^6.4.1"
   }
 }
