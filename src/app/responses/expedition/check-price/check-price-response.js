@@ -87,13 +87,12 @@ module.exports = class {
       );
 
       if (body.type === 'JNE' && jneCondition) {
-        console.log('jne & condition');
         const jnePrices = await this.jneFee();
+        // console.log(jnePrices);
         if (jnePrices?.length > 0) fees.push(jnePrices);
       }
 
       if (body.type === 'SICEPAT' && sicepatCondition) {
-        console.log('sicepat & condition');
         const sicepatPrices = await this.sicepatFee();
         if (sicepatPrices?.length > 0) fees.push(sicepatPrices);
       }
@@ -103,6 +102,12 @@ module.exports = class {
         console.log(`destination code 1: ${this.destination.ninjaOriginCode}`);
         const ninjaPrices = await this.ninjaFee();
         if (ninjaPrices?.length > 0) fees.push(ninjaPrices);
+      }
+
+      if (body.type === 'SAP' && sapCondition) {
+        // console.log(sapCondition);
+        const sapPrice = await this.sapFee();
+        if (sapPrice?.length > 0) fees.push(sapPrice);
       }
 
       if (body.type === 'IDEXPRESS' && idxCondition) {
@@ -389,6 +394,104 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
+
+
+  async sapFee() {
+    try {
+      const { body } = this.request;
+      // const prices = await this.jne.checkPrice({
+      //   origin: this.origin.jneOriginCode,
+      //   destination: this.destination.jneDestinationCode,
+      //   weight: body.weight,
+      // });
+
+      const prices_string = '[{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR","service_code":"UDRREG","goods_type":"Paket","currency":"IDR","price":"65000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR250","service_code":"JTR250","goods_type":"Paket","currency":"IDR","price":"1350000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR>250","service_code":"JTR>250","goods_type":"Paket","currency":"IDR","price":"1800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"REG","service_code":"REG19","goods_type":"Document/Paket","currency":"IDR","price":"24000","etd_from":"3","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR<150","service_code":"JTR<150","goods_type":"Paket","currency":"IDR","price":"800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"OKE","service_code":"OKE19","goods_type":"Document/Paket","currency":"IDR","price":"21000","etd_from":"4","etd_thru":"7","times":"D"}]';
+      const prices = JSON.parse(prices_string);
+      // console.log('====================');
+      // console.log(JSON.stringify(prices));
+      // console.log('------------------');
+
+      const mapped = await prices?.filter((item) => item.times)?.map((item) => {
+        const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
+        const codCondition = (
+          (item.service_code === 'REG19' || item.service_code === 'CTC19')
+          && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
+        );
+
+        let discountApplied = this.selectedDiscount.value;
+        if (this.selectedDiscount.type === 'PERCENTAGE') {
+          discountApplied = (
+            parseFloat(item.price) * parseFloat(this.selectedDiscount.value)
+          ) / 100;
+        }
+
+        let totalCalculatedCod = item.price;
+        let totalCalculatedNcod = item.price;
+        let vatCalculated = this.selectedVat.value;
+        let codCalculated = this.selectedFee?.codFee || 0;
+        if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
+          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.price)) / 100;
+        }
+
+        if (this.selectedVat.type === 'PERCENTAGE') {
+          vatCalculated = (parseFloat(this.selectedVat.value) * parseFloat(item.price)) / 100;
+        }
+
+        const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
+
+        if (codCondition) {
+          totalCalculatedCod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(taxCalculated)
+          ) - parseFloat(discountApplied);
+        }
+
+        if (!codCondition) {
+          totalCalculatedNcod = (
+            (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
+          ) - parseFloat(discountApplied);
+        }
+        let servCode = item.service_code;
+        let servDisplay = item.service_display;
+        if (item.service_code === 'CTCYES19') {
+          servCode = 'YES19';
+        }
+        if (item.service_display === 'CTCYES') {
+          servDisplay = 'YES';
+        }
+
+        if (item.service_code === 'CTCSPS19') {
+          servCode = 'SPS19';
+        }
+        if (item.service_display === 'CTCSPS') {
+          servDisplay = 'SPS';
+        }
+
+
+        return {
+          weight: body.weight,
+          serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
+          serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
+          availableCod: codCondition,
+          estimation: `${item.etd_from} - ${item.etd_thru}`,
+          estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
+          price: item.price,
+          priceFormatted: formatCurrency(item.price, 'Rp.'),
+          type: 'JNE',
+          discount: discountApplied,
+          discount_raw: this.selectedDiscount,
+          tax: taxCalculated,
+          total_cod: totalCalculatedCod,
+          total_non_cod: totalCalculatedNcod,
+        };
+      }) || [];
+      // console.log((mapped.data).length);
+
+      return mapped;
+    } catch (error) {
+      throw new Error(error?.message || 'Something Wrong');
+    }
+  }
+
 
   async idxFee() {
     try {

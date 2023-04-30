@@ -8,6 +8,7 @@ const tax = require('../constant/tax');
 const sicepat = require('./sicepat');
 const ninja = require('./ninja');
 const jne = require('./jne');
+const sap = require('./sap');
 const {
   Order,
   OrderTax,
@@ -192,6 +193,19 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 
       const service = await prices?.find((item) => item.service === serviceCode);
       price = service?.tariff || 0;
+    }
+
+    if (expedition === 'SAP') {
+      console.log("SAP CHECK PRICE");
+      const prices = await sap.checkPrice({
+        origin: origin?.sicepatOriginCode,
+        destination: destination?.sicepatDestinationCode,
+        weight,
+      });
+
+      const service = await prices?.find((item) => item.service === serviceCode);
+      price = service?.tariff || 0;
+      console.log(prices);
     }
 
     resolve(parseFloat(price));

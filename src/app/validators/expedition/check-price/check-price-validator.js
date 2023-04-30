@@ -13,7 +13,7 @@ const isExist = async ({ params, identifier }) => new Promise((resolve, reject) 
 });
 
 const validator = joi.object({
-  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS', 'ALL'),
+  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS', 'SAP','ALL'),
   origin: joi
     .number()
     .min(1)

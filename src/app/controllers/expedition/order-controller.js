@@ -16,6 +16,7 @@ module.exports = {
       await CommonOrderValidator(request);
       let result;
       result = await new OrderResponse({ request });
+      console.log('Common order response seuccess!!!');
       response.send({
         code: 200,
         message: 'OK',

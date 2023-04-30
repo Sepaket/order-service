@@ -59,8 +59,9 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log('before create order');
         const result = await this.createOrder();
-        console.log('after create order');
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!AFTER create order');
         resolve(result);
       } catch (error) {
         reject(error);
@@ -227,12 +228,13 @@ module.exports = class {
           } else if (body.service_code === 'SICEPATCOD') {
             servCode = 'SIUNT';
           } else {
-            console.log('in herte');
+            // console.log('in herte');
             servCode = body.service_code;
           }
 
           let parameter = null;
-          console.log(servCode);
+          // console.log(servCode);
+
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);
@@ -241,8 +243,6 @@ module.exports = class {
             return location.id === locationId;
           });
 
-          console.log('shipping charge');
-          console.log(servCode);
           const shippingCharge = await shippingFee({
             origin,
             destination,
@@ -254,11 +254,7 @@ module.exports = class {
           console.log(shippingCharge);
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
-
-
           let codFeeCalculated = trxFee?.codFee || 0;
-
-
           let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
@@ -315,7 +311,8 @@ module.exports = class {
               }
             }
           }
-
+          console.log(currentResi);
+          console.log('here???????????');
           let shippingCalculated = 0;
           if (item.is_cod) {
 
