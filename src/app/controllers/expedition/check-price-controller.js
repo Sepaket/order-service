@@ -9,7 +9,7 @@ module.exports = async (request, response, next) => {
     await CheckPriceValidator(request.body);
     console.log("check price")
     const result = await new CheckPriceResponse({ request });
-
+    console.log('after check price response');
     var items = result.data;
     var cod = JSON.parse(JSON.stringify(items));
     var codItemIndex = 0;

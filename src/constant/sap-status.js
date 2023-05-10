@@ -1,46 +1,35 @@
-const ninjaStatus = {
+const sapStatus = {
 
   WAITING_PICKUP: [
-    'pending pickup',
+    'ENTRI (SEDANG DI PICKUP)',
+    'ENTRI (PENDING PICKUP)',
+    'ENTRI (SEDANG PICKUP ULANG)',
   ],
 
   PROCESSED: [
-    'successful pickup',
-    'en-route to sorting hub',
-    'arrived at sorting hub',
-    'transferred to 3PL',
-    'arrived at origin hub',
-    'on vehicle for delivery',
-    'on vehicle for delivery (rts)',
-    'arrived at distribution point',
-    'pending reschedule',
-    'pending pickup at distribution point',
-    'van en-route to pickup',
-    'parcel size',
-    'parcel weight',
-    'parcel measurements update',
-    'staging',
-    'cross border transit',
-    'customs cleared',
+    'PICKED UP ',
+    'ENTRI VERIFIED ',
+    'MANIFEST OUTGOING',
+    'OUTGOING SMU',
+    'INCOMING',
+    'DELIVERY',
+    'OUTGOING RETURN',
+    'INCOMING RETURN',
+    'DELIVERY RETURN',
   ],
   DELIVERED: [
-    'successful delivered',
-    'completed',
-    'customs held',
-    'successful delivery',
+    'POD - DELIVERED',
   ],
   CANCELED: [
-    'cancelled',
+    'VOID PICKUP',
   ],
   RETURN_TO_SELLER: [
-    'returned to sender',
-    'return to sender triggered',
-    'returned to sender',
+
+    'SHIPMENT RETURN TO CLIENT',
   ],
   PROBLEM: [
-    'pickup fail',
-    'first attempt delivery fail',
+    'POD - UNDELIVERED',
   ],
 };
 
-module.exports = ninjaStatus;
+module.exports = sapStatus;

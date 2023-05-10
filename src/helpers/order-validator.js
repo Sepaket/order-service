@@ -28,7 +28,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     // console.log(shippingCharge);
     if (!shippingCharge)
     {
-      error.push({ message: 'Destinasi yang dituju tidak ditemukan' });
+      error.push({ message: 'Destinasi yang dituju tidak ditemukan - Shipping Charge not found' });
     }
 
     if (!codCondition) {
