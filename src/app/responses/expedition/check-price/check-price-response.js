@@ -106,7 +106,9 @@ module.exports = class {
 
       if (body.type === 'SAP' && sapCondition) {
         // console.log(sapCondition);
+        console.log('this is SAP')
         const sapPrice = await this.sapFee();
+        console.log(' after sapPrice');
         if (sapPrice?.length > 0) fees.push(sapPrice);
       }
 
@@ -180,6 +182,7 @@ module.exports = class {
 
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
+        console.log(item.service_code);
         const codCondition = (
           (item.service_code === 'REG19' || item.service_code === 'CTC19')
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
@@ -267,7 +270,7 @@ module.exports = class {
         destination: this.destination.sicepatDestinationCode,
         weight: body.weight,
       });
-
+      console.log(prices)
       const mapped = prices?.map((item) => {
         const rawEstimation = item.etd.split(' hari');
         const codCondition = (
@@ -399,25 +402,25 @@ module.exports = class {
   async sapFee() {
     try {
       const { body } = this.request;
-      // const prices = await this.jne.checkPrice({
+      // const prices = await this.sap.checkPrice({
       //   origin: this.origin.jneOriginCode,
       //   destination: this.destination.jneDestinationCode,
       //   weight: body.weight,
       // });
 
       const prices_string = '[{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR","service_code":"UDRREG","goods_type":"Paket","currency":"IDR","price":"65000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR250","service_code":"JTR250","goods_type":"Paket","currency":"IDR","price":"1350000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR>250","service_code":"JTR>250","goods_type":"Paket","currency":"IDR","price":"1800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"REG","service_code":"REG19","goods_type":"Document/Paket","currency":"IDR","price":"24000","etd_from":"3","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR<150","service_code":"JTR<150","goods_type":"Paket","currency":"IDR","price":"800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"OKE","service_code":"OKE19","goods_type":"Document/Paket","currency":"IDR","price":"21000","etd_from":"4","etd_thru":"7","times":"D"}]';
-      const prices = JSON.parse(prices_string);
-      // console.log('====================');
-      // console.log(JSON.stringify(prices));
-      // console.log('------------------');
 
-      const mapped = await prices?.filter((item) => item.times)?.map((item) => {
-        const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
-        const codCondition = (
-          (item.service_code === 'REG19' || item.service_code === 'CTC19')
-          && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
-        );
+      console.log('inside SAP fee')
+      const sap_price_response = '{"origin":"JB07","destination":"JB07","weight":"1","coverage_cod":true,"price":{"REG": 17500},"price_detail":{"DRGREG":{"service_type_code":"REG","service_type_name":"REGULAR","unit_price":"3500","minimum_kilo":5,"price":17500,"sla":"2-3 Hari","sla_min":"2","sla_max":"3","id":"374353"}},"price_array":[{"service_type_code":"REG","service_type_name":"REGULAR","unit_price":"3500","minimum_kilo":5,"price":17500,"sla":"2-3 Hari","sla_min":"2","sla_max":"3","id":"374353"}]}';
+      const prices_1 = JSON.parse(sap_price_response);
+      const prices = prices_1.price_array
+      console.log('====================');
+      console.log(JSON.stringify(prices));
+      console.log('------------------');
 
+      const mapped = prices?.map((item) => {
+        const rawEstimation = item.sla.split(' Hari');
+        const codCondition = false; //ini mesti dilihat apa saja yg dukung COD
         let discountApplied = this.selectedDiscount.value;
         if (this.selectedDiscount.type === 'PERCENTAGE') {
           discountApplied = (
@@ -429,8 +432,9 @@ module.exports = class {
         let totalCalculatedNcod = item.price;
         let vatCalculated = this.selectedVat.value;
         let codCalculated = this.selectedFee?.codFee || 0;
+
         if (this.selectedFee?.codFeeType === 'PERCENTAGE') {
-          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.price)) / 100;
+          codCalculated = (parseFloat(this.selectedFee?.codFee) * parseFloat(item.tariff)) / 100;
         }
 
         if (this.selectedVat.type === 'PERCENTAGE') {
@@ -450,33 +454,19 @@ module.exports = class {
             (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
           ) - parseFloat(discountApplied);
         }
-        let servCode = item.service_code;
-        let servDisplay = item.service_display;
-        if (item.service_code === 'CTCYES19') {
-          servCode = 'YES19';
-        }
-        if (item.service_display === 'CTCYES') {
-          servDisplay = 'YES';
-        }
-
-        if (item.service_code === 'CTCSPS19') {
-          servCode = 'SPS19';
-        }
-        if (item.service_display === 'CTCSPS') {
-          servDisplay = 'SPS';
-        }
-
+        let servCode = item.service_type_code;
+        let servDisplay = item.service_type_name;
 
         return {
           weight: body.weight,
           serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
           serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
           availableCod: codCondition,
-          estimation: `${item.etd_from} - ${item.etd_thru}`,
-          estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
+          estimation: rawEstimation[0],
+          estimationFormatted: item.sla,
           price: item.price,
           priceFormatted: formatCurrency(item.price, 'Rp.'),
-          type: 'JNE',
+          type: 'SAP',
           discount: discountApplied,
           discount_raw: this.selectedDiscount,
           tax: taxCalculated,

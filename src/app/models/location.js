@@ -58,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    sapBranchCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   };
 
   const Location = sequelize.define('Location', schema, {

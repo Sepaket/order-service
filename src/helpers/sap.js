@@ -45,7 +45,7 @@ const getDestination = () => new Promise((resolve, reject) => {
 
 const checkPrice = (payload) => new Promise((resolve) => {
   const { origin, destination, weight } = payload;
-
+  console.log('SAP CHECKPRUICE');
   axios.get(`${process.env.SAP_BASE_URL_TRACKING}/customer/tariff`, {
     params: {
       origin,
@@ -63,7 +63,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
 });
 
 const createOrder = (payload) => new Promise(async (resolve) => {
-  axios.post(`${process.env.SAP_BASE_URL_PICKUP}/partner/requestpickuppackage`, {
+  axios.post(`${process.env.SAP_BASE_URL_PICKUP}/shipment/pickup/single_push`, {
     auth_key: process.env.SAP_APIKEY_PICKUP,
     ...payload,
   }).then((response) => {

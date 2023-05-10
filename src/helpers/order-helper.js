@@ -116,12 +116,20 @@ const jneResi-deprecated = `
 
     const jneResi = `
       ${process.env.JNE_ORDER_PREFIX}
-      ${moment()?.format('x')?.valueOf()?.toString()
-    ?.substring(1, 4)}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1, 4)}
       ${batchno}
       ${idno}
       ${await random({ min: 0, max: 9, integer: true })}
     `;
+    const sapResi = `
+      ${process.env.SAP_ORDER_PREFIX}
+      ${moment()?.format('x')?.valueOf()?.toString()?.substring(1, 4)}
+      ${batchno}
+      ${idno}
+      ${await random({ min: 0, max: 9, integer: true })}
+    `;
+
+
 
     let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
     const currentResiString = currentResi.toString();
@@ -133,6 +141,7 @@ const jneResi-deprecated = `
     if (expedition === 'SICEPAT') resi = sicepatResi;
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
+    if (expedition === 'SAP') resi = sapResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     resolve(resi);
   } catch (error) {
     reject(error);
@@ -197,15 +206,25 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 
     if (expedition === 'SAP') {
       console.log("SAP CHECK PRICE");
-      const prices = await sap.checkPrice({
-        origin: origin?.sicepatOriginCode,
-        destination: destination?.sicepatDestinationCode,
-        weight,
-      });
+      console.log(origin);
 
-      const service = await prices?.find((item) => item.service === serviceCode);
-      price = service?.tariff || 0;
-      console.log(prices);
+
+      // const prices = await sap.checkPrice({
+      //   origin: origin?.sapOriginCode,
+      //   destination: destination?.sapDestinationCode,
+      //   weight,
+      // });
+
+      const sap_price_response = '{"origin":"JB07","destination":"JB07","weight":"1","coverage_cod":true,"price":{"REG": 17500},"price_detail":{"DRGREG":{"service_type_code":"UDRREG","service_type_name":"REGULAR","unit_price":"3500","minimum_kilo":5,"price":17500,"sla":"2-3 Hari","sla_min":"2","sla_max":"3","id":"374353"}},"price_array":[{"service_type_code":"UDRREG","service_type_name":"REGULAR","unit_price":"3500","minimum_kilo":5,"price":17500,"sla":"2-3 Hari","sla_min":"2","sla_max":"3","id":"374353"}]}';
+      const prices_1 = JSON.parse(sap_price_response);
+      const prices = prices_1.price_array //sementara sebelum bisa check fee langsung dari production
+
+      const service = await prices?.find((item) => item.service_type_code === serviceCode);
+
+      // NAMA service_type_code yg dikirim balik sebagai response dari SAP berbeda dengan service_type_code yg dikirim dari partner
+
+      price = service?.price || 0;
+
     }
 
     resolve(parseFloat(price));

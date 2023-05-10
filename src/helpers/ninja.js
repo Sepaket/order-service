@@ -95,6 +95,8 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
 const createOrder = (payload) => new Promise(async (resolve) => {
   const token = await localToken() || await tokenization();
+  console.log('inside ninja creae order')
+  // console.log(payload)
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
@@ -102,12 +104,13 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       Authorization: `Bearer ${token}`,
     },
   }).then((response) => {
-    console.log(response);
+    // console.log(response);
     resolve({
       status: true,
       message: 'OK',
     });
   }).catch((error) => {
+    // console.log(error.response.data.error.details[0].message)
     resolve({
       status: false,
       message: error?.response?.data?.error?.message || error?.message,
@@ -133,8 +136,8 @@ const tracking = (payload) => new Promise(async (resolve) => {
 const cancel = (payload) => new Promise(async (resolve, reject) => {
   const { resi } = payload;
   const token = await localToken() || await tokenization();
-  console.log(resi);
-  console.log(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`);
+  // console.log(resi);
+  // console.log(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`);
   axios.delete(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`, {
     headers: {
       Authorization: `Bearer ${token}`,

@@ -4,10 +4,12 @@ const { Sequelize } = require('sequelize');
 const jne = require('../../../../helpers/jne');
 const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
+const sap = require('../../../../helpers/sap');
 const jneParameter = require('./order-parameter/jne');
 const sicepat = require('../../../../helpers/sicepat');
 const ninjaParameter = require('./order-parameter/ninja');
 const sicepatParameter = require('./order-parameter/sicepat');
+const sapParameter = require('./order-parameter/sap');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const orderValidator = require('../../../../helpers/order-validator');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
@@ -243,7 +245,7 @@ module.exports = class {
             return location.id === locationId;
           });
 
-          const shippingCharge = await shippingFee({
+          let shippingCharge = await shippingFee({
             origin,
             destination,
             weight: item.weight,
@@ -311,34 +313,37 @@ module.exports = class {
               }
             }
           }
-          console.log(currentResi);
-          console.log('here???????????');
+
           let shippingCalculated = 0;
           if (item.is_cod) {
-
+            console.log('cod');
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
             + parseFloat(insuranceSelected);
           } else {
+            console.log('noncod');
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
           }
 
           const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
+          // console.log(codFee);
+          // console.log(trxFee?.codFee);
+          // console.log(shippingCharge);
           const goodsAmount = !item.is_codf
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
-
+          // console.log(creditCondition);
           if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
 
           const totalAmount = item?.is_cod
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
-
+          console.log(totalAmount);
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
@@ -348,10 +353,15 @@ module.exports = class {
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'NINJA'){
             // sicepatResi += 1;
-            console.log('ninja order')
+            console.log('ninja order') //current resi is ignores. resi is generated from timestamp
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+          } else if (body.type === 'SAP'){
+            // sicepatResi += 1;
+            console.log('sap order') //current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
-
+          console.log('RESI = ');
+          console.log(resi);
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
@@ -364,11 +374,17 @@ module.exports = class {
               sicepatResi += 1;
               resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             } else if (body.type === 'NINJA'){
+              sicepatResi += 1;
+              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
+            } else if (body.type === 'SAP'){
+              sicepatResi += 1;
               resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             }
 
           }
 
+          // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
+          
           const payload = {
             codFeeAdmin: codValueCalculated,
             discuontSelected: discountAmount,
@@ -390,7 +406,6 @@ module.exports = class {
             ...body,
           };
 
-
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           console.log('right before order validator');
           console.log(codCondition);
@@ -399,13 +414,19 @@ module.exports = class {
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
+          if (body.type === 'SAP') parameter = await sapParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
 
           console.log('PARAMETER');
-          // console.log(parameter);
+          console.log(parameter);
 
           if (messages?.length < 1) {
 
+
+            const tes_payload =               {...parameter,
+              resi,
+              type: body.type};
+            console.log(tes_payload);
             querySuccess.push({
               ...parameter,
               resi,
@@ -439,7 +460,7 @@ module.exports = class {
           items: queryrLogger,
           sellerId: seller.id,
         });
-        console.log('reno K');
+
 
       }
 
@@ -492,6 +513,7 @@ module.exports = class {
           { where: { id: batch.id } },
         );
       }
+
 
       return orderResponse;
     } catch (error) {
