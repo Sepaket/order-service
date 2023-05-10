@@ -105,6 +105,10 @@ const expeditionService = [
     name: 'Ninja',
     code: 'NINJA',
   },
+  {
+    name: 'SAP (testing)',
+    code: 'SAP',
+  },
   // {
   //   name: 'IDexpress',
   //   code: 'IDEXPRESS',
