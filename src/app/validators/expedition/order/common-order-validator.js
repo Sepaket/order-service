@@ -17,6 +17,7 @@ const isExist = async ({ params, identifier, model }) => new Promise((resolve, r
 
 const serviceCodeValidator = async () => new Promise((resolve, reject) => {
   const { body } = request;
+  // console.log(JSON.stringify(body.type)); //SERVICE PROVIDER
   const exist = serviceCode[body.type]?.find((item) => item.code === body.service_code);
 
   if (exist) resolve(true);
@@ -35,7 +36,7 @@ const serviceCodeValidator = async () => new Promise((resolve, reject) => {
 
 const validator = joi.object({
   batch_id: joi.number().allow(null),
-  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS'),
+  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS', 'SAP'),
   service_code: joi
     .string()
     .required()

@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const sicepat = require('../helpers/sicepat');
 const ninja = require('../helpers/ninja');
 const jne = require('../helpers/jne');
+const sap = require('../helpers/sap');
 const errorCatcher = require('../helpers/error-catcher');
 const { OrderBackground } = require('../app/models');
 
@@ -76,6 +77,29 @@ const ninjaExecutor = async (payload) => {
   }
 };
 
+const sapExecutor = async (payload) => {
+  console.log('SAP EXECUTOR');
+  console.log(JSON.parse(payload.parameter));
+  try {
+    const created = await sap.createOrder(JSON.parse(payload.parameter));
+    if (created.status) {
+      await OrderBackground.update(
+        { isExecute: true },
+        { where: { id: payload.id } },
+      );
+    } else {
+      await errorCatcher({
+        id: payload.id,
+        expedition: payload.expedition,
+        subject: 'CREATE ORDER',
+        ...created,
+      });
+    }
+  } catch (error) {
+    throw new Error(error?.message);
+  }
+};
+
 const runner = cron.schedule('*/3 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('create order scheduler run');
@@ -83,7 +107,7 @@ const runner = cron.schedule('*/3 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 100,
+      limit: 10,
     });
 
     orders?.forEach((item, index) => {
@@ -91,6 +115,7 @@ const runner = cron.schedule('*/3 * * * *', async () => {
         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
+        if (item.expedition === 'SAP') await sapExecutor(item);
       }, index * 20000);
     });
   } catch (error) {

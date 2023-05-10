@@ -31,8 +31,6 @@ module.exports = class {
   }
 
   async process() {
-
-
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
 
@@ -93,6 +91,7 @@ module.exports = class {
                         'district',
                         'subDistrict',
                         'postalCode',
+                        'sapBranchCode',
                       ],
                     },
                   ],
@@ -119,6 +118,7 @@ module.exports = class {
                     'district',
                     'subDistrict',
                     'postalCode',
+                    'sapBranchCode',
                   ],
                 },
               ],
@@ -137,12 +137,12 @@ module.exports = class {
               ? parseFloat(item?.cod_fee)
               : (parseFloat(item?.goods_price) + parseFloat(item?.shipping_charge));
 
-            const truncatedAddress = (item?.order?.receiverAddress?.receiverAddress).substring(0,200) || null;
-            const truncatedAddressNote = (item?.order?.receiverAddress?.receiverAddressNote).substring(0,100) || null;
-            const truncatedGoodsContent = (item?.goods_content).substring(0,50) || null;
-            const truncatedGoodsNotes = (item?.notes).substring(0,100) || null;
+            const truncatedAddress = (item?.order?.receiverAddress?.receiverAddress).substring(0, 200) || null;
+            const truncatedAddressNote = (item?.order?.receiverAddress?.receiverAddressNote).substring(0, 100) || null;
+            const truncatedGoodsContent = (item?.goods_content).substring(0, 50) || null;
+            const truncatedGoodsNotes = (item?.notes).substring(0, 100) || null;
 
-
+            console.log(item.order);
             return {
               resi: item.order.resi,
               order_id: item.order_id,
@@ -151,6 +151,7 @@ module.exports = class {
                 order_id: item.order_id,
                 service: item.order.expedition,
                 service_code: item.order.serviceCode,
+                sap_tlc_code: `${item.order.receiverAddress.location.sapBranchCode}-${item.order.receiverAddress.location.sapBranchCode}`,
                 weight: item.weight,
                 goods_content: truncatedGoodsContent,
                 goods_qty: item.total_item,
