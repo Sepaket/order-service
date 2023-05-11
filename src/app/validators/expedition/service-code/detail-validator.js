@@ -1,7 +1,7 @@
 const joi = require('joi');
 
 const validator = joi.object({
-  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS', 'ALL'),
+  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'SAP', 'IDEXPRESS', 'ALL'),
   code: joi.string().required(),
 });
 
