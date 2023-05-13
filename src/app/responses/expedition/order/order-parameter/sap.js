@@ -23,11 +23,11 @@ const receiverAddressFormatter = async ({ payload }) => {
 };
 
 const paramsMapper = async ({ payload }) => {
+  console.log('INSIDE SAP PARAMETER');
   const pickupAddress = await pickupAddressFormatter({ payload });
   const receiverAddress = await receiverAddressFormatter({ payload });
 
   return {
-
     customer_code: payload?.is_cod ? "DEV001" : "DEV000",
     awb_no : payload?.resi,
     reference_no: payload?.resi,
@@ -43,6 +43,8 @@ const paramsMapper = async ({ payload }) => {
     volumetric: "1x1x1",
     shipment_type_code: "SHTPC",
     insurance_flag: payload?.is_insurance ? 2 : 1,
+    insurance_type_code: "INS01",
+    insurance_value: payload?.is_insurance ? payload.insuranceSelected * payload?.goodsAmount : 0,
     shipper_name: payload?.sender_name,
     shipper_address: pickupAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     shipper_phone: payload?.sender_phone,
@@ -50,7 +52,7 @@ const paramsMapper = async ({ payload }) => {
     receiver_name: payload?.receiver_name,
     receiver_address: receiverAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     receiver_phone: payload?.receiver_phone,
-    item_value: payload?.goodsAmount,
+    item_value: payload?.is_insurance ? payload?.goodsAmount : 0,
     cod_flag: payload?.is_cod ? 2 : 1,
     cod_value: payload?.is_cod ? payload?.cod_value : null
 
