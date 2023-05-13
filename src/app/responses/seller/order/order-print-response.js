@@ -151,7 +151,7 @@ module.exports = class {
                 order_id: item.order_id,
                 service: item.order.expedition,
                 service_code: item.order.serviceCode,
-                sap_tlc_code: `${item.order.receiverAddress.location.sapBranchCode}-${item.order.receiverAddress.location.sapBranchCode}`,
+                sap_tlc_code: `${item.order.sellerAddress.location.sapBranchCode}-${item.order.receiverAddress.location.sapBranchCode}`,
                 weight: item.weight,
                 goods_content: truncatedGoodsContent,
                 goods_qty: item.total_item,
