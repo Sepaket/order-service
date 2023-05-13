@@ -100,6 +100,7 @@ module.exports = class {
         where: { expedition: body.type },
       });
 
+
       const seller = await this.seller.findOne({
         where: { id: sellerId.id },
         include: [
@@ -230,7 +231,6 @@ module.exports = class {
           } else if (body.service_code === 'SICEPATCOD') {
             servCode = 'SIUNT';
           } else {
-            // console.log('in herte');
             servCode = body.service_code;
           }
 
@@ -343,7 +343,7 @@ module.exports = class {
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
-          console.log(totalAmount);
+          // console.log(totalAmount);
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
             // console.log(`index = ${  index  } nextId ${  nextId}`);
@@ -360,8 +360,7 @@ module.exports = class {
             console.log('sap order') //current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
-          console.log('RESI = ');
-          console.log(resi);
+
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
@@ -384,7 +383,7 @@ module.exports = class {
           }
 
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
-          
+
           const payload = {
             codFeeAdmin: codValueCalculated,
             discuontSelected: discountAmount,
@@ -408,25 +407,20 @@ module.exports = class {
 
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           console.log('right before order validator');
-          console.log(codCondition);
+          // console.log(payload);
           const messages = await orderValidator(payload);
-
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
           if (body.type === 'SAP') parameter = await sapParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
-
-          console.log('PARAMETER');
-          console.log(parameter);
-
+          // console.log(messa)
           if (messages?.length < 1) {
 
-
-            const tes_payload =               {...parameter,
-              resi,
-              type: body.type};
-            console.log(tes_payload);
+            // const tes_payload =               {...parameter,
+            //   resi,
+            //   type: body.type};
+            // console.log(tes_payload);
             querySuccess.push({
               ...parameter,
               resi,
@@ -513,8 +507,6 @@ module.exports = class {
           { where: { id: batch.id } },
         );
       }
-
-
       return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');

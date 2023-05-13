@@ -96,7 +96,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 const createOrder = (payload) => new Promise(async (resolve) => {
   const token = await localToken() || await tokenization();
   console.log('inside ninja creae order')
-  // console.log(payload)
+  console.log(payload)
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
@@ -104,13 +104,15 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       Authorization: `Bearer ${token}`,
     },
   }).then((response) => {
-    // console.log(response);
+    console.log(response);
     resolve({
       status: true,
       message: 'OK',
     });
   }).catch((error) => {
     // console.log(error.response.data.error.details[0].message)
+    console.log("ERORRRRRRRRRRRRRRRRRRRRRR")
+    console.log(error)
     resolve({
       status: false,
       message: error?.response?.data?.error?.message || error?.message,
