@@ -35,6 +35,7 @@ module.exports = class {
     const seller = await jwtSelector({ request: this.request });
 
     return new Promise((resolve, reject) => {
+      console.log('INSIDE PRINT AWB')
       try {
         this.orderDetail.findAll({
           attributes: [
@@ -128,6 +129,7 @@ module.exports = class {
           where: { ...search, sellerId: seller.id },
           order: [['id', 'DESC']],
         }).then((response) => {
+          console.log('AFTER SUCCES AND GET RESPONSE')
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
@@ -142,7 +144,7 @@ module.exports = class {
             const truncatedGoodsContent = (item?.goods_content).substring(0, 50) || null;
             const truncatedGoodsNotes = (item?.notes).substring(0, 100) || null;
 
-            console.log(item.order);
+            console.log(item.seller_address);
             return {
               resi: item.order.resi,
               order_id: item.order_id,
@@ -151,7 +153,7 @@ module.exports = class {
                 order_id: item.order_id,
                 service: item.order.expedition,
                 service_code: item.order.serviceCode,
-                sap_tlc_code: `${item.order.sellerAddress.location.sapBranchCode}-${item.order.receiverAddress.location.sapBranchCode}`,
+                sap_tlc_code: `${item.seller_address.location.sapBranchCode}-${item.order.receiverAddress.location.sapBranchCode}`,
                 weight: item.weight,
                 goods_content: truncatedGoodsContent,
                 goods_qty: item.total_item,
