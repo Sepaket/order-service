@@ -10,12 +10,12 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 
-const batchScheduler = require('./src/scheduler/batch-scheduler');
-const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
-//
-const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
-const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
-const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+// const batchScheduler = require('./src/scheduler/batch-scheduler');
+// const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
+// //
+// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+// const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
+// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 // batchScheduler.start();
 // trackingScheduler.start();
@@ -38,6 +38,7 @@ Sentry.init({
 const adminRoute = require('./src/routes/admin');
 const sellerRoute = require('./src/routes/seller');
 const generalRoute = require('./src/routes/general');
+const partnerRoute = require('./src/routes/partner');
 const expeditionRoute = require('./src/routes/expedition');
 
 const corsOptions = {
@@ -62,10 +63,12 @@ application.use(bodyParser.json({ limit: 1024102420, type: 'application/json' })
 application.use(express.json({ type: ['text/*', '*/json'] }));
 application.listen(port);
 
+application.use('/api/v1/partner', partnerRoute);
 application.use('/api/v1/admin', adminRoute);
 application.use('/api/v1/seller', sellerRoute);
 application.use('/api/v1/general', generalRoute);
 application.use('/api/v1/expedition', expeditionRoute);
+
 
 application.use(Sentry.Handlers.errorHandler());
 application.use(express.static(path.join(__dirname)));

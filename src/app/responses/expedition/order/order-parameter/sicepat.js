@@ -38,9 +38,11 @@ const paramsMapper = async ({ payload }) => {
     pickup_merchant_email: payload.seller?.email || '',
     PackageList: [
       {
+        cod_value: payload?.is_cod ? payload?.cod_value : null,
+        insurance_value: payload?.is_insurance ? payload.insuranceSelected : 0,
         receipt_number: payload?.resi || '',
         origin_code: payload?.origin?.sicepatOriginCode,
-        delivery_type: payload?.service_code,
+        delivery_type: payload?.service_code === 'SICEPATCOD' ? 'SIUNT' : payload?.service_code,
         parcel_category: payload?.goods_category,
         parcel_content: payload?.goods_content,
         parcel_qty: payload?.goods_qty,

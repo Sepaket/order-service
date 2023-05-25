@@ -44,6 +44,11 @@ module.exports = class {
             moment(query.end_date).endOf('day').format(),
           ],
         },
+        status: {
+          [this.op.notIn]: [
+            'CANCELED'
+           ],
+        }
       };
 
       return condition;

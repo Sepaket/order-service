@@ -158,7 +158,7 @@ const historyIds = [];
     }
 
     sellerUpdateObject[item.sellerId]['deltatopup'] += Number(deltatopup);
-  console.log('credit add : ' + item.id + ' amount : ' + deltatopup);
+  // console.log('credit add : ' + item.id + ' amount : ' + deltatopup);
   });
 
 
@@ -176,10 +176,11 @@ const historyIds = [];
       { transaction: dbTransaction },
     );
 
-    let activityLog = await ActivityLog.create(
-      { action: 'credit history update'  },
-      { transaction: dbTransaction },
-    );
+    // THIS IS FOR ACTIVITY LOG!!!
+    // let activityLog = await ActivityLog.create(
+    //   { action: 'credit history update'  },
+    //   { transaction: dbTransaction },
+    // );
 
     for (const key in sellerUpdateObject) {
       // let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']) + Number(sellerUpdateObject[key]['deltatopup']);

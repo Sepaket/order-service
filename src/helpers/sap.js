@@ -45,19 +45,20 @@ const getDestination = () => new Promise((resolve, reject) => {
 
 const checkPrice = (payload) => new Promise((resolve) => {
   const { origin, destination, weight } = payload;
-  console.log('SAP CHECKPRUICE');
-  axios.get(`${process.env.SAP_BASE_URL_TRACKING}/customer/tariff`, {
-    params: {
-      origin,
+  axios.post(`${process.env.SAP_BASE_URL_CHECKPRICE}/master/shipment_cost/publish`, {
+    origin,
       destination,
       weight: weight || 1,
-    },
+    customer_code: process.env.SAP_CUSTOMER_CODE
+  },{
     headers: {
-      'api-key': process.env.SAP_APIKEY_TRACKING,
+      'api-key': process.env.SAP_APIKEY_GLOBAL,
     },
   }).then((response) => {
+    console.log('berhasil')
+    console.log(response.data)
     resolve(response?.data?.sap?.results || []);
-  }).catch(() => {
+  }).catch((error) => {
     resolve([]);
   });
 });
