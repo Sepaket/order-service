@@ -10,12 +10,12 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./src/app/middlewares/errorHandler');
 
-// const batchScheduler = require('./src/scheduler/batch-scheduler');
-// const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
-// //
-// const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
-// const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
-// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+const batchScheduler = require('./src/scheduler/batch-scheduler');
+const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
+//
+const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
+const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
+const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 // batchScheduler.start();
 // trackingScheduler.start();
