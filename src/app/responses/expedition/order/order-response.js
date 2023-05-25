@@ -61,9 +61,9 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('before create order');
+        // console.log('before create order');
         const result = await this.createOrder();
-        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!AFTER create order');
+        // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!AFTER create order');
         resolve(result);
       } catch (error) {
         reject(error);
@@ -143,7 +143,7 @@ module.exports = class {
         referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType
         referredSellerId = seller.sellerDetail.referred.id
       } else {
-        console.log('NO REFERRAL')
+        // console.log('NO REFERRAL')
 
       }
 
@@ -192,7 +192,7 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-      console.log('LAST RESI =====================');
+      // console.log('LAST RESI =====================');
       // let lastresi = await ResiTracker.findAll();
       let lastresi = await ResiTracker.findOne({
         where: { logisticsProvider: 'sicepat' },
@@ -218,14 +218,11 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
 
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          // console.log(item.is_cod);
-          // console.log('COD CONDITION');
-          // console.log(codCondition);
-          console.log(servCode);
+
           if (body.service_code === 'JNECOD'){
             console.log('masuk ke jnecod');
             servCode = 'REG19';
-            console.log(servCode);
+            // console.log(servCode);
           } else if (body.service_code === 'NINJACOD'){
             servCode = 'Standard';
           } else if (body.service_code === 'SICEPATCOD') {
@@ -252,8 +249,6 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
-          console.log('shipping charge');
-          console.log(shippingCharge);
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
           let codFeeCalculated = trxFee?.codFee || 0;
@@ -303,17 +298,32 @@ module.exports = class {
                   parseFloat(item.cod_value) - parseFloat(shippingCharge)
                 );
 
-                insuranceSelected = (
-                  parseFloat(insurance?.insuranceValue) * parseFloat(goodsAmountInsurance)
-                ) / 100;
+                if (parseFloat(item.cod_value) <= parseFloat(shippingCharge)) {
+                  insuranceSelected = (
+                    parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
+                  ) / 100;
+                } else {
+                  insuranceSelected = (
+                    parseFloat(insurance?.insuranceValue) * parseFloat(goodsAmountInsurance)
+                  ) / 100;
+                }
+
+
+                console.log('insurance selected COD');
+                console.log(insuranceSelected)
               } else {
+
                 insuranceSelected = (
                   parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
                 ) / 100;
+                console.log('insurance selected NON COD');
+                console.log(insuranceSelected)
               }
             }
           }
 
+          console.log('insurance selected');
+          console.log(insuranceSelected);
           let shippingCalculated = 0;
           if (item.is_cod) {
             console.log('cod');
@@ -448,7 +458,6 @@ module.exports = class {
 
       if (querySuccess?.length > 0) {
         await orderSuccessLogger(querySuccess);
-        console.log('reno J');
 
         await orderLogger({
           items: queryrLogger,

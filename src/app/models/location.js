@@ -62,6 +62,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    sapDistrictCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   };
 
   const Location = sequelize.define('Location', schema, {

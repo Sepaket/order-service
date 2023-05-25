@@ -402,12 +402,16 @@ module.exports = class {
   async sapFee() {
     try {
       const { body } = this.request;
-      // const prices = await this.sap.checkPrice({
-      //   origin: this.origin.jneOriginCode,
-      //   destination: this.destination.jneDestinationCode,
-      //   weight: body.weight,
-      // });
-
+      // console.log(this.origin.sapDistrictCode);
+      // console.log(this.origin.sapDistrictCode);
+      const prices2 = await this.sap.checkPrice({
+        origin: this.origin.sapDistrictCode,
+        destination: this.destination.sapDistrictCode,
+        weight: body.weight,
+      });
+      console.log('before prices 2')
+      console.log(prices2)
+      console.log('after prices2')
       const prices_string = '[{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR","service_code":"UDRREG","goods_type":"Paket","currency":"IDR","price":"65000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR250","service_code":"JTR250","goods_type":"Paket","currency":"IDR","price":"1350000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR>250","service_code":"JTR>250","goods_type":"Paket","currency":"IDR","price":"1800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"REG","service_code":"REG19","goods_type":"Document/Paket","currency":"IDR","price":"24000","etd_from":"3","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"JTR<150","service_code":"JTR<150","goods_type":"Paket","currency":"IDR","price":"800000","etd_from":"5","etd_thru":"6","times":"D"},{"origin_name":"JAKARTA","destination_name":"PARAKAN,TEMANGGUNG","service_display":"OKE","service_code":"OKE19","goods_type":"Document/Paket","currency":"IDR","price":"21000","etd_from":"4","etd_thru":"7","times":"D"}]';
 
       console.log('inside SAP fee')

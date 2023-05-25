@@ -100,7 +100,7 @@ const sapExecutor = async (payload) => {
   }
 };
 
-const runner = cron.schedule('*/3 * * * *', async () => {
+const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
   console.info('create order scheduler run');
 
