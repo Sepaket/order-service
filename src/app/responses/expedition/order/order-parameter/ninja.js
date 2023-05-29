@@ -1,6 +1,6 @@
 const paramsMapper = ({ payload }) => ({
   requested_tracking_number: payload?.resi,
-  service_type: 'Marketplace',
+  service_type: 'Marketplace', //Parcel or Marketplace
   marketplace: {
     'seller_id': payload?.sellerLocation?.id,
     'seller_company_name': payload?.sellerLocation?.name
