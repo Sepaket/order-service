@@ -29,36 +29,25 @@ const getLastStatus = (trackingStatus) => {
 };
 
 const tracking = async () => {
-  console.log('enter sicepat tracking')
+  console.log('enter sicepat tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
       where: {
         expedition: 'SICEPAT',
-        [Sequelize.Op.or]: [
-          {
-            status: {
-              [Sequelize.Op.ne]: 'DELIVERED',
-            },
-          },
-          {
-            status: {
-              [Sequelize.Op.ne]: 'CANCELED',
-            },
-          },
-          {
-            status: {
-              [Sequelize.Op.ne]: 'RETURN_TO_SELLER',
-            },
-          },
-        ],
+
+        status: {
+          [Sequelize.Op.notIn]: ['DELIVERED','CANCELED','RETURN_TO_SELLER'],
+        },
       },
     });
 
     await Promise.all(
       order?.map(async (item) => {
+        // console.log('orders size : ')
+        // console.log(order)
         const track = await sicepat.tracking({ resi: item.resi });
-
+        // console.log(item.resi);
         if (track?.sicepat?.status?.code === 200) {
           const trackingStatus = track?.sicepat?.result?.last_status;
           const currentStatus = getLastStatus(trackingStatus?.status || '');
@@ -87,7 +76,7 @@ const tracking = async () => {
 
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
             const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
-            console.log('Item : ' + item.id + ' amount : ' + orderDetail.sellerReceivedAmount + ' total : ' + calculated);
+            console.log(`Item : ${item.id} amount : ${orderDetail.sellerReceivedAmount} total : ${calculated}`);
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
               { where: { sellerId: orderDetail.sellerId } },
