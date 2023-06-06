@@ -45,7 +45,7 @@ module.exports = class {
           ],
         },
         status: {
-          [this.op.notIn]: [
+          [Op.notIn]: [
             'CANCELED'
            ],
         }
