@@ -13,52 +13,19 @@ module.exports = class {
   async process() {
     const seller = await jwtSelector({ request: this.request });
 
-    const orderResponse = [
-      {
-        key: 'waiting_for_pickup',
-        count: 9
-      },
-      {
-        key: 'cod_processing_total',
-        count: 9
-      },
-      {
-        key: 'non_cod_processing_total',
-        count: 9
-      },
-      {
-        key: 'cod_sent_total',
-        count: 9
-      },
-      {
-        key: 'non_cod_sent_total',
-        count: 9
-      },
-      {
-        key: 'return_to_seller',
-        count: 9
-      },
-      {
-        key: 'total_order',
-        count: 9
-      },
-      {
-        key: 'percentage_processing',
-        count: 9
-      },
-      {
-        key: 'need_attention',
-        count: 9
-      },
-      {
-        key: 'rate_return',
-        count: 9
-      },
-      {
-        key: 'rate_success',
-        count: 9
-      },
-    ];
+    const orderResponse = {
+      waiting_for_pickup: 9,
+      cod_processing_total: 9,
+      non_cod_processing_total: 9,
+      cod_sent_total: 9,
+      non_cod_sent_total: 9,
+      return_to_seller: 9,
+      total_order: 9,
+      percentage_processing: 9,
+      need_attention: 9,
+      rate_return: 9,
+      rate_success: 9,
+    };
 
     return orderResponse;
     return new Promise(async (resolve, reject) => {
