@@ -49,13 +49,12 @@ const checkPrice = (payload) => new Promise((resolve) => {
     origin,
       destination,
       weight: weight || 1,
-    customer_code: process.env.SAP_CUSTOMER_CODE
+    customer_code: process.env.SAP_CUSTOMER_CODE_CHECKPRICE
   },{
     headers: {
       'api-key': process.env.SAP_APIKEY_GLOBAL,
     },
   }).then((response) => {
-    console.log('berhasil')
     console.log(response.data)
     resolve(response?.data?.sap?.results || []);
   }).catch((error) => {

@@ -41,6 +41,7 @@ router.group('/seller', (route) => {
   route.post('/reset-special-rate', Authorization, SellerController.resetSpecialRate);
   route.delete('/:id', Authorization, SellerController.delete);
   route.post('/generate-referral-code/:id', Authorization, SellerController.generateReferralCode);
+  route.post('/set-referral-code/:id', Authorization, SellerController.setReferralCode);
 });
 
 router.group('/user', (route) => {

@@ -14,7 +14,7 @@ const SellerSetSpecialPriceResponse = require('../../responses/admin/seller/sell
 const SellerResetSpecialPriceResponse = require('../../responses/admin/seller/seller-reset-special-rate-response');
 const SellerSpecialPriceResponse = require('../../responses/admin/seller/seller-special-rate-response');
 const SellerGenerateReferralCodeResponse = require('../../responses/admin/seller/seller-generate-referral-code-response');
-
+const SellerSetReferralCodeResponse = require('../../responses/admin/seller/seller-set-referral-code-response');
 module.exports = {
   index: async (request, response, next) => {
     try {
@@ -149,4 +149,19 @@ module.exports = {
       next(error);
     }
   },
+  setReferralCode: async (request, response, next) => {
+    try {
+      // await SellerDeleteValidator(request.params);
+      const result = await new SellerSetReferralCodeResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
 };
