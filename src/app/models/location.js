@@ -42,6 +42,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    sicepatCod: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    sicepatNoncod: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     ninjaOriginCode: {
       type: DataTypes.STRING,
       allowNull: true,

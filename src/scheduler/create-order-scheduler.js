@@ -25,6 +25,7 @@ const sicepatExecutor = async (payload) => {
       });
     }
   } catch (error) {
+    console.log('error sicepat executor')
     throw new Error(error?.message);
   }
 };
