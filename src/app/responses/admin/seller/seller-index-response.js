@@ -30,6 +30,7 @@ module.exports = class {
           'id',
           'name',
           'email',
+          'phone',
         ],
         include: [
           {
