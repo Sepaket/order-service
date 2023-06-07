@@ -28,7 +28,7 @@ const paramsMapper = async ({ payload }) => {
   const receiverAddress = await receiverAddressFormatter({ payload });
 
   return {
-    customer_code: payload?.is_cod ? "DEV001" : "DEV000",
+    customer_code: payload?.is_cod ? process.env.SAP_CUSTOMER_CODE_COD : process.env.SAP_CUSTOMER_CODE_NONCOD,
     awb_no : payload?.resi,
     reference_no: payload?.resi,
     description_item: payload?.goods_content,
