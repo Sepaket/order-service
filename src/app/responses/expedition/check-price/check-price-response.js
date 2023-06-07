@@ -242,6 +242,8 @@ module.exports = class {
           serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
           serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
           availableCod: codCondition,
+          originCod: true,
+          destinationCod: true,
           estimation: `${item.etd_from} - ${item.etd_thru}`,
           estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
           price: item.price,
@@ -311,11 +313,14 @@ module.exports = class {
           ) - parseFloat(discountApplied);
         }
 
+
         return {
           weight: body.weight,
           serviceName: `Sicepat ${item.service}`,
           serviceCode: item.service,
           availableCod: codCondition,
+          originCod: this.origin.sicepatCod ? true : false,
+          destinationCod: this.destination.sicepatCod ? true : false,
           estimation: rawEstimation[0],
           estimationFormatted: `${item.etd?.toLowerCase()}`,
           price: item.tariff,
@@ -384,6 +389,8 @@ module.exports = class {
         serviceCode: 'Standard',
         estimation: '2 - 4',
         availableCod: true,
+        originCod: true,
+        destinationCod: true,
         estimationFormatted: '2 - 4 hari',
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
@@ -466,6 +473,8 @@ module.exports = class {
           serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
           serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
           availableCod: codCondition,
+          originCod: true,
+          destinationCod: true,
           estimation: rawEstimation[0],
           estimationFormatted: item.sla,
           price: item.price,
