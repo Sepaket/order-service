@@ -20,9 +20,12 @@ module.exports = class {
     const return_to_seller_total = await this.return_to_seller_total()
     const total_order = await this.order_total()
     const need_attention_total = await this.problem_total()
+    const delivered_total = await this.delivered_total()
+    const percentage_processing = (cod_processing_total + non_cod_processing_total) / total_order
 
 
-
+    const rate_return = return_to_seller_total / total_order
+    const rate_success = delivered_total / total_order
     const orderResponse = {
       waiting_for_pickup: waiting_for_pickup,
       cod_processing_total: cod_processing_total,
@@ -30,11 +33,12 @@ module.exports = class {
       cod_sent_total: cod_sent_total,
       non_cod_sent_total: non_cod_sent_total,
       return_to_seller: return_to_seller_total,
+      delivered_total: delivered_total,
       total_order: total_order,
-      percentage_processing: 0,
+      percentage_processing: percentage_processing,
       need_attention: need_attention_total,
-      rate_return: 0,
-      rate_success: 0,
+      rate_return: rate_return,
+      rate_success: rate_success,
     };
 
     return orderResponse;
@@ -218,7 +222,24 @@ module.exports = class {
   }
 
 
-
+  async delivered_total() {
+    this.seller = await jwtSelector({ request: this.request });
+    const response = await this.order.count({
+      where: {
+        '$detail.seller_id$': this.seller.id,
+        status: {
+          [Op.in]: [
+            'DELIVERED'
+          ],
+        },
+      },
+      include: [{
+        model: OrderDetail,
+        as: 'detail',
+      }],
+    });
+    return response;
+  }
 
 
 
