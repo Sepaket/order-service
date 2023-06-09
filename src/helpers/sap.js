@@ -55,8 +55,8 @@ const checkPrice = (payload) => new Promise((resolve) => {
       'api-key': process.env.SAP_APIKEY_GLOBAL,
     },
   }).then((response) => {
-    console.log(response.data)
-    resolve(response?.data?.sap?.results || []);
+    // console.log(response.data)
+    resolve(response?.data|| []);
   }).catch((error) => {
     resolve([]);
   });
