@@ -26,7 +26,7 @@ const paramsMapper = async ({ payload }) => {
   console.log('INSIDE SAP PARAMETER');
   const pickupAddress = await pickupAddressFormatter({ payload });
   const receiverAddress = await receiverAddressFormatter({ payload });
-  console.log(payload?.sellerLocation?.sellerAddress?.location)  RENORENORENORENO MASIH PROBLEM DISINI MENEMUKAN SAP BRANCH CODE UNTUK PICKUP
+  // console.log(payload?.sellerLocation?.sellerAddress?.location)  RENORENORENORENO MASIH PROBLEM DISINI MENEMUKAN SAP BRANCH CODE UNTUK PICKUP
   return {
     customer_code: payload?.is_cod ? process.env.SAP_CUSTOMER_CODE_COD : process.env.SAP_CUSTOMER_CODE_NONCOD,
     awb_no : payload?.resi,
