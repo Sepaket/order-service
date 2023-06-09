@@ -308,30 +308,24 @@ module.exports = class {
                   ) / 100;
                 }
 
-
-                console.log('insurance selected COD');
-                console.log(insuranceSelected)
               } else {
 
                 insuranceSelected = (
                   parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
                 ) / 100;
-                console.log('insurance selected NON COD');
-                console.log(insuranceSelected)
+
               }
             }
           }
 
-          console.log('insurance selected');
-          console.log(insuranceSelected);
           let shippingCalculated = 0;
           if (item.is_cod) {
-            console.log('cod');
+
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
             + parseFloat(insuranceSelected);
           } else {
-            console.log('noncod');
+
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
@@ -416,8 +410,6 @@ module.exports = class {
           };
 
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
-          console.log('right before order validator');
-          // console.log(payload);
           const messages = await orderValidator(payload);
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
