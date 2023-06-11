@@ -129,7 +129,9 @@ module.exports = class {
         where: { id: body.seller_location_id, sellerId: sellerId.id },
         include: [{ model: this.location, as: 'location' }],
       });
-
+      console.log('seller locatopn : ')
+      console.log(sellerId.id);
+      console.log(body.seller_location_id);
 
       const destinationLocation = await this.location.findAll({
         where: { id: locationIds },
@@ -408,9 +410,10 @@ module.exports = class {
             ...item,
             ...body,
           };
-
+          console.log(sellerLocation)
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
+          console.log('order validator message : ')
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
@@ -418,7 +421,8 @@ module.exports = class {
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           // console.log(messa)
           if (messages?.length < 1) {
-
+            console.log('orde validator success')
+            console.log(parameter)
             // const tes_payload =               {...parameter,
             //   resi,
             //   type: body.type};
@@ -440,6 +444,9 @@ module.exports = class {
               orderCode,
             });
             result.push(resultResponse);
+          } else {
+            console.log('orde validator error')
+            console.log(payload)
           }
 
           return error?.shift();

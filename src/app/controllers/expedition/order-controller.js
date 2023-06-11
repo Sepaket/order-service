@@ -23,6 +23,7 @@ module.exports = {
         data: result,
       });
     } catch (error) {
+      console.log("ade error");
       console.log(error);
       // console.log("error - validator - reno ");
       next(error);
