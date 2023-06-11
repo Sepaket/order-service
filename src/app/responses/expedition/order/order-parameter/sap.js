@@ -23,10 +23,14 @@ const receiverAddressFormatter = async ({ payload }) => {
 };
 
 const paramsMapper = async ({ payload }) => {
-  console.log('INSIDE SAP PARAMETER');
+  // console.log('INSIDE SAP PARAMETER');
   const pickupAddress = await pickupAddressFormatter({ payload });
   const receiverAddress = await receiverAddressFormatter({ payload });
-  // console.log(payload?.sellerLocation?.sellerAddress?.location)  RENORENORENORENO MASIH PROBLEM DISINI MENEMUKAN SAP BRANCH CODE UNTUK PICKUP
+  // console.log('RENORENO')
+  // console.log(payload.origin.sapDistrictCode)
+  // console.log(payload.destination.sapDistrictCode)
+  // console.log(payload?.sellerLocation?.sellerAddress?.location)
+  // RENORENORENORENO MASIH PROBLEM DISINI MENEMUKAN SAP BRANCH CODE UNTUK PICKUP
   return {
     customer_code: payload?.is_cod ? process.env.SAP_CUSTOMER_CODE_COD : process.env.SAP_CUSTOMER_CODE_NONCOD,
     awb_no : payload?.resi,
@@ -35,7 +39,7 @@ const paramsMapper = async ({ payload }) => {
     pickup_name: payload?.sellerLocation?.picName || '',
     pickup_address: pickupAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     pickup_phone: payload?.sellerLocation?.picPhoneNumber || '',
-    pickup_district_code: payload?.sellerLocation?.sapBranchCode,
+    pickup_district_code: payload?.origin?.sapDistrictCode,
     service_type_code: payload?.service_code,
     pickup_place: 1,
     quantity: 1,
@@ -49,7 +53,7 @@ const paramsMapper = async ({ payload }) => {
     shipper_name: payload?.sender_name,
     shipper_address: pickupAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     shipper_phone: payload?.sender_phone,
-    destination_district_code: payload?.destination?.sapBranchCode,
+    destination_district_code: payload?.destination?.sapDistrictCode,
     receiver_name: payload?.receiver_name,
     receiver_address: receiverAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     receiver_phone: payload?.receiver_phone,
