@@ -35,7 +35,9 @@ const saldoUpdater = async () => {
     ],
     where: {
       isExecute: false,
-      note: 'DELIVERED',
+      note: {
+        [Sequelize.Op.in]:['DELIVERED', 'RETURN_TO_SELLER'],
+      },
     },
   });
 

@@ -24,7 +24,6 @@ const sapStatus = {
     'VOID PICKUP',
   ],
   RETURN_TO_SELLER: [
-
     'SHIPMENT RETURN TO CLIENT',
   ],
   PROBLEM: [
