@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    additionalNote: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     provider: {
       type: DataTypes.TEXT,
       allowNull: true,

@@ -24,8 +24,8 @@ const sicepatStatus = {
   PROBLEM: [
     'CNEE UNKNOWN', // SICEPAT - Penerima tidak di kenal dilingkungan.
     'NOT AT HOME', // SICEPAT - Penerima tidak ada di rumah.
-    'ANTAR ULANG ', // SICEPAT - Paket akan di antar kembali besok.
-    'BAD ADDRESS ', // SICEPAT - Alamat tidak dikenal / tidak ditemukan.
+    'ANTAR ULANG', // SICEPAT - Paket akan di antar kembali besok.
+    'BAD ADDRESS', // SICEPAT - Alamat tidak dikenal / tidak ditemukan.
     'CRISS CROSS', // SICEPAT - Paket mengalami kesalahan sortir ketika diproses pada fasilitas hub sicepat
     'CLOSED ONCE DELIVERY ATTEMPT', // SICEPAT - Kantor / Toko tutup diluar jam operasional.
     'HILANG', // SICEPAT - Paket hilang
