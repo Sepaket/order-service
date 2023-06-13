@@ -96,6 +96,8 @@ const sapExecutor = async (payload) => {
         ...created,
       });
     }
+    console.log('SAP created : ')
+    console.log(created)
   } catch (error) {
     throw new Error(error?.message);
   }
