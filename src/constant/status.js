@@ -60,6 +60,7 @@ const sapServiceStatus = [
   { code: 'TRC01', name: 'SAP TRUCKING', type: 'SAP' },
   { code: 'CRCODS', name: 'SAP ODS CC', type: 'SAP' },
   { code: 'ATM', name: 'SAP ATM', type: 'SAP' },
+  { code: 'SAPCOD', name: 'SAP COD', type: 'SAP' },
 ];
 
 const serviceCode = {

@@ -22,7 +22,8 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       creditCondition,
       weight,
     } = payload;
-    // console.log(payload);
+    console.log('ordfer validator ')
+    console.log(payload);
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
     // console.log('shipping charge validate');
     // console.log(shippingCharge);

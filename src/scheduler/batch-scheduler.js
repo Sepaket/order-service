@@ -58,14 +58,8 @@ const saldoUpdater = async () => {
 
   });
 
-
-
-
-
   const dbTransaction = await sequelize.transaction()
   try {
-
-
     let updateResult = await OrderHistory.update(
       { isExecute: true },
       {
@@ -97,7 +91,6 @@ const saldoUpdater = async () => {
 
 
 }
-
 
 const creditUpdater = async () => {
   let sellerUpdateObject = Object.create(null);
@@ -166,8 +159,6 @@ const historyIds = [];
 
   const dbTransaction = await sequelize.transaction()
   try {
-
-
     let creditUpdateResult = await CreditHistory.update(
       { isExecute: true },
       {
@@ -204,9 +195,6 @@ const historyIds = [];
   }
   console.log('batch credit updater finish');
 };
-
-
-
 
 const referralUpdater = async () => {
   const orderHistory = await OrderHistory.findAll({

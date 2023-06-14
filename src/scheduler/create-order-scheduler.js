@@ -83,10 +83,12 @@ const sapExecutor = async (payload) => {
   console.log(JSON.parse(payload.parameter));
   try {
     const created = await sap.createOrder(JSON.parse(payload.parameter));
+    console.log('created SAP executor')
+    console.log(payload)
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
-        { where: { id: payload.id } },
+        { where: { resi: payload.resi } },
       );
     } else {
       await errorCatcher({

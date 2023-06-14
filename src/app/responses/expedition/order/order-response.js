@@ -220,7 +220,10 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
 
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
-
+          console.log('reno codcondition')
+          console.log(codCondition)
+          console.log(this.codValidator())
+          console.log('reno end===')
           if (body.service_code === 'JNECOD'){
             console.log('masuk ke jnecod');
             servCode = 'REG19';
@@ -229,6 +232,8 @@ module.exports = class {
             servCode = 'Standard';
           } else if (body.service_code === 'SICEPATCOD') {
             servCode = 'SIUNT';
+          } else if (body.service_code === 'SAPCOD') {
+            servCode = 'UDRREG';
           } else {
             servCode = body.service_code;
           }
@@ -334,9 +339,6 @@ module.exports = class {
           }
 
           const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
-          // console.log(codFee);
-          // console.log(trxFee?.codFee);
-          // console.log(shippingCharge);
           const goodsAmount = !item.is_codf
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
@@ -410,7 +412,7 @@ module.exports = class {
             ...item,
             ...body,
           };
-          console.log(sellerLocation)
+          // console.log(sellerLocation)
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
           console.log('order validator message : ')
@@ -527,6 +529,7 @@ module.exports = class {
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
     if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
+    if (body.type === 'SAP') result = (body.service_code === 'SAPCOD');
     return result;
   }
 
