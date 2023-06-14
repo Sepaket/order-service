@@ -40,7 +40,7 @@ const paramsMapper = async ({ payload }) => {
     pickup_address: pickupAddress?.replace(/\n/g, ' ')?.replace(/  +/g, ' '),
     pickup_phone: payload?.sellerLocation?.picPhoneNumber || '',
     pickup_district_code: payload?.origin?.sapDistrictCode,
-    service_type_code: payload?.service_code,
+    service_type_code: payload?.service_code === 'SAPCOD' ? 'UDRREG' : payload.service_code,
     pickup_place: 1,
     quantity: 1,
     total_item: payload?.goods_qty,

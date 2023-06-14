@@ -81,7 +81,6 @@ const tracking = async () => {
     const order = await Order.findAll({
       where: {
         expedition: 'SICEPAT',
-
         status: {
           [Sequelize.Op.notIn]: ['DELIVERED','CANCELED','RETURN_TO_SELLER'],
         },
@@ -91,13 +90,14 @@ const tracking = async () => {
     await Promise.all(
       order?.map(async (item) => {
         // console.log('orders size : ')
-        // console.log(order)
+
         const track = await sicepat.tracking({ resi: item.resi });
-        // console.log(item.resi);
+
         if (track?.sicepat?.status?.code === 200) {
+
           const trackingStatus = track?.sicepat?.result?.last_status;
           const currentStatus = await getLastStatus(trackingStatus?.status || '');
-
+          // console.log(item.id + ' : ' + item.resi + ' :: ' + currentStatus + ' -> ' + trackingStatus?.status)
           trackHistories.push({
             orderId: item.id,
             note: trackingStatus?.city || trackingStatus?.receiver_name,
@@ -113,10 +113,7 @@ const tracking = async () => {
             },
             { where: { resi: item.resi } },
           );
-          // console.log('sicepat tracking resi - : ')
-          // console.log(currentStatus)
-          // console.log(trackingStatus?.status) //INI REAL STATUS DARI SICEPATNYA
-          // console.log('**')
+
 
           // NEED 4 Cases: cod & ncod and delivered & RTS
           const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });

@@ -68,7 +68,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
 
 const createOrder = (payload) => new Promise(async (resolve) => {
   console.log('SAP create order in helpers/sap')
-  // console.log(payload)
+  console.log(payload)
   axios.post(`${process.env.SAP_BASE_URL_PICKUP}/shipment/pickup/single_push`, {
     ...payload,
   }, {
@@ -78,7 +78,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
   }).then((response) => {
     console.log('SAP Create order response')
     console.log(response)
-    if (!response?.data?.datas) {
+    if (!response?.data?.data) {
       resolve({
         status: false,
         message: response?.data?.error_message,
