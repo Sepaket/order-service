@@ -45,6 +45,10 @@ module.exports = async (request, response, next) => {
       cod[codItemIndex].service_name = 'SICEPAT COD';
       cod[codItemIndex].service_code = 'SICEPATCOD';
       result.data.push(cod[codItemIndex]);
+    } else if (cod[codItemIndex].type === 'SAP') {
+      cod[codItemIndex].service_name = 'SAP COD';
+      cod[codItemIndex].service_code = 'SAPCOD';
+      result.data.push(cod[codItemIndex]);
     }
 
 
