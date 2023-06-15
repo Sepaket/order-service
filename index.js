@@ -48,13 +48,14 @@ const corsOptions = {
     'https://sepaket.co.id',
     'https://frontend.sepaket.co.id',
     'https://api.xendit.co/',
-    '*',
+    // '*',
   ],
 };
 
 
 
-application.use(cors(corsOptions));
+// application.use(cors(corsOptions));
+application.use(cors());
 application.use(Sentry.Handlers.requestHandler());
 application.use(Sentry.Handlers.tracingHandler());
 application.use(bodyParser.urlencoded({ extended: true }));
