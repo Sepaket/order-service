@@ -30,6 +30,11 @@ module.exports = async (request, response, next) => {
           codItemIndex = item;
         }
       }
+      else if (cod[item].type === 'SAP') {
+        if (cod[item].service_code === 'UDRREG') {
+          codItemIndex = item;
+        }
+      }
     }
 
 
