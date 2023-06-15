@@ -48,6 +48,7 @@ const corsOptions = {
     'https://sepaket.co.id',
     'https://frontend.sepaket.co.id',
     'https://api.xendit.co/',
+    '*',
   ],
 };
 
