@@ -3,6 +3,7 @@ const CheckPriceValidator = require('../../validators/expedition/check-price/che
 
 // responses
 const CheckPriceResponse = require('../../responses/expedition/check-price/check-price-response');
+const cors = require('cors');
 
 module.exports = async (request, response, next) => {
   try {
