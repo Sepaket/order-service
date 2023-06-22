@@ -59,7 +59,11 @@ const paramsMapper = async ({ payload }) => {
     receiver_phone: payload?.receiver_phone,
     item_value: payload?.is_insurance ? payload?.goodsAmount : 0,
     cod_flag: payload?.is_cod ? 2 : 1,
-    cod_value: payload?.is_cod ? payload?.cod_value : null
+    cod_value: payload?.is_cod ? payload?.cod_value : null,
+    return_district_code: payload?.is_cod ? process.env.RETURN_SAP_DISTRICT_CODE : '',
+    return_phone: payload?.is_cod ? process.env.RETURN_PHONE : '',
+    return_contact: payload?.is_cod ? process.env.RETURN_NAME : '',
+    return_address: payload?.is_cod ? process.env.RETURN_ADDRESS_FULL : '',
 
   };
 };
