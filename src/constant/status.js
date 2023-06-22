@@ -34,7 +34,7 @@ const jneServiceStatus = [
   { code: 'JTR>250', name: 'JNE JTR>250', type: 'JNE' },
   { code: 'JTR<150', name: 'JNE JTR<150', type: 'JNE' },
   { code: 'JTR250', name: 'JNE JTR250', type: 'JNE' },
-  { code: 'JTR18', name: 'JNE JTR', type: 'JNE' },
+  { code: 'JTR23', name: 'JNE JTR', type: 'JNE' },
   { code: 'JNECOD', name: 'JNE COD', type: 'JNE' },
 ];
 
