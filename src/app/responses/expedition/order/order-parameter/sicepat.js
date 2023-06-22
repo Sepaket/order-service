@@ -69,6 +69,13 @@ const paramsMapper = async ({ payload }) => {
         recipient_longitude: '',
         recipient_latitude: '',
         destination_code: payload?.destination?.sicepatDestinationCode || '',
+        return_shipper_name: process.env.RETURN_NAME,
+        return_shipper_address: payload?.is_cod ? process.env.RETURN_ADDRESS_FULL : '',
+        return_shipper_province: payload?.is_cod ? process.env.RETURN_REGION : '',
+        return_shipper_city: payload?.is_cod ? process.env.RETURN_CITY : '',
+        return_shipper_district: payload?.is_cod ? process.env.RETURN_DISTRICT : '',
+        return_shipper_zip: payload?.is_cod ? process.env.RETURN_ZIP : '',
+        return_shipper_phone: payload?.is_cod ? process.env.RETURN_PHONE : '',
       },
     ],
   };

@@ -48,6 +48,18 @@ const parameterHandler = ({ payload }) => ({
   cod_flag: payload?.is_cod ? 'Y' : 'N',
   cod_amount: payload?.is_cod ? payload?.cod_value : 0,
   awb: payload?.resi,
+  return_name: process.env.RETURN_NAME,
+  return_addr1: payload?.is_cod ? process.env.RETURN_ADDR1 : '',
+  return_addr2: payload?.is_cod ? process.env.RETURN_ADDR2 : '',
+  return_addr3: payload?.is_cod ? process.env.RETURN_ADDR3 : '',
+  return_city: payload?.is_cod ? process.env.RETURN_CITY : '',
+  return_zip: payload?.is_cod ? process.env.RETURN_ZIP : '',
+  return_region: payload?.is_cod ? process.env.RETURN_REGION : '',
+  return_country: payload?.is_cod ? process.env.RETURN_COUNTRY : '',
+  return_contact: payload?.is_cod ? process.env.RETURN_CONTACT : '',
+  return_branch: payload?.is_cod ? process.env.RETURN_BRANCH : '',
+  return_phone: payload?.is_cod ? process.env.RETURN_PHONE : '',
+
 });
 
 const paramsMapper = async ({ payload }) => {
