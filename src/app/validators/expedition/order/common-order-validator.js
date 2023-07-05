@@ -17,8 +17,8 @@ const isExist = async ({ params, identifier, model }) => new Promise((resolve, r
 
 const serviceCodeValidator = async () => new Promise((resolve, reject) => {
   const { body } = request;
-  console.log('SERVICE CODE VALIDATOR')
-  console.log(body)
+  // console.log('SERVICE CODE VALIDATOR')
+  // console.log(body)
   // console.log(JSON.stringify(body.type)); //SERVICE PROVIDER
   const exist = serviceCode[body.type]?.find((item) => item.code === body.service_code);
 

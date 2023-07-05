@@ -13,10 +13,11 @@ const NinjaCallbackResponse = require('../../responses/expedition/order/ninja-ca
 module.exports = {
   commonOrder: async (request, response, next) => {
     try {
+      // console.log('reno before order validator');
       await CommonOrderValidator(request);
+      // console.log('after order validator');
       let result;
       result = await new OrderResponse({ request });
-      console.log('Common order response seuccess!!!');
       response.send({
         code: 200,
         message: 'OK',

@@ -24,6 +24,8 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     } = payload;
     console.log('ordfer validator ')
     console.log(payload);
+    console.log(payload.ongkirminuscod);
+
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
     // console.log('shipping charge validate');
     // console.log(shippingCharge);
@@ -34,6 +36,9 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
 
     if (!codCondition) {
       error.push({ message: 'Tipe penjemputan ini tidak tersedia saat anda memilih COD.' });
+    }
+    if (payload.ongkirminuscod < 0) {
+      error.push({ message: 'Ongkir lebih besar dari COD value' });
     }
     if (!payload.is_cod && !creditCondition) error.push({ message: 'Saldo anda tidak cukup untuk melakukan pengiriman non COD' });
     if (payload.is_cod && !payload.cod_value) error.push({ message: 'COD Value harus diisi untuk tipe COD' });

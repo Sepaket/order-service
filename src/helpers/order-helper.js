@@ -168,13 +168,13 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 
       const service = await prices?.find((item) => {
         // console.log(item);
-        if (item.service_code === 'CTC19' && serviceCode === 'JNECOD') {
-          console.log('jnecod dan ctc19');
+        if (item.service_code === 'CTC23' && serviceCode === 'JNECOD') {
+          console.log('jnecod dan ctc23');
           return item;
         }
-        if (item.service_code === 'CTCYES19' && serviceCode === 'YES19') return item;
-        if (item.service_code === 'CTCSPS19' && serviceCode === 'SPS19') return item;
-        if (item.service_code === 'CTC19' && serviceCode === 'REG19') return item;
+        if (item.service_code === 'CTCYES23' && serviceCode === 'YES23') return item;
+        if (item.service_code === 'CTCSPS23' && serviceCode === 'SPS23') return item;
+        if (item.service_code === 'CTC23' && serviceCode === 'REG23') return item;
         return item.service_code === serviceCode;
       });
 
@@ -205,8 +205,8 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
     }
 
     if (expedition === 'SAP') {
-      console.log("SAP CHECK PRICE");
-      console.log(origin);
+      // console.log("SAP CHECK PRICE");
+      // console.log(origin);
 
 
       // const prices = await sap.checkPrice({

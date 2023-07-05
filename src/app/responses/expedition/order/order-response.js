@@ -212,9 +212,7 @@ module.exports = class {
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
           if (body.service_code === 'JNECOD'){
-            console.log('masuk ke jnecod');
-            servCode = 'REG19';
-            // console.log(servCode);
+            servCode = 'REG23';
           } else if (body.service_code === 'NINJACOD'){
             servCode = 'Standard';
           } else if (body.service_code === 'SICEPATCOD') {
@@ -226,8 +224,6 @@ module.exports = class {
           }
 
           let parameter = null;
-          // console.log(servCode);
-
           const origin = sellerLocation?.location;
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);
@@ -243,6 +239,8 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
+          // console.log(origin);
+          // console.log(destination);
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
           let codFeeCalculated = trxFee?.codFee || 0;
@@ -324,9 +322,8 @@ module.exports = class {
             + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
           }
-
           const codFee = (parseFloat(trxFee?.codFee || 0) * parseFloat(shippingCharge || 0)) / 100;
-          const goodsAmount = !item.is_codf
+          const goodsAmount = !item.is_cod
             ? parseFloat(item.goods_amount)
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
@@ -338,6 +335,9 @@ module.exports = class {
             ? parseFloat(item?.cod_value)
             : (parseFloat(item?.goods_amount) + parseFloat(shippingCharge));
 
+          const ongkirminuscod = item?.is_cod
+            ? (parseFloat(item?.cod_value) - parseFloat(shippingCharge))
+            : 0;
           // console.log(totalAmount);
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
@@ -396,10 +396,10 @@ module.exports = class {
             referralRate,
             referralRateType,
             referredSellerId,
+            ongkirminuscod,
             ...item,
             ...body,
           };
-          // console.log(sellerLocation)
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
           console.log('order validator message : ')
@@ -408,7 +408,6 @@ module.exports = class {
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
           if (body.type === 'SAP') parameter = await sapParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
-          // console.log(messa)
           if (messages?.length < 1) {
             console.log('orde validator success')
             console.log(parameter)
@@ -530,7 +529,7 @@ module.exports = class {
     const truncatedGoodsNotes = (payload?.notes).substring(0,100) || null;
     var servCode = payload?.service_code || null;
     if (payload.service_code === "JNECOD") {
-      servCode = "REG19";
+      servCode = "REG23";
     } else if (payload.service_code === "NINJACOD") {
       servCode = "Standard";
     }
