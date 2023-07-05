@@ -208,6 +208,7 @@ const createOrder = (payload) => new Promise((resolve) => {
       },
     }).then((response) => {
       console.log('======================inside then');
+      console.log(response)
       if (!response?.data?.detail) {
         resolve({
           status: false,

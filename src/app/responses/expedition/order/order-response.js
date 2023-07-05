@@ -61,9 +61,7 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        // console.log('before create order');
         const result = await this.createOrder();
-        // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!AFTER create order');
         resolve(result);
       } catch (error) {
         reject(error);
@@ -94,7 +92,6 @@ module.exports = class {
         order: [['id', 'DESC']],
         where: { expedition: 'SICEPAT' },
       });
-
 
       const insurance = await this.insurance.findOne({
         where: { expedition: body.type },
@@ -129,9 +126,6 @@ module.exports = class {
         where: { id: body.seller_location_id, sellerId: sellerId.id },
         include: [{ model: this.location, as: 'location' }],
       });
-      console.log('seller locatopn : ')
-      console.log(sellerId.id);
-      console.log(body.seller_location_id);
 
       const destinationLocation = await this.location.findAll({
         where: { id: locationIds },
@@ -149,12 +143,10 @@ module.exports = class {
 
       }
 
-
       const sellerDiscount = seller.sellerDetail.discount;
       const sellerDiscountType = seller.sellerDetail.discountType;
       const sellerCodFee = seller.sellerDetail.codFee;
       const sellerCodFeeType = seller.sellerDetail.codFeeType;
-
 
       const globalDiscount = await this.discount.findOne({
         where: {
@@ -194,8 +186,6 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-      // console.log('LAST RESI =====================');
-      // let lastresi = await ResiTracker.findAll();
       let lastresi = await ResiTracker.findOne({
         where: { logisticsProvider: 'sicepat' },
       });
@@ -220,10 +210,7 @@ module.exports = class {
         body.order_items.map(async (item, index) => {
 
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
-          console.log('reno codcondition')
-          console.log(codCondition)
-          console.log(this.codValidator())
-          console.log('reno end===')
+
           if (body.service_code === 'JNECOD'){
             console.log('masuk ke jnecod');
             servCode = 'REG19';

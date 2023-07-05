@@ -35,6 +35,8 @@ const jneExecutor = async (payload) => {
     console.log('jne executor');
     console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
+    console.log('CHECK HERE')
+    console.log(created)
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
