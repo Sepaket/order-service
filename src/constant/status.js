@@ -28,9 +28,10 @@ const ninjaServiceStatus = [
 const jneServiceStatus = [
   // { code: 'CTCSPS', name: 'JNE CTCSPS', type: 'JNE' },
   // { code: 'CTCYES', name: 'JNE CTCYES', type: 'JNE' },
-  { code: 'YES19', name: 'JNE YES', type: 'JNE' },
-  { code: 'REG19', name: 'JNE REG', type: 'JNE' },
-  { code: 'OKE19', name: 'JNE OKE', type: 'JNE' },
+  { code: 'YES23', name: 'JNE YES', type: 'JNE' },
+  { code: 'REG23', name: 'JNE REG', type: 'JNE' },
+  { code: 'OKE23', name: 'JNE OKE', type: 'JNE' },
+  { code: 'SPS23', name: 'JNE SPS', type: 'JNE' },
   { code: 'JTR>250', name: 'JNE JTR>250', type: 'JNE' },
   { code: 'JTR<150', name: 'JNE JTR<150', type: 'JNE' },
   { code: 'JTR250', name: 'JNE JTR250', type: 'JNE' },
