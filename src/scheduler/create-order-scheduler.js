@@ -32,19 +32,15 @@ const sicepatExecutor = async (payload) => {
 
 const jneExecutor = async (payload) => {
   try {
-    console.log('jne executor');
-    console.log(payload.id);
     const created = await jne.createOrder(JSON.parse(payload.parameter));
-    console.log('CHECK HERE')
-    console.log(created)
+
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
-        console.log('error status');
-        console.log(created);
+
 
       // await errorCatcher({
       //   id: payload.id,

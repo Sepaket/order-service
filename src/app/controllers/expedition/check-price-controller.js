@@ -18,7 +18,7 @@ module.exports = async (request, response, next) => {
     // console.log(result);
     for (item in cod) {
       if (cod[item].type === 'JNE') {
-        if (cod[item].service_code === 'REG19') {
+        if (cod[item].service_code === 'REG23') {
           codItemIndex = item;
         }
       } else if (cod[item].type === 'NINJA') {

@@ -242,14 +242,12 @@ const tracking = async () => {
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = 0;
-            // await updateSaldo(calculated_1,orderDetail);
             await addOrderHistory(item.id, item.isCod,calculated_1, true, false, currentStatus,orderDetail);
 
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
-            // await updateSaldo(calculated_1,orderDetail);
             await addOrderHistory(item.id,item.isCod, calculated_1, false, false, currentStatus,orderDetail);
           }
 
@@ -257,7 +255,6 @@ const tracking = async () => {
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi  } calculated : ${calculated_1}`);
-            // await updateSaldo(calculated_1,orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,
@@ -278,7 +275,6 @@ const tracking = async () => {
         const log = await OrderLog.findOne({
           where: {
             orderId: item?.orderId,
-            // currentStatus: item?.currentStatus,
             podStatus: item?.podStatus,
             note: item?.note,
           },
