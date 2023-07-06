@@ -39,11 +39,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,no
       const referredId = orderDetail.referredSellerId;
       // console.log(orderDetail)
       if (referralRateType === 'PERCENTAGE') {
-        console.log('calculate referral')
-        console.log(referralRate)
-        console.log(shippingCalculated)
         referralCredit = referralRate * shippingCalculated / 100
-        console.log(referralCredit)
       }
 
       await OrderHistory.create({
@@ -118,23 +114,11 @@ const creditUpdate = async () => {
       ],
       where: {
         isExecute: false,
-        // [Sequelize.Op.or]: [
-        //   {
-        //     status: {
-        //       [Sequelize.Op.notIn]: [
-        //         'DELIVERED', 'CANCELED',
-        //         'RETURN_TO_SELLER',
-        //       ],
-        //     },
-        //   },
-        // ],
       },
     });
 
     await Promise.all(
       histories?.map(async (history) => {
-        // console.log(history.orderDetail.seller.sellerDetail.credit);
-        // updateSaldo(history.deltaCredit,history.orderDetail)
       }),
       );
   } catch (error) {
@@ -143,6 +127,7 @@ const creditUpdate = async () => {
 };
 
 const tracking = async () => {
+  console.log('jne tracing');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -272,7 +257,7 @@ const tracking = async () => {
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi  } calculated : ${calculated_1}`);
-            await updateSaldo(calculated_1,orderDetail);
+            // await updateSaldo(calculated_1,orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,
