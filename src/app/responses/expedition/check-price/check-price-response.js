@@ -184,7 +184,7 @@ module.exports = class {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
         console.log(item.service_code);
         const codCondition = (
-          (item.service_code === 'REG19' || item.service_code === 'CTC19')
+          (item.service_code === 'REG23' || item.service_code === 'CTC23')
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
         );
 
@@ -240,7 +240,7 @@ module.exports = class {
         return {
           weight: body.weight,
           serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
-          serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
+          serviceCode: servCode === 'CTC23' ? 'REG23' : servCode,
           availableCod: codCondition,
           originCod: true,
           destinationCod: true,
@@ -461,7 +461,7 @@ module.exports = class {
         return {
           weight: body.weight,
           serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
-          serviceCode: servCode === 'CTC19' ? 'REG19' : servCode,
+          serviceCode: servCode === 'CTC23' ? 'REG23' : servCode,
           availableCod: codCondition,
           originCod: true,
           destinationCod: true,

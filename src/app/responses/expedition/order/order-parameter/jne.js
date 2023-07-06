@@ -36,7 +36,7 @@ const parameterHandler = ({ payload }) => ({
   receiver_phone: payload?.receiver_phone,
   origin_code: payload?.origin?.jneOriginCode || '',
   destination_code: payload?.destination?.jneDestinationCode || '',
-  service_code: payload?.service_code === 'JNECOD' ? 'REG19' : payload.service_code,
+  service_code: payload?.service_code === 'JNECOD' ? 'REG23' : payload.service_code,
   weight: payload?.weight,
   qty: payload?.goods_qty,
   goods_desc: payload?.goods_content.slice(0, 55) || '',
