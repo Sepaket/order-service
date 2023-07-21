@@ -39,6 +39,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    resi: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    deltaCredit: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+    sellerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    expedition: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    serviceCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   };
 
   const OrderLog = sequelize.define('OrderLog', schema, {
