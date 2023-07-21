@@ -38,7 +38,9 @@ module.exports = class {
         const person = await this.orderAddress.findOne({
           where: { orderId: order?.id },
         });
-        await this.jne.cancel({ resi: order.resi, pic: person.senderName });
+        // await this.jne.cancel({ resi: order.resi, pic: person.senderName });
+        console.log('cancel reno');
+        // console.log(order)
         this.insertLog(order);
 
         resolve(true);
@@ -49,6 +51,7 @@ module.exports = class {
   }
 
   async insertLog(order) {
+    console.log('inside insertLog(order)')
     const dbTransaction = await sequelize.transaction();
 
     try {
@@ -57,13 +60,17 @@ module.exports = class {
         { where: { id: order.id } },
         { transaction: dbTransaction },
       );
-
       await this.orderLog.create(
         {
           orderId: order.id,
           previousStatus: order.status,
           currentStatus: orderStatus.CANCELED.text,
           note: 'Paket Dibatalkan oleh Penjual',
+          resi: order.resi,
+          deltaCredit: order.detail.shippingCalculated,
+          sellerId: order.detail.sellerId,
+          expedition: order.expedition,
+          serviceCode: order.serviceCode,
         },
         { transaction: dbTransaction },
       );
@@ -94,7 +101,9 @@ module.exports = class {
       }
 
       await dbTransaction.commit();
+      console.log('after commit');
     } catch (error) {
+      console.log('errr');
       await dbTransaction.rollback();
       throw new Error(error?.message || 'Something Wrong');
     }
