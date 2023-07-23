@@ -26,6 +26,7 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log('jne cancel');
         const { params } = this.request;
 
         const order = await this.order.findOne({

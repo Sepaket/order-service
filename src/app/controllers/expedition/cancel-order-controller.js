@@ -6,9 +6,11 @@ const JneCancelResponse = require('../../responses/expedition/cancel/jne-cancel-
 const NinjaCancelResponse = require('../../responses/expedition/cancel/ninja-cancel-response');
 const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat-cancel-response');
 
+
+/*
+Order cancellation belum bisa dilakukan secara serentak secara async. ada race condition yang menyebabkan perhitungan saldonya tidak tepat
+ */
 module.exports = async (request, response, next) => {
-
-
   try {
     let result = null;
     console.log('cancelling order...');
