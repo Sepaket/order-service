@@ -10,6 +10,8 @@ const OrderDetailResponse = require('../../responses/admin/order/order-detail-re
 const ExportResponse = require('../../responses/admin/order/order-export-response');
 const PrintResponse = require('../../responses/admin/order/order-print-response');
 const OrderListallResponse = require('../../responses/admin/order/order-listall-response');
+const SellerSetReferralCodeResponse = require('../../responses/admin/seller/seller-set-referral-code-response');
+const SetReturnStatusResponse = require('../../responses/admin/order/order-set-return-status-response');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -110,4 +112,21 @@ module.exports = {
       next(error);
     }
   },
+
+  setReturnStatus: async (request, response, next) => {
+    console.log('setReturnStatus');
+    try {
+      // await SellerDeleteValidator(request.params);
+      const result = await new SetReturnStatusResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
 };
