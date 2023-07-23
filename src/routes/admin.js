@@ -82,6 +82,7 @@ router.group('/order', (route) => {
   route.post('/export', Authorization, OrderController.export);
   route.post('/print', Authorization, OrderController.print);
   route.get('/:id', Authorization, OrderController.detail);
+  route.post('/set-return-status', Authorization, OrderController.setReturnStatus);
 });
 
 router.group('/notification', (route) => {
