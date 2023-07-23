@@ -18,6 +18,7 @@ const NeedAttentionReponse = require('../../responses/seller/report/seller-repor
 const RateReturReponse = require('../../responses/seller/report/seller-report-rate-retur');
 const RateSuccessReponse = require('../../responses/seller/report/seller-report-rate-success');
 const OrderTotalChartReponse = require('../../responses/seller/report/seller-report-order-total-chart');
+const Retur = require('../../responses/seller/report/seller-report-retur');
 
 const TopupPaidReponse = require('../../responses/seller/report/seller-report-topup-paid');
 const WithdrawCompletedReponse = require('../../responses/seller/report/seller-report-withdraw-completed');
@@ -385,6 +386,20 @@ module.exports = {
     }
   },
 
+  retur: async (request, response, next) => {
+    try {
+      const result = await new Retur({ request });
+      // console.log(result);
+      response.send({
+        code: 200,
+        message: 'OK',
+        count: result.length,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
 
 };

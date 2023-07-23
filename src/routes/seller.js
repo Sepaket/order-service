@@ -80,6 +80,7 @@ router.group('/reports', (route) => {
   route.get('/withdraw-completed', Authorization, ReportController.withdrawCompleted);
   route.get('/cod-shipping-paid', Authorization, ReportController.codShippingPaid);
   route.get('/non-cod-shipping-paid', Authorization, ReportController.nonCodShippingPaid);
+  route.get('/retur', Authorization, ReportController.retur);
 });
 
 router.group('/payment', (route) => {
