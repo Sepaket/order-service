@@ -201,7 +201,7 @@ module.exports = class {
               // group: ['previous_status', 'current_status'],
               where: { orderId: result.order_id },
             });
-            console.log(orderLogs);
+            // console.log(orderLogs);
             result.order = await this.converter.objectToSnakeCase(result?.order) || null;
             result.cod_value = result?.cod_fee || 0;
 
@@ -249,8 +249,12 @@ module.exports = class {
             }
 
             result.shipping_charge = parseFloat(shippingCalculated);
+            // result.tracking = result.orderLog;
           } else {
             console.log('RESPONSE IS ELSE');
+          }
+          if (result.order.expedition === 'NINJA') {
+            result.tracking = result.order_log;
           }
 
           if (response) resolve(result);
