@@ -253,9 +253,13 @@ module.exports = class {
           } else {
             console.log('RESPONSE IS ELSE');
           }
-          // if (result.order.expedition === 'NINJA') {
-          //   result.tracking = result.order_log;
-          // }
+
+          if (result?.order.expedition === 'NINJA') {
+            if (result?.order_log) {
+              result.tracking = result.order_log;
+            }
+
+          }
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
