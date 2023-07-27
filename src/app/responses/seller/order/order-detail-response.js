@@ -185,7 +185,7 @@ module.exports = class {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
-          // console.log(result)
+          console.log(response)
           if (response != null) {
             // console.log('response is not null')
 
@@ -254,12 +254,15 @@ module.exports = class {
             console.log('RESPONSE IS ELSE');
           }
 
-          if (result?.order.expedition === 'NINJA') {
-            if (result?.order_log) {
-              result.tracking = result.order_log;
-            }
-
-          }
+          // if (result?.order.expedition === 'NINJA') {
+          //   if (result?.order_log) {
+          //     result.tracking = result.order_log;
+          //   }
+          //
+          // } else {
+          //   // console.log('expedition NOT NINJA')
+          //   // console.log(result)
+          // }
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
