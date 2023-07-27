@@ -265,6 +265,7 @@ module.exports = class {
             console.log('RESPONSE IS ELSE');
           }
           const logHistory = [];
+          result.riwayat = '';
           if (result?.order.expedition === 'NINJA') {
             const ninjaLogs = await this.ninjaTracking.findAll({
               attributes: [
@@ -349,6 +350,7 @@ module.exports = class {
             // result.riwayat = 'riwayat NOT ninja';
             // console.log('expedition NOT NINJA')
             // console.log(result)
+            result.riwayat = '';
           }
 
           if (response) resolve(result);
