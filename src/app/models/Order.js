@@ -114,6 +114,13 @@ module.exports = (sequelize, DataTypes) => {
       as: 'statuses',
       foreignKey: 'orderId',
     });
+    model.Order.hasMany(model.NinjaTracking, {
+      as: 'ninjaTracking',
+      sourceKey: 'resi',
+      foreignKey: 'trackingRefNo',
+    });
+
+
   };
 
   return Order;
