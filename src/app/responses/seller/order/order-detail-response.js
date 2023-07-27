@@ -293,6 +293,10 @@ module.exports = class {
               templog.timestamp = ninjaLogs[index].timestamp;
               templog.status = ninjaLogs[index].status;
               templog.note = '';
+              templog.photo = '';
+              templog.signature = '';
+              templog.lat = '';
+              templog.long = '';
               logHistory.push(templog);
               // console.log(templog);
             }
@@ -307,6 +311,7 @@ module.exports = class {
             const jneLogs = await this.trackingHistory.findAll({
               attributes: [
                 'orderId',
+                'cnoteRaw',
                 'detailRaw',
                 'historyRaw',
                 'cnotePodDate',
@@ -324,6 +329,7 @@ module.exports = class {
             });
 
             // console.log(jneLogs);
+            // eslint-disable-next-line guard-for-in
             for (const index in jneLogs) {
               const templog = {};
               // console.log(`${jneLogs[index]} is at position ${index}`);
@@ -331,6 +337,10 @@ module.exports = class {
               templog.timestamp = jneLogs[index].cnotePodDate;
               templog.status = jneLogs[index].cnotePodStatus;
               templog.note = jneLogs[index].cnoteLastStatus;
+              templog.photo = '';
+              templog.signature = '';
+              templog.lat = '';
+              templog.long = '';
               logHistory.push(templog);
               // console.log(templog);
             }
