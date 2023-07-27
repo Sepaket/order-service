@@ -192,6 +192,14 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: 'orderId',
       foreignKey: 'orderId',
     });
+
+    // model.OrderDetail.belongsToMany(model.NinjaTracking, {
+    //   as: 'ninjatracking',
+    //   through: model.Order,
+    //   foreignKey: 'trackingRefNo',
+    //   // uniqueCustomKey: 'trackingRefNo',
+    //   // foreignKey: 'orderId',
+    // });
   };
 
   return OrderDetail;

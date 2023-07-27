@@ -13,6 +13,7 @@ const {
   OrderDiscount,
   Ticket,
   TrackingHistory,
+  NinjaTracking,
 } = require('../../../models');
 
 module.exports = class {
@@ -30,6 +31,7 @@ module.exports = class {
     this.converter = snakeCaseConverter;
     this.ticket = Ticket;
     this.trackingHistory = TrackingHistory;
+    this.ninjaTracking = NinjaTracking;
     return this.process();
   }
 
@@ -103,6 +105,14 @@ module.exports = class {
                     },
                   ],
                 },
+                // {
+                //   model: this.ninjaTracking,
+                //   as: 'ninjaTracking',
+                //   required: false,
+                //   attributes: [
+                //
+                //   ],
+                // },
               ],
             },
             {
@@ -123,6 +133,7 @@ module.exports = class {
                 'deletedAt',
               ],
             },
+
             {
               model: this.ticket,
               as: 'ticket',
@@ -185,7 +196,7 @@ module.exports = class {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
-          console.log(response)
+          console.log(response);
           if (response != null) {
             // console.log('response is not null')
 
@@ -253,16 +264,82 @@ module.exports = class {
           } else {
             console.log('RESPONSE IS ELSE');
           }
+          const logHistory = [];
+          if (result?.order.expedition === 'NINJA') {
+            const ninjaLogs = await this.ninjaTracking.findAll({
+              attributes: [
+                'id',
+                'raw',
+                'status',
+                'timestamp',
+                'trackingRefNo',
+                'trackingId',
+                // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                // 'updated_at', 'deleted_at', 'order_id',
+                // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+              ],
+              // group: ['previous_status', 'current_status'],
+              where: { trackingRefNo: result.order.resi },
+              order: [
+                ['id', 'ASC'],
+              ],
+            });
 
-          // if (result?.order.expedition === 'NINJA') {
-          //   if (result?.order_log) {
-          //     result.tracking = result.order_log;
-          //   }
-          //
-          // } else {
-          //   // console.log('expedition NOT NINJA')
-          //   // console.log(result)
-          // }
+            // eslint-disable-next-line guard-for-in,no-restricted-syntax
+            for (const index in ninjaLogs) {
+              const templog = {};
+              // console.log(`${ninjaLogs[index]} is at position ${index}`);
+              // console.log(ninjaLogs[index].id);
+              templog.timestamp = ninjaLogs[index].timestamp;
+              templog.status = ninjaLogs[index].status;
+              templog.note = '';
+              logHistory.push(templog);
+              // console.log(templog);
+            }
+            // console.log(logHistory);
+            result.riwayat = JSON.stringify(logHistory);
+            // if (result?.order_log) {
+            //   result.tracking = result.order_log;
+            // }
+          } if (result?.order.expedition === 'JNE') {
+            // console.log('enter jne');
+            // console.log(result);
+            const jneLogs = await this.trackingHistory.findAll({
+              attributes: [
+                'orderId',
+                'detailRaw',
+                'historyRaw',
+                'cnotePodDate',
+                'cnotePodStatus',
+                'cnoteLastStatus',
+                // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                // 'updated_at', 'deleted_at', 'order_id',
+                // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+              ],
+              // group: ['previous_status', 'current_status'],
+              where: { orderId: result.order_id },
+              order: [
+                ['cnotePodDate', 'ASC'],
+              ],
+            });
+
+            // console.log(jneLogs);
+            for (const index in jneLogs) {
+              const templog = {};
+              // console.log(`${jneLogs[index]} is at position ${index}`);
+              // console.log(jneLogs[index]);
+              templog.timestamp = jneLogs[index].cnotePodDate;
+              templog.status = jneLogs[index].cnotePodStatus;
+              templog.note = jneLogs[index].cnoteLastStatus;
+              logHistory.push(templog);
+              // console.log(templog);
+            }
+            result.riwayat = JSON.stringify(logHistory);
+          } else {
+            // result.riwayat = 'riwayat NOT ninja';
+            // console.log('expedition NOT NINJA')
+            // console.log(result)
+          }
 
           if (response) resolve(result);
           else reject(httpErrors(404, 'No Data Found', { data: null }));
