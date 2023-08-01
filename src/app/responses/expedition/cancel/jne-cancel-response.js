@@ -26,9 +26,10 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('jne cancel');
-        const { params } = this.request;
 
+        const { params } = this.request;
+        console.log('jne cancel');
+        console.log(params.id);
         const order = await this.order.findOne({
           where: { id: params.id },
           include: [{ model: this.orderDetail, as: 'detail', required: true }],
@@ -39,11 +40,11 @@ module.exports = class {
         const person = await this.orderAddress.findOne({
           where: { orderId: order?.id },
         });
-        // await this.jne.cancel({ resi: order.resi, pic: person.senderName });
-        console.log('cancel reno');
+        await this.jne.cancel({ resi: order.resi, pic: person.senderName });
+        // console.log('cancel reno');
         // console.log(order)
-        this.insertLog(order);
-
+        await this.insertLog(order);
+        await this.processSaldo(order);
         resolve(true);
       } catch (error) {
         reject(error);
@@ -51,8 +52,35 @@ module.exports = class {
     });
   }
 
+  async processSaldo(order) {
+    const dbTransaction = await sequelize.transaction();
+    try {
+      if (!order.isCod) {
+        const shippingCalculated = order?.detail?.shippingCalculated;
+        const seller = await this.sellerDetail.findOne({
+          where: { sellerId: order.detail.sellerId },
+        });
+        const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
+        const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
+
+        await this.sellerDetail.update(
+          { credit },
+          { where: { sellerId: seller.sellerId } },
+          { transaction: dbTransaction },
+        );
+        await dbTransaction.commit();
+      } else {
+        console.log('canceled order is COD');
+      }
+    } catch (error) {
+      await dbTransaction.rollback();
+      throw new Error(error?.message || 'Something Wrong');
+    }
+  }
+
   async insertLog(order) {
     console.log('inside insertLog(order)')
+    console.log(order.id);
     const dbTransaction = await sequelize.transaction();
 
     try {
@@ -81,26 +109,6 @@ module.exports = class {
         { where: { resi: order.resi } },
         { transaction: dbTransaction },
       );
-
-      const shippingCalculated = order?.detail?.shippingCalculated;
-      const seller = await this.sellerDetail.findOne({
-        where: { sellerId: order.detail.sellerId },
-      });
-
-      if (!order.isCod) {
-
-        const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
-        const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
-
-        await this.sellerDetail.update(
-          { credit },
-          { where: { sellerId: seller.sellerId } },
-          { transaction: dbTransaction },
-        );
-      } else {
-        console.log('canceled order is COD');
-      }
-
       await dbTransaction.commit();
       console.log('after commit');
     } catch (error) {

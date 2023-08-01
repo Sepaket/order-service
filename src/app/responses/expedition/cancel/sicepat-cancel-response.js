@@ -25,7 +25,8 @@ module.exports = class {
     return new Promise(async (resolve, reject) => {
       try {
         const { params } = this.request;
-
+        console.log('sicepat cancel');
+        console.log(params.id);
         const order = await this.order.findOne({
           where: { id: params.id },
           include: [{ model: this.orderDetail, as: 'detail', required: true }],
@@ -39,8 +40,8 @@ module.exports = class {
           } catch (error) {
             console.log('canceling sicepat order error');
           }
-          // console.log(cancelresponse);
           await this.insertLog(order);
+          await this.processSaldo(order);
         }
 
         resolve(true);
@@ -48,6 +49,31 @@ module.exports = class {
         reject(error);
       }
     });
+  }
+
+  async processSaldo(order) {
+    const dbTransaction = await sequelize.transaction();
+    try {
+      if (!order.isCod) {
+        const shippingCalculated = order?.detail?.shippingCalculated;
+        const seller = await this.sellerDetail.findOne({
+          where: { sellerId: order.detail.sellerId },
+        });
+
+        const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
+        const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
+
+        await this.sellerDetail.update(
+          { credit },
+          { where: { sellerId: seller.sellerId } },
+          { transaction: dbTransaction },
+        );
+      }
+      await dbTransaction.commit();
+    } catch (error) {
+      await dbTransaction.rollback();
+      throw new Error(error?.message || 'Something Wrong');
+    }
   }
 
   async insertLog(order) {
@@ -70,30 +96,11 @@ module.exports = class {
         { transaction: dbTransaction },
       );
 
-      console.log('before background update');
-      console.log(order.resi);
       await this.background.update(
         { isExecute: true },
         { where: { resi: order.resi } },
         { transaction: dbTransaction },
       );
-
-      if (!order.isCod) {
-        const shippingCalculated = order?.detail?.shippingCalculated;
-        const seller = await this.sellerDetail.findOne({
-          where: { sellerId: order.detail.sellerId },
-        });
-
-        const creditValue = seller.credit === 'NaN' ? 0 : seller.credit;
-        const credit = parseFloat(creditValue) + parseFloat(shippingCalculated);
-
-        await this.sellerDetail.update(
-          { credit },
-          { where: { sellerId: seller.sellerId } },
-          { transaction: dbTransaction },
-        );
-      }
-
       await dbTransaction.commit();
     } catch (error) {
       await dbTransaction.rollback();
