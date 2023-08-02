@@ -8,11 +8,12 @@ const tokenization = () => new Promise((resolve, reject) => {
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
+    const redistimeout = Number(response?.data?.expires_in) * 1000 * 0.9;
     setRedisData({
       db: 3,
       key: 'ninja-token',
       data: response?.data?.access_token,
-      timeout: 300000, // 5 min
+      timeout: redistimeout, // 11 hours
     });
     resolve(response?.data?.access_token);
   }).catch((error) => {
@@ -63,10 +64,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
     const originSplitted = origin.split(',');
     const destinationSplitted = destination.split(',');
-    console.log('inside check price 0 ');
     const token = await localToken() || await tokenization();
-    console.log('inside check price 1');
-    console.log(service);
     // console.log('inside ninja ${token}');
     const price = await axios.post(`${process.env.NINJA_BASE_URL}/1.0/public/price`, {
       weight,
