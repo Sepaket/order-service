@@ -30,6 +30,7 @@ module.exports = class {
     this.trackingHistory = TrackingHistory;
     this.converter = snakeCaseConverter;
     this.ticket = Ticket;
+    this.ninjaTracking = NinjaTracking;
     return this.process();
   }
 
