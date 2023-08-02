@@ -311,6 +311,8 @@ module.exports = class {
 
               }
               result.riwayat = JSON.stringify(logHistory);
+            } if (result?.order.expedition === 'SICEPAT') {
+
             } else {
 
               result.riwayat = '';

@@ -38,7 +38,6 @@ module.exports = class {
   async process() {
     const { params } = this.request;
     const seller = await jwtSelector({ request: this.request });
-    console.log(seller);
     return new Promise((resolve, reject) => {
       try {
         this.orderDetail.findOne({
@@ -303,8 +302,7 @@ module.exports = class {
             //   result.tracking = result.order_log;
             // }
           } if (result?.order.expedition === 'JNE') {
-            // console.log('enter jne');
-            // console.log(result);
+
             const jneLogs = await this.trackingHistory.findAll({
               attributes: [
                 'orderId',
@@ -325,12 +323,9 @@ module.exports = class {
               ],
             });
 
-            // console.log(jneLogs);
             // eslint-disable-next-line guard-for-in
             for (const index in jneLogs) {
               const templog = {};
-              // console.log(`${jneLogs[index]} is at position ${index}`);
-              // console.log(jneLogs[index]);
               templog.timestamp = jneLogs[index].cnotePodDate;
               templog.status = jneLogs[index].cnotePodStatus;
               templog.note = jneLogs[index].cnoteLastStatus;
@@ -342,6 +337,9 @@ module.exports = class {
 
             }
             result.riwayat = JSON.stringify(logHistory);
+          } if (result?.order.expedition === 'SICEPAT') {
+            console.log('enter SICEPAT');
+            console.log(result);
           } else {
 
             result.riwayat = '';
