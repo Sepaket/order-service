@@ -8,11 +8,12 @@ const tokenization = () => new Promise((resolve, reject) => {
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
+    const redistimeout = Number(response?.data?.expires_in) * 1000 * 0.9;
     setRedisData({
       db: 3,
       key: 'ninja-token',
       data: response?.data?.access_token,
-      timeout: 300000, // 5 min
+      timeout: redistimeout, // 11 hours
     });
     resolve(response?.data?.access_token);
   }).catch((error) => {
@@ -63,10 +64,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
     const originSplitted = origin.split(',');
     const destinationSplitted = destination.split(',');
-    console.log('inside check price 0 ');
     const token = await localToken() || await tokenization();
-    console.log('inside check price 1');
-    console.log(service);
     // console.log('inside ninja ${token}');
     const price = await axios.post(`${process.env.NINJA_BASE_URL}/1.0/public/price`, {
       weight,
@@ -85,8 +83,6 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
       },
     });
     const displayPrice = price?.data?.data?.total_fee + (price?.data?.data?.total_fee * 35 / 100);
-    // console.log(price?.data?.data?.total_fee);
-    // console.log(Math.round(displayPrice/100)*100);
     resolve(Math.round(displayPrice/100)*100);
   } catch (error) {
     resolve(null);
@@ -95,8 +91,6 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
 const createOrder = (payload) => new Promise(async (resolve) => {
   const token = await localToken() || await tokenization();
-  console.log('inside ninja creae order')
-  console.log(payload)
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
@@ -104,15 +98,11 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       Authorization: `Bearer ${token}`,
     },
   }).then((response) => {
-    console.log(response);
     resolve({
       status: true,
       message: 'OK',
     });
   }).catch((error) => {
-    // console.log(error.response.data.error.details[0].message)
-    console.log("ERORRRRRRRRRRRRRRRRRRRRRR")
-    console.log(error)
     resolve({
       status: false,
       message: error?.response?.data?.error?.message || error?.message,
