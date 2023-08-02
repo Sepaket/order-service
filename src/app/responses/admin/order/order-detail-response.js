@@ -12,6 +12,7 @@ const {
   OrderDiscount,
   Ticket,
   TrackingHistory,
+  NinjaTracking,
 } = require('../../../models');
 
 module.exports = class {
@@ -181,7 +182,6 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
           if (result == null) {
-            // console.log('IS NULL');
             reject(httpErrors(404, 'No Data Found', { data: null }));
           } else {
             const orderLogs = await this.orderLog.findAll({
@@ -238,9 +238,85 @@ module.exports = class {
             result.shipping_charge = parseFloat(shippingCalculated);
 
             delete result?.cod_fee;
+            const logHistory = [];
+            result.riwayat = '';
+            if (result?.order.expedition === 'NINJA') {
+              const ninjaLogs = await this.ninjaTracking.findAll({
+                attributes: [
+                  'id',
+                  'raw',
+                  'status',
+                  'timestamp',
+                  'trackingRefNo',
+                  'trackingId',
+                  // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                  // 'updated_at', 'deleted_at', 'order_id',
+                  // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+                ],
+                // group: ['previous_status', 'current_status'],
+                where: { trackingRefNo: result.order.resi },
+                order: [
+                  ['id', 'ASC'],
+                ],
+              });
 
+              // eslint-disable-next-line guard-for-in,no-restricted-syntax
+              for (const index in ninjaLogs) {
+                const templog = {};
+                templog.timestamp = ninjaLogs[index].timestamp;
+                templog.status = ninjaLogs[index].status;
+                templog.note = '';
+                templog.photo = '';
+                templog.signature = '';
+                templog.lat = '';
+                templog.long = '';
+                logHistory.push(templog);
+
+              }
+
+              result.riwayat = JSON.stringify(logHistory);
+            } if (result?.order.expedition === 'JNE') {
+              const jneLogs = await this.trackingHistory.findAll({
+                attributes: [
+                  'orderId',
+                  'cnoteRaw',
+                  'detailRaw',
+                  'historyRaw',
+                  'cnotePodDate',
+                  'cnotePodStatus',
+                  'cnoteLastStatus',
+                  // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                  // 'updated_at', 'deleted_at', 'order_id',
+                  // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+                ],
+                // group: ['previous_status', 'current_status'],
+                where: { orderId: result.order_id },
+                order: [
+                  ['cnotePodDate', 'ASC'],
+                ],
+              });
+
+              for (const index in jneLogs) {
+                const templog = {};
+
+                templog.timestamp = jneLogs[index].cnotePodDate;
+                templog.status = jneLogs[index].cnotePodStatus;
+                templog.note = jneLogs[index].cnoteLastStatus;
+                templog.photo = '';
+                templog.signature = '';
+                templog.lat = '';
+                templog.long = '';
+                logHistory.push(templog);
+
+              }
+              result.riwayat = JSON.stringify(logHistory);
+            } else {
+
+              result.riwayat = '';
+            }
             if (response) resolve(result);
             else reject(httpErrors(404, 'No Data Found', { data: null }));
+
           }
 
         });

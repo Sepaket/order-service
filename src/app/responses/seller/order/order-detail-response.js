@@ -196,10 +196,8 @@ module.exports = class {
           const result = await this.converter.objectToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );
-          console.log(response);
-          if (response != null) {
-            // console.log('response is not null')
 
+          if (response != null) {
             const orderLogs = await this.orderLog.findAll({
               attributes: [
                 'previous_status',
@@ -234,7 +232,7 @@ module.exports = class {
 
             result.order_log = await this.converter.arrayToSnakeCase(
               JSON.parse(JSON.stringify(orderLogs)),
-            );
+            );riw
 
             let vatCalculated = this.tax.vat;
 
@@ -262,7 +260,7 @@ module.exports = class {
             result.shipping_charge = parseFloat(shippingCalculated);
             // result.tracking = result.orderLog;
           } else {
-            console.log('RESPONSE IS ELSE');
+
           }
           const logHistory = [];
           result.riwayat = '';
@@ -289,8 +287,6 @@ module.exports = class {
             // eslint-disable-next-line guard-for-in,no-restricted-syntax
             for (const index in ninjaLogs) {
               const templog = {};
-              // console.log(`${ninjaLogs[index]} is at position ${index}`);
-              // console.log(ninjaLogs[index].id);
               templog.timestamp = ninjaLogs[index].timestamp;
               templog.status = ninjaLogs[index].status;
               templog.note = '';
@@ -299,7 +295,7 @@ module.exports = class {
               templog.lat = '';
               templog.long = '';
               logHistory.push(templog);
-              // console.log(templog);
+
             }
             // console.log(logHistory);
             result.riwayat = JSON.stringify(logHistory);
@@ -343,13 +339,11 @@ module.exports = class {
               templog.lat = '';
               templog.long = '';
               logHistory.push(templog);
-              // console.log(templog);
+
             }
             result.riwayat = JSON.stringify(logHistory);
           } else {
-            // result.riwayat = 'riwayat NOT ninja';
-            // console.log('expedition NOT NINJA')
-            // console.log(result)
+
             result.riwayat = '';
           }
 
