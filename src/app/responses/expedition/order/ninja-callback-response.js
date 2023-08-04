@@ -78,7 +78,7 @@ module.exports = class {
   }
 
   updateSellerDetail() {
-    console.log('update tracking history');
+    // console.log('update tracking history');
   }
 
   async addOrderHistory(resi, currentStatus, isExecute, onHold) {
@@ -100,13 +100,17 @@ module.exports = class {
         if (result.history === null) {
           deltaCredit = parseFloat(result.detail.shippingCalculated);
           if (result?.detail?.referralRateType === 'PERCENTAGE') {
-            referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100
+            referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100;
           }
 
           if ((currentStatus === 'DELIVERED') && (!result?.is_cod)) {
             deltaCredit = 0;
+          } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.is_cod)) {
+            // eslint-disable-next-line operator-assignment
+            deltaCredit = -1 * deltaCredit;
+            // eslint-disable-next-line operator-assignment
+            referralCredit = -1 * referralCredit;
           }
-
 
           await OrderHistory.create({
             orderId: result?.id,
