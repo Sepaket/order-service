@@ -103,9 +103,9 @@ module.exports = class {
             referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100;
           }
 
-          if ((currentStatus === 'DELIVERED') && (!result?.is_cod)) {
+          if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
             deltaCredit = 0;
-          } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.is_cod)) {
+          } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
             // eslint-disable-next-line operator-assignment
             deltaCredit = -1 * deltaCredit;
             // eslint-disable-next-line operator-assignment
@@ -118,7 +118,7 @@ module.exports = class {
             deltaCredit,
             isExecute,
             onHold,
-            isCod: result?.is_cod,
+            isCod: result?.isCod,
             provider: result?.expedition,
             note: currentStatus,
             referralId: result?.detail?.referredSellerId,
