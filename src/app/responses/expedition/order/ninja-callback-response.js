@@ -111,7 +111,8 @@ module.exports = class {
             // eslint-disable-next-line operator-assignment
             referralCredit = -1 * referralCredit;
           }
-
+          console.log('reno ninja');
+          console.log(result);
           await OrderHistory.create({
             orderId: result?.id,
             deltaCredit,
