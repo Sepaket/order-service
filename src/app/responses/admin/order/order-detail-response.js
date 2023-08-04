@@ -297,6 +297,7 @@ module.exports = class {
                 ],
               });
 
+              // eslint-disable-next-line guard-for-in,no-restricted-syntax
               for (const index in jneLogs) {
                 const templog = {};
 
@@ -312,7 +313,42 @@ module.exports = class {
               }
               result.riwayat = JSON.stringify(logHistory);
             } if (result?.order.expedition === 'SICEPAT') {
+              const sicepatLogs = await this.orderLog.findAll({
+                attributes: [
+                  'id',
+                  'orderId',
+                  'previousStatus',
+                  'currentStatus',
+                  'note',
+                  'createdAt',
+                  'podStatus',
+                  'resi',
+                  // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                  // 'updated_at', 'deleted_at', 'order_id',
+                  // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+                ],
+                // group: ['previous_status', 'current_status'],
+                where: { orderId: result.order_id },
+                order: [
+                  ['id', 'ASC'],
+                ],
+              });
 
+              console.log('SICEPAT LOGS');
+              for (const index in sicepatLogs) {
+                const templog = {};
+
+                templog.timestamp = sicepatLogs[index].createdAt;
+                templog.status = sicepatLogs[index].currentStatus;
+                templog.note = sicepatLogs[index].note;
+                templog.photo = '';
+                templog.signature = '';
+                templog.lat = '';
+                templog.long = '';
+                logHistory.push(templog);
+
+              }
+              result.riwayat = JSON.stringify(logHistory);
             } else {
 
               result.riwayat = '';

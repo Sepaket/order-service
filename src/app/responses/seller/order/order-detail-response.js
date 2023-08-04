@@ -340,6 +340,44 @@ module.exports = class {
           } if (result?.order.expedition === 'SICEPAT') {
             console.log('enter SICEPAT');
             console.log(result);
+
+            const sicepatLogs = await this.orderLog.findAll({
+              attributes: [
+                'id',
+                'orderId',
+                'previousStatus',
+                'currentStatus',
+                'note',
+                'createdAt',
+                'podStatus',
+                'resi',
+                // [Sequelize.fn('MIN', Sequelize.col('created_at')),'created_at'],
+                // 'updated_at', 'deleted_at', 'order_id',
+                // [Sequelize.fn('MIN', Sequelize.col('id')),'id'],
+              ],
+              // group: ['previous_status', 'current_status'],
+              where: { orderId: result.order_id },
+              order: [
+                ['id', 'ASC'],
+              ],
+            });
+
+            // eslint-disable-next-line guard-for-in,no-restricted-syntax
+            for (const index in sicepatLogs) {
+              const templog = {};
+
+              templog.timestamp = sicepatLogs[index].createdAt;
+              templog.status = sicepatLogs[index].currentStatus;
+              templog.note = sicepatLogs[index].note;
+              templog.photo = '';
+              templog.signature = '';
+              templog.lat = '';
+              templog.long = '';
+              logHistory.push(templog);
+
+            }
+            result.riwayat = JSON.stringify(logHistory);
+
           } else {
 
             result.riwayat = '';
