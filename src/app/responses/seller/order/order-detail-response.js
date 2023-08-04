@@ -231,7 +231,7 @@ module.exports = class {
 
             result.order_log = await this.converter.arrayToSnakeCase(
               JSON.parse(JSON.stringify(orderLogs)),
-            );riw
+            );
 
             let vatCalculated = this.tax.vat;
 
