@@ -4,7 +4,6 @@ const shortid = require('shortid-36');
 const qs = require('querystring');
 require('dotenv').config();
 
-
 const caseConverter = ({ parameter }) => {
   // eslint-disable-next-line no-unused-vars
   const { body } = this.request;
@@ -15,8 +14,7 @@ const caseConverter = ({ parameter }) => {
   }, {});
 };
 
-String.prototype.escapeSpecialCharsInJSONString = function() {
-
+String.prototype.escapeSpecialCharsInJSONString = function () {
   // return this .replace(/[\\]/g, '\\\\')
   //   .replace(/[\"]/g, '\\\"')
   //   .replace(/[\/]/g, '\\/')
@@ -26,8 +24,7 @@ String.prototype.escapeSpecialCharsInJSONString = function() {
   //   .replace(/[\r]/g, '\\r')
   //   .replace(/[\t]/g, '\\t');
 
-
-  return this .replace(/[\\]/g, '\\\\')
+  return this.replace(/[\\]/g, '\\\\')
     .replace(/[\"]/g, '\\\"')
     .replace(/[\/]/g, '\\/')
     .replace(/[\b]/g, ' ')
@@ -36,7 +33,6 @@ String.prototype.escapeSpecialCharsInJSONString = function() {
     .replace(/[\r]/g, ' ')
     .replace(/[\t]/g, ' ');
 };
-
 
 const payloadFormatter = (payload) => {
   // eslint-disable-next-line no-unused-vars
@@ -64,11 +60,9 @@ const payloadFormatter = (payload) => {
   // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
   // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].escapeSpecialCharsInJSONString();
 
-  console.log('payload formatter goods desc ' + payload['GOODS_DESC']);
+  console.log(`payload formatter goods desc ${payload.GOODS_DESC}`);
   return payload;
 };
-
-
 
 const parameter = (payload) => new Promise((resolve, reject) => {
   try {
@@ -125,7 +119,6 @@ const parameter = (payload) => new Promise((resolve, reject) => {
     reject(error);
   }
 });
-
 
 const getOrigin = () => new Promise((resolve, reject) => {
   axios.post(`${process.env.JNE_BASE_URL}/insert/getorigin`, qs.stringify({
@@ -208,7 +201,10 @@ const createOrder = (payload) => new Promise((resolve) => {
       },
     }).then((response) => {
       console.log('======================inside then');
-      console.log(response)
+      console.log(response?.data);
+      if (response.data.status === false) {
+        console.log('error : '.response.data.error);
+      }
       if (!response?.data?.detail) {
         resolve({
           status: false,
@@ -217,11 +213,12 @@ const createOrder = (payload) => new Promise((resolve) => {
         return;
       }
 
-      const status = (response.data.detail[0]['status']).toLowerCase();
+      const status = (response.data.detail[0].status).toLowerCase();
       if (status === 'error') {
+        console.log('error');
         resolve({
           status: false,
-          message: response.data.detail[0]['reason'],
+          message: response.data.detail[0].reason,
         });
         return;
       }
@@ -290,8 +287,6 @@ const cancel = (payload) => new Promise((resolve, reject) => {
     reject(new Error(error?.response?.data?.error?.reason || error?.message || 'Something Wrong'));
   });
 });
-
-
 
 module.exports = {
   getOrigin,

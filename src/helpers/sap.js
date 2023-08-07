@@ -57,18 +57,18 @@ const checkPrice = (payload) => new Promise((resolve) => {
       'api-key': process.env.SAP_APIKEY_GLOBAL,
     },
   }).then((response) => {
-    console.log('then after checkpirce')
+    // console.log('then after checkpirce')
     // console.log(response.data)
     resolve(response?.data || []);
   }).catch((error) => {
-    console.log('catch after checkprice')
+    // console.log('catch after checkprice')
     resolve([]);
   });
 });
 
 const createOrder = (payload) => new Promise(async (resolve) => {
-  console.log('SAP create order in helpers/sap')
-  console.log(payload)
+  // console.log('SAP create order in helpers/sap')
+  // console.log(payload)
   axios.post(`${process.env.SAP_BASE_URL_PICKUP}/shipment/pickup/single_push`, {
     ...payload,
   }, {
@@ -76,8 +76,8 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       'api_key': 'S3P@kEt#_2023',
     },
   }).then((response) => {
-    console.log('SAP Create order response')
-    console.log(response)
+    // console.log('SAP Create order response')
+    // console.log(response)
     if (!response?.data?.data) {
       resolve({
         status: false,
