@@ -295,8 +295,8 @@ const referralUpdater = async () => {
     );
 
     for (const key in sellerUpdateObject) {
-      console.log(key)
-      console.log(sellerUpdateObject[key]);
+      // console.log(key)
+      // console.log(sellerUpdateObject[key]);
       let newCredit = Number(sellerUpdateObject[key]['credit']) + Number(sellerUpdateObject[key]['delta']);
       let updateSeller = await SellerDetail.update(
         { credit: newCredit },
