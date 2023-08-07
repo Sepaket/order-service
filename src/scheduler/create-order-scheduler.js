@@ -31,6 +31,7 @@ const sicepatExecutor = async (payload) => {
 };
 
 const jneExecutor = async (payload) => {
+  console.log('JNE EXECUTOR');
   try {
     const created = await jne.createOrder(JSON.parse(payload.parameter));
 
@@ -110,15 +111,19 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 10,
+      limit: 400,
     });
 
+    // if (orders[0].expedition === 'NINJA') ninjaExecutor(orders[0]);
+
     orders?.forEach((item, index) => {
+    //   console.log(item.expedition);
       setTimeout(async () => {
-        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
-        if (item.expedition === 'JNE') await jneExecutor(item);
-        if (item.expedition === 'NINJA') await ninjaExecutor(item);
-        if (item.expedition === 'SAP') await sapExecutor(item);
+
+        if (item.expedition === 'SICEPAT') sicepatExecutor(item);
+        if (item.expedition === 'JNE') jneExecutor(item);
+      //   if (item.expedition === 'NINJA') ninjaExecutor(item);
+      //   if (item.expedition === 'SAP') sapExecutor(item);
       }, index * 20000);
     });
   } catch (error) {

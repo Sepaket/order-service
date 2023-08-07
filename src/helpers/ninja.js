@@ -3,12 +3,17 @@ const { NinjaLocation } = require('../app/models');
 const { setRedisData, getRedisData } = require('./redis');
 
 const tokenization = () => new Promise((resolve, reject) => {
+  console.log('GET NEW TOKEN for ninja using API')
   axios.post(`${process.env.NINJA_BASE_URL}/2.0/oauth/access_token`, {
     client_id: process.env.NINJA_CLIENT_ID,
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
-    const redistimeout = Number(response?.data?.expires_in) * 1000 * 0.9;
+    // const redistimeout = Number(response?.data?.expires_in) * 1000 * 0.9;
+    const redistimeout = 432000 * 1000 * 0.9;
+    console.log('redistimeout')
+    console.log(redistimeout)
+    console.log(response)
     setRedisData({
       db: 3,
       key: 'ninja-token',
@@ -17,13 +22,17 @@ const tokenization = () => new Promise((resolve, reject) => {
     });
     resolve(response?.data?.access_token);
   }).catch((error) => {
+    console.log('redistimeout ERROR')
+    console.log(error)
     reject(new Error(error?.response?.data?.message || error?.message || 'Something Wrong'));
   });
 });
 
 const localToken = async () => {
+  console.log('use local token for ninja')
   try {
     const token = await getRedisData({ key: 'ninja-token', db: 3 });
+    console.log(token);
     return token;
   } catch (error) {
     throw new Error(error?.message || 'Somethin Wrong');
@@ -91,7 +100,11 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
 const createOrder = (payload) => new Promise(async (resolve) => {
 
-  const token = await localToken() || await tokenization();
+  let token = await localToken()
+  if (token === null) {
+
+    token = await tokenization();
+  }
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
     ...payload,
   }, {
