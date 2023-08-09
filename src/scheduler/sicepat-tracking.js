@@ -141,7 +141,7 @@ const tracking = async () => {
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod) {
             console.log('RETURN TO SELLER & COD')
             additional_note = 'return to seller & cod';
-            const amounttoupdate = (-1 * parseFloat(orderDetail.shippingCalculated))
+            const amounttoupdate = (-1 * parseFloat(orderDetail.shippingCalculated)) + parseFloat(orderDetail.codFeeAdmin);
             await addOrderHistory(item.id, item.isCod,amounttoupdate, false, false, currentStatus,additional_note, orderDetail);
 
 

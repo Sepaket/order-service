@@ -242,8 +242,8 @@ module.exports = class {
             const logHistory = [];
             result.riwayat = '';
             if (result?.order.expedition === 'NINJA') {
-              console.log('order detail ninja riwayat');
-              console.log(result.order.resi);
+              // console.log('order detail ninja riwayat');
+              // console.log(result.order.resi);
               const ninjaLogs = await this.ninjaTracking.findAll({
                 attributes: [
                   'id',
