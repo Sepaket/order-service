@@ -10,7 +10,7 @@ const sicepatExecutor = async (payload) => {
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
     console.log('SICEPAT ORDER CREATED');
-    console.log(created);
+    // console.log(created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -82,8 +82,8 @@ const sapExecutor = async (payload) => {
   console.log(JSON.parse(payload.parameter));
   try {
     const created = await sap.createOrder(JSON.parse(payload.parameter));
-    console.log('created SAP executor')
-    console.log(payload)
+    // console.log('created SAP executor')
+    // console.log(payload)
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -111,19 +111,20 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 400,
+      limit: 100,
     });
-
-    // if (orders[0].expedition === 'NINJA') ninjaExecutor(orders[0]);
+    // console.log('ORDERS')
+    // console.log(orders[5].resi);
+    // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
 
     orders?.forEach((item, index) => {
-    //   console.log(item.expedition);
+      console.log(item.expedition);
       setTimeout(async () => {
-
-        if (item.expedition === 'SICEPAT') sicepatExecutor(item);
-        if (item.expedition === 'JNE') jneExecutor(item);
-      //   if (item.expedition === 'NINJA') ninjaExecutor(item);
-      //   if (item.expedition === 'SAP') sapExecutor(item);
+    //
+    //     if (item.expedition === 'SICEPAT') sicepatExecutor(item);
+    //     if (item.expedition === 'JNE') jneExecutor(item);
+        if (item.expedition === 'NINJA') await ninjaExecutor(item);
+    //     if (item.expedition === 'SAP') sapExecutor(item);
       }, index * 20000);
     });
   } catch (error) {
