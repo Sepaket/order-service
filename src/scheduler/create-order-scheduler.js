@@ -111,7 +111,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 100,
+      limit: 2,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
