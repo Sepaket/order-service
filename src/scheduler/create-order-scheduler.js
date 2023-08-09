@@ -111,21 +111,22 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 2,
+      limit: 4,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
     // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
 
     orders?.forEach((item, index) => {
-      console.log(item.expedition);
+      // console.log(item.expedition);
       setTimeout(async () => {
     //
         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
-    //     if (item.expedition === 'SAP') sapExecutor(item);
-      }, index * 20000);
+        if (item.expedition === 'SAP') sapExecutor(item);
+    //   }, index * 20000);
+    }, 20000);
     });
   } catch (error) {
     // eslint-disable-next-line no-console
