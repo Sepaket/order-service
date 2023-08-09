@@ -9,7 +9,7 @@ const tokenization = () => new Promise((resolve, reject) => {
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
-    const redistimeout = Number(response?.data?.expires_in) * 1 * 0.9;
+    const redistimeout = Number(response?.data?.expires_in) * 10000 * 0.9;
     // const redistimeout = 432000 * 1000 * 0.9;
     // console.log('redistimeout')
     // console.log(redistimeout)
@@ -103,7 +103,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
 
   let token = await localToken()
   if (token === null) {
-
+    console.log('NO NINJA TOKEN');
     token = await tokenization();
   }
   axios.post(`${process.env.NINJA_BASE_URL}/4.1/orders`, {
