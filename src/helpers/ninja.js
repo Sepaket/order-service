@@ -9,17 +9,18 @@ const tokenization = () => new Promise((resolve, reject) => {
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
-    // const redistimeout = Number(response?.data?.expires_in) * 1000 * 0.9;
-    const redistimeout = 432000 * 1000 * 0.9;
-    console.log('redistimeout')
-    console.log(redistimeout)
-    console.log(response)
+    const redistimeout = Number(response?.data?.expires_in) * 1 * 0.9;
+    // const redistimeout = 432000 * 1000 * 0.9;
+    // console.log('redistimeout')
+    // console.log(redistimeout)
+    // console.log(response)
     setRedisData({
       db: 3,
       key: 'ninja-token',
       data: response?.data?.access_token,
       timeout: redistimeout, // 11 hours
     });
+    console.log('after storing to redis')
     resolve(response?.data?.access_token);
   }).catch((error) => {
     console.log('redistimeout ERROR')

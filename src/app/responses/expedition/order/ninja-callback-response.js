@@ -97,20 +97,26 @@ module.exports = class {
         console.log('Order not found');
 
       } else {
-        if (result.history === null) {
-          deltaCredit = parseFloat(result.detail.shippingCalculated);
-          if (result?.detail?.referralRateType === 'PERCENTAGE') {
-            referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100;
-          }
+        deltaCredit = parseFloat(result.detail.shippingCalculated);
+        if (result?.detail?.referralRateType === 'PERCENTAGE') {
+          referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100;
+        }
+        console.log('current status');
+        console.log(currentStatus);
+        if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
+          deltaCredit = 0;
+        } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
 
-          if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
-            deltaCredit = 0;
-          } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
-            // eslint-disable-next-line operator-assignment
-            deltaCredit = -1 * deltaCredit;
-            // eslint-disable-next-line operator-assignment
-            referralCredit = -1 * referralCredit;
-          }
+          // eslint-disable-next-line operator-assignment
+          deltaCredit = -1 * deltaCredit;
+          console.log('deltacredit', deltaCredit);
+          // eslint-disable-next-line operator-assignment
+          referralCredit = -1 * referralCredit;
+        }
+
+        if (result.history === null) {
+
+
           console.log('reno ninja');
           console.log(result);
           await OrderHistory.create({
@@ -128,7 +134,10 @@ module.exports = class {
         } else {
           console.log('update history instead');
           await result.history.update(
-            { note: currentStatus },
+            { note: currentStatus,
+              deltaCredit,
+              referralCredit,
+            },
           );
         }
       }
