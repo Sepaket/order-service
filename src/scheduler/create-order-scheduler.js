@@ -121,8 +121,8 @@ const runner = cron.schedule('*/1 * * * *', async () => {
       console.log(item.expedition);
       setTimeout(async () => {
     //
-        if (item.expedition === 'SICEPAT') sicepatExecutor(item);
-        if (item.expedition === 'JNE') jneExecutor(item);
+        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+        if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
     //     if (item.expedition === 'SAP') sapExecutor(item);
       }, index * 20000);
