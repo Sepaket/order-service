@@ -101,24 +101,21 @@ module.exports = class {
         if (result?.detail?.referralRateType === 'PERCENTAGE') {
           referralCredit = result.detail.referralRate * parseFloat(result.detail.shippingCalculated) / 100;
         }
-        console.log('current status');
-        console.log(currentStatus);
+
         if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
           deltaCredit = 0;
         } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
 
           // eslint-disable-next-line operator-assignment
           deltaCredit = -1 * deltaCredit;
-          console.log('deltacredit', deltaCredit);
+          deltaCredit = deltaCredit + parseFloat(result.detail.codFeeAdmin);
+
           // eslint-disable-next-line operator-assignment
           referralCredit = -1 * referralCredit;
         }
 
         if (result.history === null) {
 
-
-          console.log('reno ninja');
-          console.log(result);
           await OrderHistory.create({
             orderId: result?.id,
             deltaCredit,
