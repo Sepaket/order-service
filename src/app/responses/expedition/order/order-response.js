@@ -239,8 +239,7 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
-          // console.log(origin);
-          // console.log(destination);
+
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
           let codFeeCalculated = trxFee?.codFee || 0;
@@ -353,6 +352,9 @@ module.exports = class {
           } else if (body.type === 'SAP'){
             // sicepatResi += 1;
             console.log('sap order') //current resi is ignores. resi is generated from timestamp
+            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+          } else if (body.type === 'LALAMOVE'){
+            console.log('lalamove order')
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
 
