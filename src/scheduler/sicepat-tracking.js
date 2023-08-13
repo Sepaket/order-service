@@ -119,7 +119,7 @@ const tracking = async () => {
           const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
           let additional_note = ''
           if (currentStatus === 'DELIVERED' && item.isCod) {
-            const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
+            // const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
             });
@@ -132,7 +132,7 @@ const tracking = async () => {
               { where: { sellerId: orderDetail.sellerId } },
             );
           }
-          if (currentStatus === 'DELIVERED' && !tem.isCod) {
+          if (currentStatus === 'DELIVERED' && !item.isCod) {
 
           }
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod) {

@@ -15,12 +15,12 @@ const ninja = require('../helpers/ninja');
 const { setRedisData, getRedisData } = require('../helpers/redis');
 
 const authExpireCheck = async () => {
-  console.log('auth expire check');
+  console.log('NINJA auth expire check');
 
-  const redisNinjaToken = await getRedisData({ db: 0, key: 'ninja_token' });
   // const getOrigin = ninja.getOrigin()
-  // const ninjaToken = await ninja.localToken;
-  // console.log(`ninja token :  ${ninjaToken}`);
+  const redisNinjaToken = await ninja.getLocalToken();
+  console.log(`Redis Ninja token :  ${ninjaToken}`);
+
   // if (redisNinjaToken === null) {
   //   console.log('VALID IS NULL');
   //   setRedisData(

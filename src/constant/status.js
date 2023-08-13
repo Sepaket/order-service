@@ -64,18 +64,28 @@ const sapServiceStatus = [
   { code: 'SAPCOD', name: 'SAP COD', type: 'SAP' },
 ];
 
+const lalamoveServiceStatus = [
+  { code: 'COURIER', name: 'LALAMOVE COURIER', type: 'LALAMOVE' },
+  { code: 'MOTORCYCLE', name: 'LALAMOVE MOTORCYCLE', type: 'LALAMOVE' },
+  { code: 'TRUCK550', name: 'LALAMOVE TRUCK550', type: 'LALAMOVE' },
+  { code: 'VAN', name: 'LALAMOVE VAN', type: 'LALAMOVE' },
+  { code: 'WALKER', name: 'LALAMOVE WALKER', type: 'LALAMOVE' },
+];
+
 const serviceCode = {
   JNE: jneServiceStatus,
   SICEPAT: sicepatServiceStatus,
   NINJA: ninjaServiceStatus,
   SAP: sapServiceStatus,
   IDEXPRESS: idxServiceStatus,
+  LALAMOVE: lalamoveServiceStatus,
   ALL: [
     ...jneServiceStatus,
     ...sicepatServiceStatus,
     ...ninjaServiceStatus,
     ...sapServiceStatus,
     ...idxServiceStatus,
+    ...lalamoveServiceStatus,
   ],
 };
 
@@ -111,6 +121,10 @@ const expeditionService = [
     name: 'SAP',
     code: 'SAP',
   },
+  {
+    name: 'LALAMOVE',
+    code: 'LALAMOVE',
+  },
   // {
   //   name: 'IDexpress',
   //   code: 'IDEXPRESS',
@@ -141,4 +155,5 @@ module.exports = {
   serviceCode,
   expeditionService,
   sicepatParcelCategories,
+  lalamoveServiceStatus,
 };

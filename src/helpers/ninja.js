@@ -9,36 +9,38 @@ const tokenization = () => new Promise((resolve, reject) => {
     client_secret: process.env.NINJA_SECRET,
     grant_type: process.env.NINJA_GRANT_TYPE,
   }).then((response) => {
-    const redistimeout = Number(response?.data?.expires_in) * 10000 * 0.9;
-    // const redistimeout = 432000 * 1000 * 0.9;
-    // console.log('redistimeout')
-    // console.log(redistimeout)
-    // console.log(response)
+    const redistimeout = Number(response?.data?.expires_in) * 1 * 0.9;
     setRedisData({
       db: 3,
       key: 'ninja-token',
       data: response?.data?.access_token,
       timeout: redistimeout, // 11 hours
     });
-    console.log('after storing to redis')
     resolve(response?.data?.access_token);
   }).catch((error) => {
-    console.log('redistimeout ERROR')
     console.log(error)
     reject(new Error(error?.response?.data?.message || error?.message || 'Something Wrong'));
   });
 });
 
 const localToken = async () => {
-  console.log('use local token for ninja')
   try {
     const token = await getRedisData({ key: 'ninja-token', db: 3 });
-    console.log(token);
     return token;
   } catch (error) {
     throw new Error(error?.message || 'Somethin Wrong');
   }
 };
+
+const getLocalToken = () => new Promise(async (resolve, reject) => {
+  try {
+    const token = await getRedisData({ key: 'ninja-token', db: 3 });
+    resolve(token);
+  } catch (error) {
+    reject(new Error(`Ninja: ${error?.message || 'Something Wrong'}`));
+  }
+});
+
 
 const getOrigin = () => new Promise(async (resolve, reject) => {
   try {
@@ -101,7 +103,7 @@ const checkPrice = (payload) => new Promise(async (resolve) => {
 
 const createOrder = (payload) => new Promise(async (resolve) => {
 
-  let token = await localToken()
+  let token = await getLocalToken()
   if (token === null) {
     console.log('NO NINJA TOKEN');
     token = await tokenization();
@@ -127,7 +129,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
 
 const tracking = (payload) => new Promise(async (resolve) => {
   const { resi } = payload;
-  const token = await localToken() || await tokenization();
+  const token = await getLocalToken() || await tokenization();
 
   axios.get(`${process.env.NINJA_BASE_URL}/1.0/orders/tracking-events/${resi}`, {
     headers: {
@@ -142,7 +144,7 @@ const tracking = (payload) => new Promise(async (resolve) => {
 
 const cancel = (payload) => new Promise(async (resolve, reject) => {
   const { resi } = payload;
-  const token = await localToken() || await tokenization();
+  const token = await getLocalToken() || await tokenization();
   // console.log(resi);
   // console.log(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`);
   axios.delete(`${process.env.NINJA_BASE_URL}/2.2/orders/${process.env.NINJA_ORDER_PREFIX}${resi}`, {
@@ -166,4 +168,7 @@ module.exports = {
   createOrder,
   tracking,
   cancel,
+  localToken,
+  getLocalToken,
+
 };
