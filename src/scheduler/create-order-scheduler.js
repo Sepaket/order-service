@@ -123,7 +123,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
-        // if (item.expedition === 'SAP') sapExecutor(item);
+        if (item.expedition === 'SAP') sapExecutor(item);
         // if (item.expedition === 'LALAMOVE') await lalamoveExecutor(item);
     //   }, index * 20000);
     }, 8000);

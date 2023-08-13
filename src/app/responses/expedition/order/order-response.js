@@ -10,6 +10,7 @@ const sicepat = require('../../../../helpers/sicepat');
 const ninjaParameter = require('./order-parameter/ninja');
 const sicepatParameter = require('./order-parameter/sicepat');
 const sapParameter = require('./order-parameter/sap');
+const lalamoveParameter = require('./order-parameter/lalamove');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const orderValidator = require('../../../../helpers/order-validator');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
@@ -196,19 +197,14 @@ module.exports = class {
         : '0000';
 
       var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
-
       var nextId = 0;
-
       const latestOrder = await this.order.findOne({
         order: [['id', 'DESC']],
       });
 
       let increment = 1;
       const response = await Promise.all(
-
-
         body.order_items.map(async (item, index) => {
-
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
           if (body.service_code === 'JNECOD'){
@@ -273,7 +269,6 @@ module.exports = class {
             codValueCalculated = codFeeCalculated + vatCalculated;
           }
 
-
           if (selectedDiscount?.type === 'PERCENTAGE') {
             discountAmount = (
               parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
@@ -300,18 +295,15 @@ module.exports = class {
                 }
 
               } else {
-
                 insuranceSelected = (
                   parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
                 ) / 100;
-
               }
             }
           }
 
           let shippingCalculated = 0;
           if (item.is_cod) {
-
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
             + parseFloat(insuranceSelected);
@@ -337,20 +329,17 @@ module.exports = class {
           const ongkirminuscod = item?.is_cod
             ? (parseFloat(item?.cod_value) - parseFloat(shippingCharge))
             : 0;
-          // console.log(totalAmount);
+
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
-            // console.log(`index = ${  index  } nextId ${  nextId}`);
             var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
           } else if (body.type === 'SICEPAT'){
             sicepatResi += 1;
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'NINJA'){
-            // sicepatResi += 1;
             console.log('ninja order') //current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'SAP'){
-            // sicepatResi += 1;
             console.log('sap order') //current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'LALAMOVE'){
@@ -376,7 +365,6 @@ module.exports = class {
               sicepatResi += 1;
               resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             }
-
           }
 
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
@@ -409,6 +397,7 @@ module.exports = class {
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
           if (body.type === 'SAP') parameter = await sapParameter({ payload });
+          if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
             console.log('orde validator success')

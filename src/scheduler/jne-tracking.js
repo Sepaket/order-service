@@ -127,7 +127,7 @@ const creditUpdate = async () => {
 };
 
 const tracking = async () => {
-  console.log('jne tracing');
+  // console.log('jne tracing');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
