@@ -26,19 +26,9 @@ const serviceCodeValidator = async () => new Promise((resolve, reject) => {
   else reject(new Error('This service code does not exist'));
 });
 
-/*
-  NOTE
-
-  address length validation from 3pl :
-  - sicepat: 400 char
-  - jne: 80 char
-  - ninja: 100 char
-  - idexpress: 500 char
-*/
-
 const validator = joi.object({
   batch_id: joi.number().allow(null),
-  type: joi.string().required().valid('JNE', 'SICEPAT', 'NINJA', 'IDEXPRESS', 'SAP','LALAMOVE'),
+  type: joi.string().required().valid('LALAMOVE'),
   service_code: joi
     .string()
     .required()

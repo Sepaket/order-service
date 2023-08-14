@@ -193,7 +193,7 @@ const historyIds = [];
     console.log(error);
     await dbTransaction.rollback();
   }
-  console.log('batch credit updater finish');
+  // console.log('batch credit updater finish');
 };
 
 const referralUpdater = async () => {
@@ -266,7 +266,7 @@ const referralUpdater = async () => {
         sellerUpdateObject[item.referred.id]['ids'] = [];
         sellerUpdateObject[item.referred.id]['delta'] = 0;
       }
-      console.log('referral');
+      // console.log('referral');
       // console.log(item.referred);
       sellerUpdateObject[item.referred.id]['delta'] += Number(item.referralCredit);
       console.log(sellerUpdateObject[item.referred.id]['delta']);
@@ -354,7 +354,7 @@ const processing = async () => {
 // every 1 hour 0 */1 * * *
 const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('batch scheduler run');
+  // console.info('batch scheduler run');
 
   try {
     await processing();

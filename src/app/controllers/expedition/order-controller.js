@@ -2,6 +2,7 @@
 const BulkOrderValidator = require('../../validators/expedition/order/bulk-order-validator');
 const OrderDraftValidator = require('../../validators/expedition/order/order-draft-validator');
 const CommonOrderValidator = require('../../validators/expedition/order/common-order-validator');
+const GeolocOrderValidator = require('../../validators/expedition/order/geoloc-order-validator');
 
 // responses
 const OrderResponse = require('../../responses/expedition/order/order-response');
@@ -13,11 +14,23 @@ const NinjaCallbackResponse = require('../../responses/expedition/order/ninja-ca
 module.exports = {
   commonOrder: async (request, response, next) => {
     try {
-      // console.log('reno before order validator');
-      await CommonOrderValidator(request);
-      // console.log('after order validator');
+      console.log('common order');
+      // console.log(request);
+      const { body } = request;
+      const specialOrderArr = ['LALAMOVE'];
       let result;
-      result = await new OrderResponse({ request });
+      if (specialOrderArr.includes(body.type)) {
+        console.log('special');
+        await GeolocOrderValidator(request);
+        result = await new OrderResponse({ request });
+      } else {
+        console.log('not special');
+        await CommonOrderValidator(request);
+        result = await new OrderResponse({ request });
+      }
+
+
+
       response.send({
         code: 200,
         message: 'OK',

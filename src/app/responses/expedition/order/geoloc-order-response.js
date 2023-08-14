@@ -1,15 +1,8 @@
 const moment = require('moment');
 const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
-const jne = require('../../../../helpers/jne');
+const lalamove = require('../../../../helpers/lalamove');
 const tax = require('../../../../constant/tax');
-const ninja = require('../../../../helpers/ninja');
-const sap = require('../../../../helpers/sap');
-const jneParameter = require('./order-parameter/jne');
-const sicepat = require('../../../../helpers/sicepat');
-const ninjaParameter = require('./order-parameter/ninja');
-const sicepatParameter = require('./order-parameter/sicepat');
-const sapParameter = require('./order-parameter/sap');
 const lalamoveParameter = require('./order-parameter/lalamove');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const orderValidator = require('../../../../helpers/order-validator');
@@ -39,13 +32,11 @@ const { stringify } = require('querystring');
 
 module.exports = class {
   constructor({ request }) {
-    this.jne = jne;
+    this.lalamove = lalamove;
     this.tax = tax;
     this.order = Order;
-    this.ninja = ninja;
     this.seller = Seller;
     this.op = Sequelize.Op;
-    this.sicepat = sicepat;
     this.request = request;
     this.batch = OrderBatch;
     this.location = Location;
@@ -71,7 +62,7 @@ module.exports = class {
   }
 
   async createOrder() {
-    console.log('order-response.js - createOrder')
+    console.log('geoloc-order-response.js - createOrder')
     const dbTransaction = await sequelize.transaction();
     try {
       const error = [];
@@ -89,10 +80,6 @@ module.exports = class {
       let selectedDiscount = null;
       let batch = await this.batch.findOne({
         where: { id: body?.batch_id || 0, sellerId: sellerId.id },
-      });
-      const order = await this.order.findOne({
-        order: [['id', 'DESC']],
-        where: { expedition: 'SICEPAT' },
       });
 
       const insurance = await this.insurance.findOne({
@@ -206,18 +193,7 @@ module.exports = class {
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
-
-          if (body.service_code === 'JNECOD'){
-            servCode = 'REG23';
-          } else if (body.service_code === 'NINJACOD'){
-            servCode = 'Standard';
-          } else if (body.service_code === 'SICEPATCOD') {
-            servCode = 'SIUNT';
-          } else if (body.service_code === 'SAPCOD') {
-            servCode = 'UDRREG';
-          } else {
             servCode = body.service_code;
-          }
 
           let parameter = null;
           const origin = sellerLocation?.location;
@@ -242,21 +218,9 @@ module.exports = class {
           let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
-          const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
-          let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
-          let allowDiscount = 0;
-
-          if (allowedServiceCodeDiscount.includes(servCode)) {
-            allowDiscount = 1;
-            dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
-          } else {
-            allowDiscount = 0;
-            dupeSelectedDiscount.value = 0;
-          }
-
 
           let shippingWithDiscount = parseFloat(shippingCharge)
-            + parseFloat(dupeSelectedDiscount?.value || 0);
+            + parseFloat(selectedDiscount?.value || 0);
 
           if (sellerCodFee && sellerCodFee >= 0) {
             if (sellerCodFeeType === 'PERCENTAGE' && item.is_cod) {
@@ -283,7 +247,7 @@ module.exports = class {
 
           if (selectedDiscount?.type === 'PERCENTAGE') {
             discountAmount = (
-              parseFloat(shippingCharge) * parseFloat(dupeSelectedDiscount.value)
+              parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
             ) / 100;
 
             shippingWithDiscount = parseFloat(shippingCharge) - discountAmount;
@@ -318,7 +282,6 @@ module.exports = class {
           if (item.is_cod) {
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
-              + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
           } else {
 
@@ -343,19 +306,7 @@ module.exports = class {
             ? (parseFloat(item?.cod_value) - parseFloat(shippingCharge))
             : 0;
 
-          if (body.type === 'JNE') {
-            nextId = latestOrder.id + increment;
-            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
-          } else if (body.type === 'SICEPAT'){
-            sicepatResi += 1;
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'NINJA'){
-            console.log('ninja order') //current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'SAP'){
-            console.log('sap order') //current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'LALAMOVE'){
+          if (body.type === 'LALAMOVE'){
             console.log('lalamove order')
             const tes_lalamove = '{"data":{"serviceType":"MOTORCYCLE","specialRequests":["TOLL_FEE_10"],"language":"en_HK","stops":[{"coordinates":{"lat":"22.33547351186244","lng":"114.17615807116502"},"address":"Innocentre, 72 Tat Chee Ave, Kowloon Tong"},{"coordinates":{"lat":"22.29553167157697","lng":"114.16885175766998"},"address":"Canton Rd, Tsim Sha Tsui"}],"isRouteOptimized":false,"item":{"quantity":"12","weight":"LESS_THAN_3_KG","categories":["FOOD_DELIVERY","OFFICE_ITEM"],"handlingInstructions":["KEEP_UPRIGHT"]}}}';
             // console.log(tes_lalamove);
@@ -367,18 +318,9 @@ module.exports = class {
           });
 
           if (resiIsExist) {
-            if (body.type === 'JNE') {
+            if (body.type === 'LALAMOVE') {
               nextId = nextId + 1;
               resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
-            } else if (body.type === 'SICEPAT'){
-              sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            } else if (body.type === 'NINJA'){
-              sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            } else if (body.type === 'SAP'){
-              sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
             }
           }
 
@@ -407,10 +349,7 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
-          if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
-          if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
-          if (body.type === 'JNE') parameter = await jneParameter({ payload });
-          if (body.type === 'SAP') parameter = await sapParameter({ payload });
+
           if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
@@ -516,9 +455,6 @@ module.exports = class {
     let result;
     const { body } = this.request;
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
-    if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
-    if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
-    if (body.type === 'SAP') result = (body.service_code === 'SAPCOD');
     return result;
   }
 
