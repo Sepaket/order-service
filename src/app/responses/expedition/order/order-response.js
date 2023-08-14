@@ -242,10 +242,21 @@ module.exports = class {
           let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
-          const serviceWithDiscount = ['REG23', 'b', 'c']
-          // if servCode no in
+          const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+          let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+          let allowDiscount = 0;
+
+          if (allowedServiceCodeDiscount.includes(servCode)) {
+            allowDiscount = 1;
+            dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+          } else {
+            allowDiscount = 0;
+            dupeSelectedDiscount.value = 0;
+          }
+
+
           let shippingWithDiscount = parseFloat(shippingCharge)
-            + parseFloat(selectedDiscount?.value || 0);
+            + parseFloat(dupeSelectedDiscount?.value || 0);
 
           if (sellerCodFee && sellerCodFee >= 0) {
             if (sellerCodFeeType === 'PERCENTAGE' && item.is_cod) {
@@ -272,7 +283,7 @@ module.exports = class {
 
           if (selectedDiscount?.type === 'PERCENTAGE') {
             discountAmount = (
-              parseFloat(shippingCharge) * parseFloat(selectedDiscount.value)
+              parseFloat(shippingCharge) * parseFloat(dupeSelectedDiscount.value)
             ) / 100;
 
             shippingWithDiscount = parseFloat(shippingCharge) - discountAmount;
@@ -307,6 +318,7 @@ module.exports = class {
           if (item.is_cod) {
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(codValueCalculated)
+              + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
           } else {
 

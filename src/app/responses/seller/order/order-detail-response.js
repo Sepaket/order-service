@@ -249,6 +249,7 @@ module.exports = class {
             if (result?.order?.is_cod) {
               shippingCalculated = parseFloat(shippingWithDiscount)
                 + parseFloat(codFeeAdmin)
+                + parseFloat(vatCalculated)
                 + parseFloat(insureanceAmount);
             } else {
               shippingCalculated = parseFloat(shippingWithDiscount)
