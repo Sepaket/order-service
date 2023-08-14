@@ -23,12 +23,9 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       weight,
     } = payload;
     console.log('ordfer validator ')
-    console.log(payload);
-    console.log(payload.ongkirminuscod);
 
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
-    // console.log('shipping charge validate');
-    // console.log(shippingCharge);
+
     if (!shippingCharge)
     {
       error.push({ message: 'Destinasi yang dituju tidak ditemukan - Shipping Charge not found' });
@@ -44,7 +41,6 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
     if (payload.is_cod && !payload.cod_value) error.push({ message: 'COD Value harus diisi untuk tipe COD' });
     if (!payload.is_cod && !payload.goods_amount) error.push({ message: 'Goods Amount harus diisi untuk tipe non COD' });
     if (!weight || weight === null || weight === '') error.push({ message: 'Berat harus di isi dan minimal 1 KG' });
-    console.log('reno a');
     if (await required(payload?.is_cod)) error.push({ message: 'Metode pengiriman harus diisi 1 atau 0' });
     if (await required(payload?.sender_name)) error.push({ message: 'Nama pengirim harus diisi' });
     if (await required(payload?.sender_phone)) error.push({ message: 'No. Telepon pengirim harus diisi' });
@@ -92,7 +88,6 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       if (parseFloat(payload.goods_amount) >= 5000000) error.push({ message: 'Nilai barang maximal Rp. 5.000.000' });
       if (parseFloat(payload.goods_amount) <= 10000) error.push({ message: 'Nilai barang minimal Rp. 10.000' });
     }
-    console.log('reno 1');
     resolve(error);
   } catch (error) {
     reject(error);

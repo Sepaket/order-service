@@ -9,8 +9,6 @@ const { OrderBackground } = require('../app/models');
 const sicepatExecutor = async (payload) => {
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
-    console.log('SICEPAT ORDER CREATED');
-    // console.log(created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -104,9 +102,12 @@ const sapExecutor = async (payload) => {
   }
 };
 
+
+
+
 const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('create order scheduler run');
+  // console.info('create order scheduler run');
 
   try {
     const orders = await OrderBackground.findAll({

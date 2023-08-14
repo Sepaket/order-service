@@ -63,7 +63,6 @@ module.exports = class {
 
   async checkServiceFee() {
     try {
-      console.log('enter service fee');
       const { body } = this.request;
       const fees = [];
 
@@ -93,22 +92,18 @@ module.exports = class {
       }
 
       if (body.type === 'SICEPAT' && sicepatCondition) {
+        console.log('si cepat free');
         const sicepatPrices = await this.sicepatFee();
         if (sicepatPrices?.length > 0) fees.push(sicepatPrices);
       }
 
       if (body.type === 'NINJA' && ninjaCondition) {
-        console.log(`origin code 1: ${this.origin.ninjaOriginCode} origin code 2 : ${this.origin.ninjaDestinationCode}`);
-        console.log(`destination code 1: ${this.destination.ninjaOriginCode}`);
         const ninjaPrices = await this.ninjaFee();
         if (ninjaPrices?.length > 0) fees.push(ninjaPrices);
       }
 
       if (body.type === 'SAP' && sapCondition) {
-        // console.log(sapCondition);
-        // console.log('this is SAP')
         const sapPrice = await this.sapFee();
-        // console.log(' after sapPrice');
         if (sapPrice?.length > 0) fees.push(sapPrice);
       }
 
@@ -122,7 +117,7 @@ module.exports = class {
         let jnePrices = [];
         let sicepatPrices = [];
         let ninjaPrices = [];
-        let sapPrices = [];
+        const sapPrices = [];
         let idxPrices = [];
 
         if (jneCondition) jnePrices = await this.jneFee();
@@ -178,21 +173,29 @@ module.exports = class {
         weight: body.weight,
       });
 
-      console.log(prices);
 
       const mapped = await prices?.filter((item) => item.times)?.map((item) => {
         const day = (item.times.toUpperCase() === 'D') ? 'hari' : 'minggu';
-        console.log(item.service_code);
+        const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+
+        let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+        let allowDiscount = 0;
+
+
+        let discountApplied = 0;
+
         const codCondition = (
           (item.service_code === 'REG23' || item.service_code === 'CTC23')
           && parseFloat(body.goods_amount || 0) <= parseFloat(5000000)
         );
 
-        let discountApplied = this.selectedDiscount.value;
+
         if (this.selectedDiscount.type === 'PERCENTAGE') {
           discountApplied = (
             parseFloat(item.price) * parseFloat(this.selectedDiscount.value)
           ) / 100;
+        } else {
+          discountApplied = this.selectedDiscount.value;
         }
 
         let totalCalculatedCod = item.price;
@@ -235,28 +238,50 @@ module.exports = class {
         if (item.service_display === 'CTCSPS') {
           servDisplay = 'SPS';
         }
+        if (allowedServiceCodeDiscount.includes(item.service_code)) {
+          allowDiscount = 1;
+          return {
+            weight: body.weight,
+            serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
+            serviceCode: servCode === 'CTC23' ? 'REG23' : servCode,
+            availableCod: codCondition,
+            originCod: true,
+            destinationCod: true,
+            estimation: `${item.etd_from} - ${item.etd_thru}`,
+            estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
+            price: item.price,
+            priceFormatted: formatCurrency(item.price, 'Rp.'),
+            type: 'JNE',
+            discount: discountApplied * allowDiscount,
+            discount_raw: this.selectedDiscount,
+            tax: taxCalculated,
+            total_cod: totalCalculatedCod,
+            total_non_cod: totalCalculatedNcod,
+          };
+        } else {
+          dupeSelectedDiscount.value = 0;
+          return {
+            weight: body.weight,
+            serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
+            serviceCode: servCode === 'CTC23' ? 'REG23' : servCode,
+            availableCod: codCondition,
+            originCod: true,
+            destinationCod: true,
+            estimation: `${item.etd_from} - ${item.etd_thru}`,
+            estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
+            price: item.price,
+            priceFormatted: formatCurrency(item.price, 'Rp.'),
+            type: 'JNE',
+            discount: discountApplied * allowDiscount,
+            discount_raw: dupeSelectedDiscount,
+            tax: taxCalculated,
+            total_cod: totalCalculatedCod,
+            total_non_cod: totalCalculatedNcod,
+          };
+        }
 
-
-        return {
-          weight: body.weight,
-          serviceName: servDisplay === 'CTC' ? 'JNE REG' : servDisplay,
-          serviceCode: servCode === 'CTC23' ? 'REG23' : servCode,
-          availableCod: codCondition,
-          originCod: true,
-          destinationCod: true,
-          estimation: `${item.etd_from} - ${item.etd_thru}`,
-          estimationFormatted: `${item.etd_from} - ${item.etd_thru} ${day}`,
-          price: item.price,
-          priceFormatted: formatCurrency(item.price, 'Rp.'),
-          type: 'JNE',
-          discount: discountApplied,
-          discount_raw: this.selectedDiscount,
-          tax: taxCalculated,
-          total_cod: totalCalculatedCod,
-          total_non_cod: totalCalculatedNcod,
-        };
       }) || [];
-      // console.log((mapped.data).length);
+      console.log((mapped));
 
       return mapped;
     } catch (error) {
@@ -266,14 +291,19 @@ module.exports = class {
 
   async sicepatFee() {
     try {
+
       const { body } = this.request;
       const prices = await this.sicepat.checkPrice({
         origin: this.origin.sicepatOriginCode,
         destination: this.destination.sicepatDestinationCode,
         weight: body.weight,
       });
-      console.log(prices)
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+      let allowDiscount = 0;
+
       const mapped = prices?.map((item) => {
+
         const rawEstimation = item.etd.split(' hari');
         const codCondition = (
           (item.service === 'SIUNT')
@@ -313,21 +343,28 @@ module.exports = class {
           ) - parseFloat(discountApplied);
         }
 
+        if (allowedServiceCodeDiscount.includes(item.service)) {
+          console.log(item.service);
+          allowDiscount = 1;
+          dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+        } else {
+           dupeSelectedDiscount.value = 0;
+        }
 
         return {
           weight: body.weight,
           serviceName: `Sicepat ${item.service}`,
           serviceCode: item.service,
           availableCod: codCondition,
-          originCod: this.origin.sicepatCod ? true : false,
-          destinationCod: this.destination.sicepatCod ? true : false,
+          originCod: !!this.origin.sicepatCod,
+          destinationCod: !!this.destination.sicepatCod,
           estimation: rawEstimation[0],
           estimationFormatted: `${item.etd?.toLowerCase()}`,
           price: item.tariff,
           priceFormatted: formatCurrency(item.tariff, 'Rp.'),
           type: 'SICEPAT',
-          discount: discountApplied,
-          discount_raw: this.selectedDiscount,
+          discount: discountApplied * allowDiscount,
+          discount_raw: dupeSelectedDiscount,
           tax: taxCalculated,
           total_cod: totalCalculatedCod,
           total_non_cod: totalCalculatedNcod,
@@ -342,6 +379,9 @@ module.exports = class {
 
   async ninjaFee() {
     try {
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+      let allowDiscount = 0;
       const { body } = this.request;
       const price = await this.ninja.checkPrice({
         weight: body.weight,
@@ -382,6 +422,8 @@ module.exports = class {
         ) - parseFloat(discountApplied);
       }
 
+
+
       return (price) ? [{
         price,
         weight: body.weight,
@@ -405,23 +447,24 @@ module.exports = class {
     }
   }
 
-
   async sapFee() {
     try {
+      console.log(this.selectedDiscount);
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+      let allowDiscount = 0;
       const { body } = this.request;
-      // console.log(this.origin.sapDistrictCode);
-      // console.log(this.origin.sapDistrictCode);
       const prices2 = await this.sap.checkPrice({
         origin: this.origin.sapDistrictCode,
         destination: this.destination.sapDistrictCode,
         weight: body.weight,
       });
 
-      const prices = prices2.price_array
+      const prices = prices2.price_array;
 
       const mapped = prices?.map((item) => {
         const rawEstimation = item.sla.split(' Hari');
-        const codCondition = false; //ini mesti dilihat apa saja yg dukung COD
+        const codCondition = false; // ini mesti dilihat apa saja yg dukung COD
         let discountApplied = this.selectedDiscount.value;
         if (this.selectedDiscount.type === 'PERCENTAGE') {
           discountApplied = (
@@ -455,8 +498,19 @@ module.exports = class {
             (parseFloat(item.price) * body.weight) + parseFloat(vatCalculated)
           ) - parseFloat(discountApplied);
         }
-        let servCode = item.service_type_code;
-        let servDisplay = item.service_type_name;
+        const servCode = item.service_type_code;
+        const servDisplay = item.service_type_name;
+
+        if (allowedServiceCodeDiscount.includes(servCode)) {
+          console.log('SAP EXIATA')
+          allowDiscount = 1;
+          dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+        } else {
+          allowDiscount = 0;
+          dupeSelectedDiscount.value = 0;
+        }
+
+
 
         return {
           weight: body.weight,
@@ -470,8 +524,8 @@ module.exports = class {
           price: item.price,
           priceFormatted: formatCurrency(item.price, 'Rp.'),
           type: 'SAP',
-          discount: discountApplied,
-          discount_raw: this.selectedDiscount,
+          discount: discountApplied * allowDiscount,
+          discount_raw: dupeSelectedDiscount,
           tax: taxCalculated,
           total_cod: totalCalculatedCod,
           total_non_cod: totalCalculatedNcod,
@@ -484,7 +538,6 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
-
 
   async idxFee() {
     try {

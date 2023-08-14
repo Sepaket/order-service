@@ -75,7 +75,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,no
 
 
 const tracking = async () => {
-  console.log('enter sicepat tracking');
+  // console.log('enter sicepat tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({

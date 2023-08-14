@@ -200,8 +200,8 @@ const createOrder = (payload) => new Promise((resolve) => {
         // 'Content-Length' : 1000000000000,
       },
     }).then((response) => {
-      console.log('======================inside then');
-      console.log(response?.data);
+      // console.log('======================inside then');
+      // console.log(response?.data);
       if (response.data.status === false) {
         console.log('error : '.response.data.error);
       }
