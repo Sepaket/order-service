@@ -84,15 +84,23 @@ module.exports = class {
         'NINJACOD' : 'NINJA',
         'SAPCOD' : 'SAP',
       };
-      console.log('global disc');
-      console.log(globalDisc);
-      const res2 = allowedServiceCodeDiscount.map((item3pl) =>({
 
+      let sel_disc = seller.discount;
+      if (sellerId.id === 1298) {
+        if (item3pl == 'Standard' || item3pl == 'NINJACOD') {
+          sel_disc = 5;
+        }
+
+      }
+
+
+
+      const res2 = allowedServiceCodeDiscount.map((item3pl) =>({
         specific_seller: true,
           expedition: servicecode3plmap[item3pl],
           serviceCode: item3pl,
           type: seller.discountType,
-          value: seller.discount,
+          value: sel_disc,
           minimum_order: null,
           maximum_order: null,
 

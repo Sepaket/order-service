@@ -245,14 +245,19 @@ module.exports = class {
           let discountAmount = selectedDiscount?.value || 0;
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
-          const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+          const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG', 'JNECOD', 'SICEPATCOD', 'NINJACOD', 'SAPCOD'];
 
           let dupeSelectedDiscount = JSON.parse(JSON.stringify(selectedDiscount));
           let allowDiscount = 0;
-          console.log('incer 1');
+
           if (allowedServiceCodeDiscount.includes(servCode)) {
             allowDiscount = 1;
             dupeSelectedDiscount = JSON.parse(JSON.stringify(selectedDiscount));
+            if (servCode == 'Standard' || servCode == 'NINJACOD') {
+              if (sellerId.id === 1298) {
+                dupeSelectedDiscount.value = 5;
+              }
+            }
           } else {
             allowDiscount = 0;
             dupeSelectedDiscount.value = 0;
