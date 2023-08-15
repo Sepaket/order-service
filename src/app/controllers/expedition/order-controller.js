@@ -26,6 +26,7 @@ module.exports = {
       } else {
         console.log('not special');
         await CommonOrderValidator(request);
+        console.log('after validator');
         result = await new OrderResponse({ request });
       }
 

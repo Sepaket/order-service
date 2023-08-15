@@ -47,7 +47,7 @@ module.exports = class {
           'minimumOrder',
         ],
       });
-
+      let globalDisc = {};
       const discountMap = seller?.discount > 0
         ? [{
           specific_seller: true,
@@ -63,6 +63,37 @@ module.exports = class {
           maximum_order: item.maximumOrder,
         }));
 
+      if (seller?.discount > 0) {
+        globalDisc.type = seller.discountType;
+        globalDisc.value = seller.discount;
+      } else {
+        globalDisc.type = discounts[0].type;
+        globalDisc.value = discounts[0].value;
+      }
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+
+      const servicecode3plmap =  {
+        'CTC23' : 'JNE',
+        'REG23' : 'JNE',
+        'Standard' : 'NINJA',
+        'REG' : 'SICEPAT',
+        'SIUNT' : 'SICEPAT',
+        'UDRREG' : 'SAP',
+      };
+      console.log('global disc');
+      console.log(globalDisc);
+      const res2 = allowedServiceCodeDiscount.map((item3pl) =>({
+
+        specific_seller: true,
+          expedition: servicecode3plmap[item3pl],
+          serviceCode: item3pl,
+          type: seller.discountType,
+          value: seller.discount,
+          minimum_order: null,
+          maximum_order: null,
+
+    }
+        ))
       return {
         cod_fee: {
           value: trxFee?.codFee || 0,
@@ -73,6 +104,7 @@ module.exports = class {
           type: tax.vatType,
         },
         discount: discountMap || [],
+        service_discount: res2 || [],
         insurance: insurances || [],
       };
     } catch (error) {
