@@ -203,6 +203,7 @@ module.exports = class {
       });
 
       let increment = 1;
+
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           var codCondition = (item.is_cod) ? (this.codValidator()) : true;
@@ -220,7 +221,9 @@ module.exports = class {
           }
 
           let parameter = null;
+
           const origin = sellerLocation?.location;
+
           const destination = destinationLocation?.find((location) => {
             // const locationId = locationIds.find((id) => id === location.id);
             const locationId = item.receiver_location_id;
@@ -243,21 +246,22 @@ module.exports = class {
           let insuranceSelected = item.is_insurance
             ? insurance?.insuranceValue || 0 : 0;
           const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
-          let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
-          let allowDiscount = 0;
 
+          let dupeSelectedDiscount = JSON.parse(JSON.stringify(selectedDiscount));
+          let allowDiscount = 0;
+          console.log('incer 1');
           if (allowedServiceCodeDiscount.includes(servCode)) {
             allowDiscount = 1;
-            dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+            dupeSelectedDiscount = JSON.parse(JSON.stringify(selectedDiscount));
           } else {
             allowDiscount = 0;
             dupeSelectedDiscount.value = 0;
           }
-
+          console.log('incer 2');
 
           let shippingWithDiscount = parseFloat(shippingCharge)
             + parseFloat(dupeSelectedDiscount?.value || 0);
-
+          console.log(shippingWithDiscount);
           if (sellerCodFee && sellerCodFee >= 0) {
             if (sellerCodFeeType === 'PERCENTAGE' && item.is_cod) {
               codFeeCalculated = (
@@ -357,7 +361,6 @@ module.exports = class {
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           } else if (body.type === 'LALAMOVE'){
             console.log('lalamove order')
-            const tes_lalamove = '{"data":{"serviceType":"MOTORCYCLE","specialRequests":["TOLL_FEE_10"],"language":"en_HK","stops":[{"coordinates":{"lat":"22.33547351186244","lng":"114.17615807116502"},"address":"Innocentre, 72 Tat Chee Ave, Kowloon Tong"},{"coordinates":{"lat":"22.29553167157697","lng":"114.16885175766998"},"address":"Canton Rd, Tsim Sha Tsui"}],"isRouteOptimized":false,"item":{"quantity":"12","weight":"LESS_THAN_3_KG","categories":["FOOD_DELIVERY","OFFICE_ITEM"],"handlingInstructions":["KEEP_UPRIGHT"]}}}';
             // console.log(tes_lalamove);
             var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
           }
