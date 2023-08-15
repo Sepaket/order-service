@@ -33,6 +33,7 @@ module.exports = class {
     return this.process();
   }
 
+
   process() {
     return new Promise(async (resolve, reject) => {
       try {
@@ -298,7 +299,7 @@ module.exports = class {
         destination: this.destination.sicepatDestinationCode,
         weight: body.weight,
       });
-      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG', 'JNECOD', 'SICEPATCOD', 'NINJACOD', 'SAPCOD'];
       let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
       let allowDiscount = 0;
 
@@ -347,6 +348,7 @@ module.exports = class {
           console.log(item.service);
           allowDiscount = 1;
           dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+
         } else {
            dupeSelectedDiscount.value = 0;
         }
@@ -379,7 +381,8 @@ module.exports = class {
 
   async ninjaFee() {
     try {
-      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG', 'JNECOD', 'SICEPATCOD', 'NINJACOD', 'SAPCOD'];
+      console.log('ninja fee')
       let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
       let allowDiscount = 0;
       const { body } = this.request;
@@ -390,12 +393,7 @@ module.exports = class {
         service: 'Standard',
       });
       // console.log(`price : ${price}`);
-      let discountApplied = this.selectedDiscount.value;
-      if (this.selectedDiscount.type === 'PERCENTAGE') {
-        discountApplied = (
-          parseFloat(price) * parseFloat(this.selectedDiscount.value)
-        ) / 100;
-      }
+
 
       let totalCalculatedCod = price;
       let totalCalculatedNcod = price;
@@ -412,6 +410,24 @@ module.exports = class {
       const service = 'Standard';
       const taxCalculated = parseFloat(codCalculated) + parseFloat(vatCalculated);
 
+
+      if (allowedServiceCodeDiscount.includes(service)) {
+        console.log('masuk sini')
+        allowDiscount = 1;
+        dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+        // if (service === 'Standard' || service === 'NINJACOD') {
+        //   dupeSelectedDiscount.value = 5;
+        // }
+      } else {
+        dupeSelectedDiscount.value = 0;
+      }
+
+      let discountApplied = this.selectedDiscount.value;
+      if (this.selectedDiscount.type === 'PERCENTAGE') {
+        discountApplied = (
+          parseFloat(price) * parseFloat(dupeSelectedDiscount.value)
+        ) / 100;
+      }
       if (service === 'Standard') {
         totalCalculatedCod = (
           (parseFloat(price) * body.weight) + parseFloat(taxCalculated)
@@ -421,7 +437,6 @@ module.exports = class {
           (parseFloat(price) * body.weight) + parseFloat(vatCalculated)
         ) - parseFloat(discountApplied);
       }
-
 
 
       return (price) ? [{
@@ -437,7 +452,7 @@ module.exports = class {
         priceFormatted: formatCurrency(price, 'Rp.'),
         type: 'NINJA',
         discount: discountApplied,
-        discount_raw: this.selectedDiscount,
+        discount_raw: dupeSelectedDiscount,
         tax: taxCalculated,
         total_cod: totalCalculatedCod,
         total_non_cod: totalCalculatedNcod,
@@ -450,7 +465,7 @@ module.exports = class {
   async sapFee() {
     try {
       console.log(this.selectedDiscount);
-      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG', 'JNECOD', 'SICEPATCOD', 'NINJACOD', 'SAPCOD'];
       let dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
       let allowDiscount = 0;
       const { body } = this.request;
@@ -505,6 +520,7 @@ module.exports = class {
           console.log('SAP EXIATA')
           allowDiscount = 1;
           dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
+
         } else {
           allowDiscount = 0;
           dupeSelectedDiscount.value = 0;
