@@ -70,7 +70,7 @@ module.exports = class {
         globalDisc.type = discounts[0].type;
         globalDisc.value = discounts[0].value;
       }
-      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG'];
+      const allowedServiceCodeDiscount = ['CTC23', 'REG23', 'Standard', 'REG', 'SIUNT', 'UDRREG', 'JNECOD', 'SICEPATCOD', 'NINJACOD', 'SAPCOD'];
 
       const servicecode3plmap =  {
         'CTC23' : 'JNE',
@@ -79,6 +79,10 @@ module.exports = class {
         'REG' : 'SICEPAT',
         'SIUNT' : 'SICEPAT',
         'UDRREG' : 'SAP',
+        'JNECOD' : 'JNE',
+        'SICEPATCOD' : 'SICEPAT',
+        'NINJACOD' : 'NINJA',
+        'SAPCOD' : 'SAP',
       };
       console.log('global disc');
       console.log(globalDisc);
