@@ -41,7 +41,7 @@ module.exports = class {
     });
   }
 
-  async updateOrderHistory(resi,currentStatus) {
+  async updateOrderHistory(resi, currentStatus) {
     console.log('order : ');
     // console.log(converted.tracking_ref_no);
     if (currentStatus === 'WAITING_PICKUP') {
@@ -50,20 +50,20 @@ module.exports = class {
     } else if (currentStatus === 'PROCESSED') {
       console.log('this is processed');
       await this.addOrderHistory(resi, currentStatus, false, false);
-      //UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
+      // UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
       // await this.updateOH(resi, currentStatus, false, false);
     } else if (currentStatus === 'DELIVERED') {
-      //NON COD berarti tidak ada proses penambahan saldo
+      // NON COD berarti tidak ada proses penambahan saldo
       // COD ada addorderhistory
       console.log('this is DELIVERED');
       await this.addOrderHistory(resi, currentStatus, false, false);
     } else if (currentStatus === 'CANCELED') {
       console.log('this is CANCELED');
-      //kalau NONCOD berarti ongkir dikembalikan
-      //kalau COD tidak ada
+      // kalau NONCOD berarti ongkir dikembalikan
+      // kalau COD tidak ada
     } else if (currentStatus === 'RETURN_TO_SELLER') {
       console.log('this is RETURN_TO_SELLER');
-      //COD dan NONCOD ongkir tidak dikembalikan
+      // COD dan NONCOD ongkir tidak dikembalikan
       await this.addOrderHistory(resi, currentStatus, false, false);
     } else if (currentStatus === 'PROBLEM') {
 
@@ -74,7 +74,6 @@ module.exports = class {
 
   updateOH(resi, currentStatus, isExecute, onHold) {
     console.log('update order history');
-
   }
 
   updateSellerDetail() {
@@ -85,17 +84,14 @@ module.exports = class {
     await Order.findOne({
       where: { resi },
       include: [
-        { model: this.orderDetail, as: 'detail',
-        },
-        { model: this.orderHistory, as: 'history',
-        },
+        { model: this.orderDetail, as: 'detail' },
+        { model: this.orderHistory, as: 'history' },
       ],
     }).then(async (result) => {
       let deltaCredit = 0;
       let referralCredit = 0;
       if (result === null) {
         console.log('Order not found');
-
       } else {
         deltaCredit = parseFloat(result.detail.shippingCalculated);
         if (result?.detail?.referralRateType === 'PERCENTAGE') {
@@ -105,17 +101,19 @@ module.exports = class {
         if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
           deltaCredit = 0;
         } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
-
           // eslint-disable-next-line operator-assignment
           deltaCredit = -1 * deltaCredit;
-          deltaCredit = deltaCredit + parseFloat(result.detail.codFeeAdmin);
+          deltaCredit += parseFloat(result.detail.codFeeAdmin);
 
           // eslint-disable-next-line operator-assignment
           referralCredit = -1 * referralCredit;
+        } else if ((currentStatus === 'DELIVERED') && (result?.isCod)) {
+          // eslint-disable-next-line operator-assignment
+          deltaCredit = -1 * deltaCredit;
+          deltaCredit += parseFloat(result.detail.sellerReceivedAmount);
         }
 
         if (result.history === null) {
-
           await OrderHistory.create({
             orderId: result?.id,
             deltaCredit,
@@ -131,18 +129,16 @@ module.exports = class {
         } else {
           console.log('update history instead');
           await result.history.update(
-            { note: currentStatus,
+            {
+              note: currentStatus,
               deltaCredit,
               referralCredit,
             },
           );
         }
       }
-
-    })
-
+    });
   }
-
 
   getLastStatus(trackingStatus) {
     let currentStatus = '';
@@ -179,8 +175,6 @@ module.exports = class {
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
-
-
 
       const currentStatus = this.getLastStatus(converted.status.toLowerCase());
       // add referral and order_histories here
@@ -239,6 +233,4 @@ module.exports = class {
       throw new Error(httpErrors(500, error.message, { data: false }));
     }
   }
-
-
 };
