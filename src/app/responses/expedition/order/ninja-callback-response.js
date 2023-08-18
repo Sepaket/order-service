@@ -99,8 +99,10 @@ module.exports = class {
         }
 
         if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
+          console.log('1');
           deltaCredit = 0;
         } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
+          console.log('12');
           // eslint-disable-next-line operator-assignment
           deltaCredit = -1 * deltaCredit;
           deltaCredit += parseFloat(result.detail.codFeeAdmin);
@@ -108,9 +110,11 @@ module.exports = class {
           // eslint-disable-next-line operator-assignment
           referralCredit = -1 * referralCredit;
         } else if ((currentStatus === 'DELIVERED') && (result?.isCod)) {
+          console.log('13');
           // eslint-disable-next-line operator-assignment
-          deltaCredit = -1 * deltaCredit;
-          deltaCredit += parseFloat(result.detail.sellerReceivedAmount);
+          // deltaCredit = -1 * deltaCredit;
+          // console.log(result);
+          deltaCredit = parseFloat(result.detail.sellerReceivedAmount);
         }
 
         if (result.history === null) {
@@ -192,7 +196,19 @@ module.exports = class {
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
+      console.log(order.status);
 
+      console.log(currentStatus);
+
+      if (currentStatus === 'DELIVERED') {
+        if (currentStatus === order.status) {
+          throw new Error('no change in status');
+        }
+      } else if (currentStatus === 'RETURN_TO_SELLER') {
+        if (currentStatus === order.status) {
+          throw new Error('no change in status');
+        }
+      }
       const currentSaldo = await this.seller.findOne({
         where: { sellerId: order.detail.sellerId },
       });
