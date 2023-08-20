@@ -7,6 +7,7 @@ const errorCatcher = require('../helpers/error-catcher');
 const { OrderBackground } = require('../app/models');
 
 const sicepatExecutor = async (payload) => {
+  console.log('sicepat EXECUTOR');
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
     if (created.status) {
@@ -107,7 +108,7 @@ const sapExecutor = async (payload) => {
 
 const runner = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  // console.info('create order scheduler run');
+  console.info('create order scheduler run');
 
   try {
     const orders = await OrderBackground.findAll({

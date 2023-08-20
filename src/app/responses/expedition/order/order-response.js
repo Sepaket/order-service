@@ -415,8 +415,7 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
-          console.log('body.type  : ');
-          console.log(body);
+
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
@@ -443,7 +442,6 @@ module.exports = class {
             });
             result.push(resultResponse);
           } else {
-            console.log('order validator error')
             console.log(messages)
           }
 
@@ -454,13 +452,13 @@ module.exports = class {
 
 
       if (querySuccess?.length > 0) {
+        console.log('query success');
+        console.log(querySuccess);
         await orderSuccessLogger(querySuccess);
-
         await orderLogger({
           items: queryrLogger,
           sellerId: seller.id,
         });
-
 
       }
 
@@ -519,7 +517,6 @@ module.exports = class {
     }
   }
   codValidator() {
-    // console.log("masuk codValidator - reno");
     let result;
     const { body } = this.request;
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');

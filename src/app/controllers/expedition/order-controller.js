@@ -2,10 +2,12 @@
 const BulkOrderValidator = require('../../validators/expedition/order/bulk-order-validator');
 const OrderDraftValidator = require('../../validators/expedition/order/order-draft-validator');
 const CommonOrderValidator = require('../../validators/expedition/order/common-order-validator');
-const GeolocOrderValidator = require('../../validators/expedition/order/geoloc-order-validator');
+// const GeolocOrderValidator = require('../../validators/expedition/order/geoloc-order-validator');
+// const LalamoveOrderValidator = require('../../validators/expedition/order/lalamove-order-validator');
 
 // responses
 const OrderResponse = require('../../responses/expedition/order/order-response');
+const LalamoveOrderResponse = require('../../responses/expedition/order/lalamove-order-response');
 const OrderDraft = require('../../responses/expedition/order/order-draft-response');
 const BulkOrderResponse = require('../../responses/expedition/order/bulk-order-response');
 const TransactionFeeResponse = require('../../responses/expedition/order/transaction-fee-response');
@@ -22,7 +24,7 @@ module.exports = {
       if (specialOrderArr.includes(body.type)) {
         console.log('special');
         await CommonOrderValidator(request);
-        result = await new OrderResponse({ request });
+        result = await new LalamoveOrderResponse({ request });
       } else {
         console.log('not special');
         await CommonOrderValidator(request);

@@ -408,23 +408,16 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 });
 
 const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
-  console.log('order success logger');
   const dbTransaction = await sequelize.transaction();
-  // console.log('console log parameter');
-  // console.log(parameter[0].requested_tracking_number);
-
-  // split(process.env.SICEPAT_CUSTOMER_ID)?.pop()
   try {
 
     const queryMapped = parameter.map((item) => {
 
       const payload = { ...item };
       // delete payload.type;
-      console.log(payload.type);
+
       if (payload.type === 'NINJA') {
         let track_no = payload.requested_tracking_number;
-        console.log('reno debug b');
-        console.log(payload);
         let ninja_resi_no = track_no.split(process.env.JNE_ORDER_PREFIX)?.pop();
         payload.requested_tracking_number = ninja_resi_no;
       }
@@ -434,7 +427,10 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
       if (payload.type === 'JNE') {
 
       }
-
+      if (payload.type === 'LALAMOVE') {
+        console.log('LALAMOVE PAYLOAD');
+        console.log(payload);
+      }
 
       return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
@@ -443,12 +439,13 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
         parameter: JSON.stringify(payload),
       };
     });
-
+    console.log('0-0');
+    console.log(queryMapped);
     await OrderBackground.bulkCreate(
       queryMapped,
       { transaction: dbTransaction },
     );
-
+    console.log('0-1');
     await dbTransaction.commit();
     resolve(true);
   } catch (error) {
