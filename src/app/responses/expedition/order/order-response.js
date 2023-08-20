@@ -5,6 +5,7 @@ const jne = require('../../../../helpers/jne');
 const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
 const sap = require('../../../../helpers/sap');
+const referral = require('../../../../helpers/referral');
 const jneParameter = require('./order-parameter/jne');
 const sicepat = require('../../../../helpers/sicepat');
 const ninjaParameter = require('./order-parameter/ninja');
@@ -80,6 +81,9 @@ module.exports = class {
       const queryrLogger = [];
       const { body } = this.request;
       var servCode = '';
+      let referralRate = null;
+      let referralRateType = null;
+      let referredSellerId = null;
 
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
       const locationIds = body.order_items.map((item) => item.receiver_location_id);
@@ -132,9 +136,7 @@ module.exports = class {
         where: { id: locationIds },
       });
 
-      let referralRate = null;
-      let referralRateType = null;
-      let referredSellerId = null;
+
       if(seller.sellerDetail.referred !== null) {
         referralRate = seller.sellerDetail.referred.referredDetail.rateReferal
         referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType
@@ -225,7 +227,6 @@ module.exports = class {
           const origin = sellerLocation?.location;
 
           const destination = destinationLocation?.find((location) => {
-            // const locationId = locationIds.find((id) => id === location.id);
             const locationId = item.receiver_location_id;
 
             return location.id === locationId;
@@ -262,11 +263,10 @@ module.exports = class {
             allowDiscount = 0;
             dupeSelectedDiscount.value = 0;
           }
-          console.log('incer 2');
 
           let shippingWithDiscount = parseFloat(shippingCharge)
             + parseFloat(dupeSelectedDiscount?.value || 0);
-          console.log(shippingWithDiscount);
+
           if (sellerCodFee && sellerCodFee >= 0) {
             if (sellerCodFeeType === 'PERCENTAGE' && item.is_cod) {
               codFeeCalculated = (
@@ -415,6 +415,8 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
+          console.log('body.type  : ');
+          console.log(body);
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
@@ -422,10 +424,7 @@ module.exports = class {
           if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
-            // const tes_payload =               {...parameter,
-            //   resi,
-            //   type: body.type};
-            // console.log(tes_payload);
+
             querySuccess.push({
               ...parameter,
               resi,

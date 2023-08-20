@@ -1,7 +1,7 @@
 const shortid = require('shortid-36');
 
 const parameterHandler = ({ payload }) => ({
-  pickup_name: payload?.seller?.name.slice(0, 50) || '',
+  pickup_name: payload?.sellerLocation?.picName.slice(0, 30) || '',
   pickup_date: payload?.pickup_date?.split('-')?.reverse()?.join('-'),
   pickup_time: payload?.pickup_time,
   pickup_pic: payload?.sellerLocation?.picName.slice(0, 30) || '',

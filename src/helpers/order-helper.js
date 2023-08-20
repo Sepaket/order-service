@@ -167,7 +167,6 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
       });
 
       const service = await prices?.find((item) => {
-        // console.log(item);
         if (item.service_code === 'CTC23' && serviceCode === 'JNECOD') {
           console.log('jnecod dan ctc23');
           return item;

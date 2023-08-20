@@ -21,7 +21,7 @@ module.exports = {
       let result;
       if (specialOrderArr.includes(body.type)) {
         console.log('special');
-        await GeolocOrderValidator(request);
+        await CommonOrderValidator(request);
         result = await new OrderResponse({ request });
       } else {
         console.log('not special');
