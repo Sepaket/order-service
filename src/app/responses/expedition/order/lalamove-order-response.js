@@ -204,10 +204,10 @@ module.exports = class {
           items: queryrLogger,
           sellerId: seller.id,
         });
-
+      console.log('after order logger')
 
       }
-
+      console.log('after order logger 2')
       const filtered = response?.filter((item) => item);
       const orderResponse = {
         info: {

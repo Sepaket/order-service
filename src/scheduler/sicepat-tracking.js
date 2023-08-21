@@ -56,7 +56,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,no
         deltaCredit: deltaCredit,
         isExecute: isExecute,
         isCod:isCod,
-        provider:'JNE',
+        provider:'SICEPAT',
         onHold: onHold,
         note: note,
         additional_note: additional_note,
@@ -75,7 +75,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,no
 
 
 const tracking = async () => {
-  // console.log('enter sicepat tracking');
+  console.log('enter sicepat tracking');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -89,8 +89,8 @@ const tracking = async () => {
 
     await Promise.all(
       order?.map(async (item) => {
-        // console.log('orders size : ')
-
+        // console.log('resi : ')
+        // console.log(item.resi);
         const track = await sicepat.tracking({ resi: item.resi });
 
         if (track?.sicepat?.status?.code === 200) {
@@ -119,6 +119,7 @@ const tracking = async () => {
           const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
           let additional_note = ''
           if (currentStatus === 'DELIVERED' && item.isCod) {
+            console.log('SICEPAT COD DELIVERED');
             // const orderDetail = await OrderDetail.findOne({ where: { orderId: item.id } });
             const currentCredit = await SellerDetail.findOne({
               where: { sellerId: orderDetail.sellerId },
@@ -127,6 +128,7 @@ const tracking = async () => {
             const credit = currentCredit.credit === 'NaN' ? 0 : currentCredit.credit;
             const calculated = parseFloat(credit) + parseFloat(orderDetail.sellerReceivedAmount);
             console.log(`Item : ${item.id} amount : ${orderDetail.sellerReceivedAmount} total : ${calculated}`);
+            await addOrderHistory(item.id, item.isCod,parseFloat(orderDetail.sellerReceivedAmount), false, false, currentStatus,additional_note, orderDetail);
             await SellerDetail.update(
               { credit: parseFloat(calculated) },
               { where: { sellerId: orderDetail.sellerId } },

@@ -318,20 +318,23 @@ const orderQueryDiscount = async (payload) => {
 
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
   console.log('order logger');
+  console.log(params);
   const dbTransaction = await sequelize.transaction();
 
   try {
+    console.log('reno 0a')
     const queryOrder = await orderQuery(params.items);
     // console.log(params)
     const seller = await SellerDetail.findOne({
       where: { sellerId: params.sellerId },
     });
-
+    console.log('reno 0b')
+    console.log(queryOrder);
     const orders = await Order.bulkCreate(
       queryOrder,
       { transaction: dbTransaction },
     );
-
+    console.log('reno 1')
     const orderTaxQueries = await orderQueryTax(params.items);
     const orderDetailQueries = await orderQueryDetail(params);
     const orderAddressQueries = await orderQueryAddress(params.items);
@@ -340,7 +343,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       orderId: item.id,
       ...orderDetailQueries[idx],
     }));
-
+    console.log('reno 2')
     const orderTax = orders?.map((item, idx) => ({
       orderId: item.id,
       ...orderTaxQueries[idx],
@@ -355,7 +358,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       orderId: item.id,
       ...orderDiscountQueries[idx],
     }));
-
+    console.log('reno 3')
     const orderLog = orders?.map((item) => ({
       orderId: item.id,
       previousStatus: orderStatus.WAITING_PICKUP.text,
