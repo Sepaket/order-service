@@ -84,6 +84,7 @@ const creditUpdate = async () => {
 };
 
 const tracking = async () => {
+  console.log('tracking jne');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
@@ -364,7 +365,7 @@ const force_retracking = async () => {
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
             console.log(`${item.resi} calculated : ${calculated_1}`);
-            await updateSaldo(calculated_1, orderDetail);
+            // await updateSaldo(calculated_1, orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,

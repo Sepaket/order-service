@@ -498,7 +498,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, referralCredit, isEx
       //shipping calculated di tambah kembali dengan codfreeadmin karena untuk perhitungan referal tidak menggunakan codfeeadmin
       const shippingCalculated = Number(orderDetail.shippingCalculated) - Number(orderDetail.codFeeAdmin);
       // let referralCredit = 0;
-      // const referredId = orderDetail.referredSellerId;
+      const referredId = orderDetail.referredSellerId;
       // // console.log(orderDetail)
       // if (referralRateType === 'PERCENTAGE') {
       //   referralCredit = referralRate * shippingCalculated / 100
