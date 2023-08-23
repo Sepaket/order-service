@@ -1,6 +1,8 @@
 const httpErrors = require('http-errors');
 const ninjaStatus = require('../../../../constant/ninja-status');
 const orderStatus = require('../../../../constant/order-status');
+// eslint-disable-next-line import/extensions
+
 const {
   Order,
   sequelize,
@@ -11,6 +13,7 @@ const {
   NinjaTracking,
   TrackingHistory,
 } = require('../../../models');
+const orderHelper = require('../../../../helpers/order-helper');
 
 module.exports = class {
   constructor({ request }) {
@@ -42,29 +45,51 @@ module.exports = class {
   }
 
   async updateOrderHistory(resi, currentStatus) {
-    console.log('order : ');
+    console.log('NINJA UPDATE ORDER HISTORY : ');
+    const order = await Order.findOne({ where: { resi },
+      include: [
+        // eslint-disable-next-line no-use-before-define
+        { model: OrderDetail, as: 'detail' },
+        { model: OrderHistory, as: 'history' },
+      ],
+    });
+    const orderDetail = await OrderDetail.findOne({ where: { orderId: order.id } });
+    let deltaCredit = 0;
+    const referralCredit = 0;
     // console.log(converted.tracking_ref_no);
     if (currentStatus === 'WAITING_PICKUP') {
-      console.log(' WAITING PICKUP ');
-      await this.addOrderHistory(resi, currentStatus, false, false);
+      // console.log(' WAITING PICKUP ');
+
     } else if (currentStatus === 'PROCESSED') {
       console.log('this is processed');
-      await this.addOrderHistory(resi, currentStatus, false, false);
-      // UPDATE order,order_history dan order_detail bila perslu (perubahan berat)
-      // await this.updateOH(resi, currentStatus, false, false);
-    } else if (currentStatus === 'DELIVERED') {
+
+    } else if((currentStatus === 'DELIVERED') && (order?.isCod)) {
+      console.log('this is DELIVERED');
+      deltaCredit = parseFloat(order.detail.shippingCalculated);
+
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
+    } else if((currentStatus === 'DELIVERED') && (!order?.isCod)) {
       // NON COD berarti tidak ada proses penambahan saldo
       // COD ada addorderhistory
-      console.log('this is DELIVERED');
-      await this.addOrderHistory(resi, currentStatus, false, false);
+      console.log('this is DELIVERED NON COD');
+      // await this.addOrderHistory(resi, currentStatus, false, false);
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit,true, false, currentStatus);
     } else if (currentStatus === 'CANCELED') {
       console.log('this is CANCELED');
       // kalau NONCOD berarti ongkir dikembalikan
       // kalau COD tidak ada
-    } else if (currentStatus === 'RETURN_TO_SELLER') {
+    } else if ((currentStatus === 'RETURN_TO_SELLER') && (order?.isCod)) {
       console.log('this is RETURN_TO_SELLER');
       // COD dan NONCOD ongkir tidak dikembalikan
-      await this.addOrderHistory(resi, currentStatus, false, false);
+      deltaCredit = -1 * deltaCredit;
+      deltaCredit += parseFloat(order.detail.codFeeAdmin);
+      referralCredit = -1 * referralCredit;
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
+    } else if ((currentStatus === 'RETURN_TO_SELLER') && (!order.isCod)) {
+      console.log('this is RETURN_TO_SELLER NON COD');
+      // COD dan NONCOD ongkir tidak dikembalikan
+      referralCredit = -1 * referralCredit;
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit,true, false, currentStatus);
     } else if (currentStatus === 'PROBLEM') {
 
     } else {
@@ -80,7 +105,7 @@ module.exports = class {
     // console.log('update tracking history');
   }
 
-  async addOrderHistory(resi, currentStatus, isExecute, onHold) {
+  async addOrderHistorytidakdipakai(resi, currentStatus, isExecute, onHold) {
     await Order.findOne({
       where: { resi },
       include: [
@@ -99,21 +124,12 @@ module.exports = class {
         }
 
         if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
-          console.log('1');
           deltaCredit = 0;
         } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
-          console.log('12');
-          // eslint-disable-next-line operator-assignment
           deltaCredit = -1 * deltaCredit;
           deltaCredit += parseFloat(result.detail.codFeeAdmin);
-
-          // eslint-disable-next-line operator-assignment
           referralCredit = -1 * referralCredit;
         } else if ((currentStatus === 'DELIVERED') && (result?.isCod)) {
-          console.log('13');
-          // eslint-disable-next-line operator-assignment
-          // deltaCredit = -1 * deltaCredit;
-          // console.log(result);
           deltaCredit = parseFloat(result.detail.sellerReceivedAmount);
         }
 
@@ -196,9 +212,7 @@ module.exports = class {
       if (!order) {
         throw new Error('Invalid Data (tracking_ref_no or tracking_id)');
       }
-      console.log(order.status);
-
-      console.log(currentStatus);
+      console.log('ninja callback. status = ', currentStatus);
 
       if (currentStatus === 'DELIVERED') {
         if (currentStatus === order.status) {
@@ -209,21 +223,22 @@ module.exports = class {
           throw new Error('no change in status');
         }
       }
-      const currentSaldo = await this.seller.findOne({
-        where: { sellerId: order.detail.sellerId },
-      });
 
-      const calculatedCredit = (
-        parseFloat(currentSaldo.credit) + parseFloat(order.detail.sellerReceivedAmount)
-      );
-
-      if (converted.status.toLowerCase() === 'completed' && order.isCod) {
-        await this.seller.update(
-          { credit: parseFloat(calculatedCredit) },
-          { where: { sellerId: order.detail.sellerId } },
-          { transaction: dbTransaction },
-        );
-      }
+      // const currentSaldo = await this.seller.findOne({
+      //   where: { sellerId: order.detail.sellerId },
+      // });
+      //
+      // const calculatedCredit = (
+      //   parseFloat(currentSaldo.credit) + parseFloat(order.detail.sellerReceivedAmount)
+      // );
+      //
+      // if (converted.status.toLowerCase() === 'completed' && order.isCod) {
+      //   await this.seller.update(
+      //     { credit: parseFloat(calculatedCredit) },
+      //     { where: { sellerId: order.detail.sellerId } },
+      //     { transaction: dbTransaction },
+      //   );
+      // }
 
       await this.log.create({
         orderId: order.id,

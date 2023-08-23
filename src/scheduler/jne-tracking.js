@@ -1,5 +1,7 @@
 const { Sequelize } = require('sequelize');
+const { del } = require('express/lib/application');
 const jne = require('../helpers/jne');
+const orderHelper = require('../helpers/order-helper');
 const orderStatus = require('../constant/order-status');
 const {
   Order,
@@ -10,59 +12,15 @@ const {
   TrackingHistory,
   Seller,
 } = require('../app/models');
-const { del } = require('express/lib/application');
-
 
 async function updateOrderHistory() {
-  console.log("update tracking history");
+  console.log('update tracking history');
 }
 async function updateOrder() {
-  console.log("update tracking history");
+  console.log('update tracking history');
 }
 async function updateSellerDetail() {
-  console.log("update tracking history");
-}
-
-
-async function addOrderHistory(orderId, isCod, deltaCredit, isExecute, onHold,note,orderDetail) {
-
-  await OrderHistory.findOne({
-    where: { orderId: orderId}
-  }).then(async (result) => {
-    if (result === null) {
-      console.log('order history is NULL')
-      const referralRate = Number(orderDetail.referralRate);
-      const referralRateType = orderDetail.referralRateType;
-      //shipping calculated di tambah kembali dengan codfreeadmin karena untuk perhitungan referal tidak menggunakan codfeeadmin
-      const shippingCalculated = Number(orderDetail.shippingCalculated) - Number(orderDetail.codFeeAdmin);
-      let referralCredit = 0;
-      const referredId = orderDetail.referredSellerId;
-      // console.log(orderDetail)
-      if (referralRateType === 'PERCENTAGE') {
-        referralCredit = referralRate * shippingCalculated / 100
-      }
-
-      await OrderHistory.create({
-        orderId: orderId,
-        deltaCredit: deltaCredit,
-        isExecute: isExecute,
-        isCod:isCod,
-        provider:'JNE',
-        onHold: onHold,
-        note: note,
-        referralId: referredId,
-        referralCredit: referralCredit,
-        referralBonusExecuted: false
-      });
-    } else {
-      console.log('order history existed');
-
-    }
-
-  })
-
-
-
+  console.log('update tracking history');
 }
 
 const getLastStatus = (trackingStatus) => {
@@ -93,23 +51,22 @@ const creditUpdate = async () => {
   console.log('order credit update');
   try {
     const histories = await OrderHistory.findAll({
-      include:[
+      include: [
         {
           model: OrderDetail,
           as: 'orderDetail',
           required: true,
-          include : {
+          include: {
             model: Seller,
             as: 'seller',
             required: true,
-            include : {
+            include: {
               model: SellerDetail,
               as: 'sellerDetail',
               required: true,
-            }
+            },
           },
         },
-
 
       ],
       where: {
@@ -120,32 +77,31 @@ const creditUpdate = async () => {
     await Promise.all(
       histories?.map(async (history) => {
       }),
-      );
+    );
   } catch (error) {
     throw new Error(error);
   }
 };
 
 const tracking = async () => {
-  // console.log('jne tracing');
   try {
     const trackHistories = [];
     const order = await Order.findAll({
-      include:[
+      include: [
         {
           model: OrderDetail,
           as: 'detail',
           required: true,
-        include : {
-          model: Seller,
-          as: 'seller',
-          required: true,
-          include : {
-            model: SellerDetail,
-            as: 'sellerDetail',
+          include: {
+            model: Seller,
+            as: 'seller',
             required: true,
-          }
-        },
+            include: {
+              model: SellerDetail,
+              as: 'sellerDetail',
+              required: true,
+            },
+          },
         },
 
       ],
@@ -171,7 +127,7 @@ const tracking = async () => {
           // const trackingStatus = track?.history[track?.history?.length - 1];
           // DIBAWAH INI KODE LAMA
           // const currentStatus = getLastStatus(trackingStatus?.code || '');
-        let currentStatus = '';
+          let currentStatus = '';
           // RENO
           if (track?.cnote.pod_code === null) {
             currentStatus = 'PROCESSED';
@@ -190,7 +146,7 @@ const tracking = async () => {
             });
           });
           await TrackingHistory.findOne({
-            where: { orderId: item.id }
+            where: { orderId: item.id },
           }).then(async (result) => {
             if (result === null) {
               await TrackingHistory.create({
@@ -209,18 +165,15 @@ const tracking = async () => {
                 cnoteRaw: JSON.stringify(track?.cnote),
                 detailRaw: JSON.stringify(track?.detail),
                 historyRaw: JSON.stringify(track?.history),
-                  cnotePodDate: track.cnote.cnote_pod_date,
-                  cnotePodStatus: track.cnote.pod_status,
-                  cnotePodCode: track.cnote.pod_code,
-                  cnoteLastStatus: track.cnote.last_status,
-                  cnoteEstimateDelivery: track.cnote.estimate_delivery,
+                cnotePodDate: track.cnote.cnote_pod_date,
+                cnotePodStatus: track.cnote.pod_status,
+                cnotePodCode: track.cnote.pod_code,
+                cnoteLastStatus: track.cnote.last_status,
+                cnoteEstimateDelivery: track.cnote.estimate_delivery,
               },
-                { where: { orderId: item.id } },
-                );
-
+              { where: { orderId: item.id } });
             }
-
-          })
+          });
 
           Order.update(
             {
@@ -230,40 +183,33 @@ const tracking = async () => {
             },
             { where: { resi: item.resi } },
           );
-          var calculated_1 = 0;
-          // const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
+          let calculated1 = 0;
+          let referralCredit = 0;
           const orderDetail = item.detail;
-          const log =  await OrderLog.findAll({ where: { orderId: item.id } });
+          const log = await OrderLog.findAll({ where: { orderId: item.id } });
 
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
-            calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
-              await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus, orderDetail);
+            calculated1 = parseFloat(orderDetail.sellerReceivedAmount);
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated1, referralCredit, false, false, currentStatus);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
-            calculated_1 = 0;
-            await addOrderHistory(item.id, item.isCod,calculated_1, true, false, currentStatus,orderDetail);
-
+            calculated1 = 0;
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated1, referralCredit, true, false, currentStatus);
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
-            calculated_1 = parseFloat(orderDetail.shippingCalculated);
-            await addOrderHistory(item.id,item.isCod, calculated_1, false, false, currentStatus,orderDetail);
+            calculated1 = parseFloat(orderDetail.shippingCalculated);
+            // eslint-disable-next-line operator-assignment
+            referralCredit = -1 * referralCredit;
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated1, referralCredit, false, false, currentStatus);
           }
-
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
-            calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
-            console.log(`${item.resi  } calculated : ${calculated_1}`);
-            await OrderHistory.create({
-              orderId: item.id,
-              deltaCredit: calculated_1,
-              note: currentStatus,
-            });
-            // console.log('order history is created ' + item.orderId);
+            calculated1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
+            referralCredit = -1 * referralCredit;
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated1, referralCredit, false, false, currentStatus);
           }
-
-
         }
 
         return item;
@@ -289,7 +235,6 @@ const tracking = async () => {
             note: item?.note,
           });
         }
-
       }),
     );
   } catch (error) {
@@ -302,20 +247,20 @@ const force_retracking = async () => {
   try {
     const trackHistories = [];
     const order = await Order.findAll({
-      include:[
+      include: [
         {
           model: OrderDetail,
           as: 'detail',
           required: true,
-          include : {
+          include: {
             model: Seller,
             as: 'seller',
             required: true,
-            include : {
+            include: {
               model: SellerDetail,
               as: 'sellerDetail',
               required: true,
-            }
+            },
           },
         },
 
@@ -357,7 +302,7 @@ const force_retracking = async () => {
             });
           });
           await TrackingHistory.findOne({
-            where: { orderId: item.id }
+            where: { orderId: item.id },
           }).then(async (result) => {
             if (result === null) {
               await TrackingHistory.create({
@@ -373,21 +318,18 @@ const force_retracking = async () => {
               });
             } else {
               await TrackingHistory.update({
-                  cnoteRaw: JSON.stringify(track?.cnote),
-                  detailRaw: JSON.stringify(track?.detail),
-                  historyRaw: JSON.stringify(track?.history),
-                  cnotePodDate: track.cnote.cnote_pod_date,
-                  cnotePodStatus: track.cnote.pod_status,
-                  cnotePodCode: track.cnote.pod_code,
-                  cnoteLastStatus: track.cnote.last_status,
-                  cnoteEstimateDelivery: track.cnote.estimate_delivery,
-                },
-                { where: { orderId: item.id } },
-              );
-
+                cnoteRaw: JSON.stringify(track?.cnote),
+                detailRaw: JSON.stringify(track?.detail),
+                historyRaw: JSON.stringify(track?.history),
+                cnotePodDate: track.cnote.cnote_pod_date,
+                cnotePodStatus: track.cnote.pod_status,
+                cnotePodCode: track.cnote.pod_code,
+                cnoteLastStatus: track.cnote.last_status,
+                cnoteEstimateDelivery: track.cnote.estimate_delivery,
+              },
+              { where: { orderId: item.id } });
             }
-
-          })
+          });
           Order.update(
             {
               status: currentStatus,
@@ -396,39 +338,33 @@ const force_retracking = async () => {
             },
             { where: { resi: item.resi } },
           );
-          var calculated_1 = 0;
+          let calculated_1 = 0;
           // const orderDetail =  await OrderDetail.findOne({ where: { orderId: item.id } });
           const orderDetail = item.detail;
-          const log =  await OrderLog.findAll({ where: { orderId: item.id } });
-
-
+          const log = await OrderLog.findAll({ where: { orderId: item.id } });
 
           if (currentStatus === 'DELIVERED' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.sellerReceivedAmount);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus,orderDetail);
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated_1, false, false, currentStatus, orderDetail);
           }
 
           if (currentStatus === 'DELIVERED' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, item.isCod,calculated_1, true, false, currentStatus,orderDetail);
-
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated_1, true, false, currentStatus, orderDetail);
           }
 
           if (currentStatus === 'RETURN_TO_SELLER' && !item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.shippingCalculated);
             // await updateSaldo(calculated_1,orderDetail);
-            await addOrderHistory(item.id, item.isCod,calculated_1, false, false, currentStatus,orderDetail);
+            await orderHelper.addOrderHistory(item.id, item.isCod, calculated_1, false, false, currentStatus, orderDetail);
           }
-
-
-
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
-            console.log(`${item.resi  } calculated : ${calculated_1}`);
-            await updateSaldo(calculated_1,orderDetail);
+            console.log(`${item.resi} calculated : ${calculated_1}`);
+            await updateSaldo(calculated_1, orderDetail);
             await OrderHistory.create({
               orderId: item.id,
               deltaCredit: calculated_1,
@@ -436,8 +372,6 @@ const force_retracking = async () => {
             });
             // console.log('order history is created ' + item.orderId);
           }
-
-
         }
 
         return item;
@@ -464,14 +398,12 @@ const force_retracking = async () => {
             note: item?.note,
           });
         }
-
       }),
     );
   } catch (error) {
     throw new Error(error);
   }
 };
-
 
 module.exports = {
   tracking,

@@ -22,6 +22,7 @@ const {
   OrderDiscount,
   OrderBackground,
   TransactionFee,
+  OrderHistory,
 } = require('../app/models');
 // const { transactionFee } = require('../app/controllers/expedition/order-controller');
 
@@ -481,6 +482,54 @@ const orderFailedLogger = async (parameter) => new Promise(async (resolve, rejec
   }
 });
 
+
+async function addOrderHistory(orderId, isCod, deltaCredit, referralCredit, isExecute, onHold,note) {
+// console.log('addOrderHistory');
+  await OrderHistory.findOne({
+    where: { orderId: orderId},
+  }).then(async (result) => {
+    if (result === null) {
+      const order = await Order.findByPk(orderId);
+      const orderDetail = await OrderDetail.findOne({ where: { orderId: orderId } });
+
+      const referralRate = Number(orderDetail.referralRate);
+      const referralRateType = orderDetail.referralRateType;
+
+      //shipping calculated di tambah kembali dengan codfreeadmin karena untuk perhitungan referal tidak menggunakan codfeeadmin
+      const shippingCalculated = Number(orderDetail.shippingCalculated) - Number(orderDetail.codFeeAdmin);
+      // let referralCredit = 0;
+      // const referredId = orderDetail.referredSellerId;
+      // // console.log(orderDetail)
+      // if (referralRateType === 'PERCENTAGE') {
+      //   referralCredit = referralRate * shippingCalculated / 100
+      // } else if (referralRateType === 'AMOUNT') {
+      //   referralCredit = referralRate;
+      // }
+
+      await OrderHistory.create({
+        orderId: orderId,
+        deltaCredit: deltaCredit,
+        isExecute: isExecute,
+        isCod:isCod,
+        provider:order.expedition,
+        onHold: onHold,
+        note: note,
+        referralId: referredId,
+        referralCredit: referralCredit,
+        referralBonusExecuted: false
+      });
+    } else {
+      console.log('order history EXISTED : DO NOTHING!');
+
+    }
+
+  })
+
+
+
+}
+
+
 module.exports = {
   resiMapper,
   shippingFee,
@@ -488,4 +537,5 @@ module.exports = {
   batchCreator,
   orderSuccessLogger,
   orderFailedLogger,
+  addOrderHistory,
 };
