@@ -10,12 +10,15 @@ const sicepatExecutor = async (payload) => {
   console.log('sicepat EXECUTOR');
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
+    console.log('sicepat EXECUTOR 2');
     if (created.status) {
+      console.log('sicepat EXECUTOR 3');
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
+      console.log('sicepat EXECUTOR error ');
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
@@ -113,7 +116,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false },
-      limit: 5,
+      limit: 20,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
