@@ -31,7 +31,9 @@ module.exports = {
 
   create: async (request, response, next) => {
     try {
+      console.log('Ticket create');
       await TicketCreateValidator(request);
+      console.log('Ticket create - after validator');
       const result = await new TicketCreateResponse({ request });
 
       response.send({
