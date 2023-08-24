@@ -3,6 +3,7 @@ const sicepat = require('../helpers/sicepat');
 const ninja = require('../helpers/ninja');
 const jne = require('../helpers/jne');
 const sap = require('../helpers/sap');
+const lalamove = require('../helpers/lalamove');
 const errorCatcher = require('../helpers/error-catcher');
 const { OrderBackground } = require('../app/models');
 
@@ -107,6 +108,28 @@ const sapExecutor = async (payload) => {
 };
 
 
+const lalamoveExecutor = async (payload) => {
+  console.log('lalamove EXECUTOR');
+  try {
+    const created = await lalamove.createOrder(JSON.parse(payload.parameter));
+    // if (created.status) {
+    //   await OrderBackground.update(
+    //     { isExecute: true },
+    //     { where: { id: payload.id } },
+    //   );
+    // } else {
+    //   await errorCatcher({
+    //     id: payload.id,
+    //     expedition: payload.expedition,
+    //     subject: 'CREATE ORDER',
+    //     ...created,
+    //   });
+    // }
+  } catch (error) {
+    throw new Error(error?.message);
+  }
+};
+
 
 
 const runner = cron.schedule('*/1 * * * *', async () => {
@@ -129,7 +152,7 @@ const runner = cron.schedule('*/1 * * * *', async () => {
         if (item.expedition === 'JNE') await jneExecutor(item);
         if (item.expedition === 'NINJA') await ninjaExecutor(item);
         if (item.expedition === 'SAP') sapExecutor(item);
-        // if (item.expedition === 'LALAMOVE') await lalamoveExecutor(item);
+        if (item.expedition === 'LALAMOVE') await lalamoveExecutor(item);
     //   }, index * 20000);
     }, 8000);
     });

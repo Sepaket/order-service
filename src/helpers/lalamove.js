@@ -2,6 +2,7 @@ const axios = require('axios');
 const moment = require('moment');
 const shortid = require('shortid-36');
 const qs = require('querystring');
+const CryptoJS = require('crypto-js');
 const { Location } = require('../app/models');
 require('dotenv').config();
 
@@ -188,6 +189,16 @@ const checkPrice = (payload) => new Promise((resolve) => {
 const createOrder = (payload) => new Promise((resolve) => {
   try {
     const payloadFormatted = payloadFormatter(payload);
+    const SECRET = process.env.LALAMOVE_APISECRET;
+    const API_KEY = process.env.LALAMOVE_APIKEY;
+
+    const time = new Date().getTime().toString();
+    const method = 'POST';
+    const path = '/v3/quotations';
+    const rawSignature = `${time}\r\n${method}\r\n${path}\r\n\r\n${payload}`;
+    const SIGNATURE = CryptoJS.HmacSHA256(rawSignature, SECRET).toString();
+    const TOKEN = `${API_KEY}:${time}:${SIGNATURE}`;
+    console.log('token')
     const payloadStringify = qs.stringify({
       username: process.env.JNE_USERNAME,
       api_key: process.env.JNE_APIKEY,
@@ -197,12 +208,10 @@ const createOrder = (payload) => new Promise((resolve) => {
     axios.post(`${process.env.JNE_BASE_URL}/pickupcashless`, payloadStringify, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        // 'Accept-Encoding': 'gzip, deflate, br',
-        // 'Content-Length' : 1000000000000,
+        Market: 'ID',
+
       },
     }).then((response) => {
-      // console.log('======================inside then');
-      // console.log(response?.data);
       if (response.data.status === false) {
         console.log('error : '.response.data.error);
       }
@@ -289,7 +298,6 @@ const cancel = (payload) => new Promise((resolve, reject) => {
   });
 });
 
-
 const isExist = async ({ param, identifier, model }) => new Promise((resolve) => {
   model.findOne({
     where: { [`${identifier}`]: param },
@@ -303,10 +311,6 @@ const required = (param) => new Promise((resolve) => {
   else resolve(false);
 });
 
-
-
-
-
 const validate = (payload) => new Promise(async (resolve, reject) => {
   try {
     const error = [];
@@ -316,8 +320,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       creditCondition,
       weight,
     } = payload;
-    console.log('lalamove validator ')
-
+    console.log('lalamove validator ');
 
     if (payload.ongkirminuscod < 0) {
       error.push({ message: 'Ongkir lebih besar dari COD value' });

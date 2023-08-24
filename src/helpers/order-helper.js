@@ -234,6 +234,7 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
 });
 
 const orderQuery = async (payload) => {
+  // console.log('inside orderquery', payload);
   const mapped = payload?.map((item) => ({
     batchId: item.batchId,
     orderCode: item.orderCode,
@@ -251,10 +252,11 @@ const orderQuery = async (payload) => {
 
 const orderQueryDetail = async (payload) => {
   const calculateFee = await profitHandler(payload);
-  console.log('order query detail');
+  // console.log('calculate fee : ', calculateFee)
+  // console.log('order query detail');
   const fee = await TransactionFee.findByPk('1');
-  console.log(fee.rateReferal);
-  console.log(payload);
+  // console.log(fee.rateReferal);
+  // console.log(payload);
   const mapped = payload.items.map((item, idx) => ({
     batchId: item.batchId,
     sellerId: item.seller.id,
@@ -318,24 +320,24 @@ const orderQueryDiscount = async (payload) => {
 };
 
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
-  console.log('order logger');
-  console.log(params);
+  // console.log('order logger');
+  // console.log(params);
   const dbTransaction = await sequelize.transaction();
 
   try {
-    console.log('reno 0a')
+
     const queryOrder = await orderQuery(params.items);
     // console.log(params)
     const seller = await SellerDetail.findOne({
       where: { sellerId: params.sellerId },
     });
-    console.log('reno 0b')
-    console.log(queryOrder);
+    // console.log('reno 0b')
+    // console.log(queryOrder);
     const orders = await Order.bulkCreate(
       queryOrder,
       { transaction: dbTransaction },
     );
-    console.log('reno 1')
+
     const orderTaxQueries = await orderQueryTax(params.items);
     const orderDetailQueries = await orderQueryDetail(params);
     const orderAddressQueries = await orderQueryAddress(params.items);
@@ -344,7 +346,7 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       orderId: item.id,
       ...orderDetailQueries[idx],
     }));
-    console.log('reno 2')
+
     const orderTax = orders?.map((item, idx) => ({
       orderId: item.id,
       ...orderTaxQueries[idx],
@@ -359,12 +361,11 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
       orderId: item.id,
       ...orderDiscountQueries[idx],
     }));
-    console.log('reno 3')
+
     const orderLog = orders?.map((item) => ({
       orderId: item.id,
       previousStatus: orderStatus.WAITING_PICKUP.text,
     }));
-
     let calculatedCredit = parseFloat(seller.credit);
     params.items?.map((item) => {
       if (!item.is_cod) calculatedCredit -= parseFloat(item.shippingCalculated);
@@ -432,8 +433,8 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
 
       }
       if (payload.type === 'LALAMOVE') {
-        console.log('LALAMOVE PAYLOAD');
-        console.log(payload);
+        // console.log('LALAMOVE PAYLOAD');
+        // console.log(payload);
       }
 
       return {

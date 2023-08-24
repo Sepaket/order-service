@@ -22,7 +22,7 @@ module.exports = {
       const specialOrderArr = ['LALAMOVE'];
       let result;
       if (specialOrderArr.includes(body.type)) {
-        console.log('special');
+        console.log('special order');
         await CommonOrderValidator(request);
         result = await new LalamoveOrderResponse({ request });
       } else {

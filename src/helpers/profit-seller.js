@@ -1,4 +1,5 @@
 const profitHandler = (payload) => new Promise((resolve, reject) => {
+  // console.log('profit handler : ', payload)
   try {
     const profits = payload.items.map((item) => {
       if (item.is_cod) {

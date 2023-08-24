@@ -1,4 +1,5 @@
 const httpErrors = require('http-errors');
+const { add } = require('nodemon/lib/rules');
 const ninjaStatus = require('../../../../constant/ninja-status');
 const orderStatus = require('../../../../constant/order-status');
 // eslint-disable-next-line import/extensions
@@ -46,7 +47,8 @@ module.exports = class {
 
   async updateOrderHistory(resi, currentStatus) {
     console.log('NINJA UPDATE ORDER HISTORY : ');
-    const order = await Order.findOne({ where: { resi },
+    const order = await Order.findOne({
+      where: { resi },
       include: [
         // eslint-disable-next-line no-use-before-define
         { model: OrderDetail, as: 'detail' },
@@ -62,18 +64,17 @@ module.exports = class {
 
     } else if (currentStatus === 'PROCESSED') {
       console.log('this is processed');
-
-    } else if((currentStatus === 'DELIVERED') && (order?.isCod)) {
+    } else if ((currentStatus === 'DELIVERED') && (order?.isCod)) {
       console.log('this is DELIVERED');
       deltaCredit = parseFloat(order.detail.shippingCalculated);
 
       await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
-    } else if((currentStatus === 'DELIVERED') && (!order?.isCod)) {
+    } else if ((currentStatus === 'DELIVERED') && (!order?.isCod)) {
       // NON COD berarti tidak ada proses penambahan saldo
       // COD ada addorderhistory
       console.log('this is DELIVERED NON COD');
       // await this.addOrderHistory(resi, currentStatus, false, false);
-      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit,true, false, currentStatus);
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, true, false, currentStatus);
     } else if (currentStatus === 'CANCELED') {
       console.log('this is CANCELED');
       // kalau NONCOD berarti ongkir dikembalikan
@@ -89,7 +90,7 @@ module.exports = class {
       console.log('this is RETURN_TO_SELLER NON COD');
       // COD dan NONCOD ongkir tidak dikembalikan
       referralCredit = -1 * referralCredit;
-      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit,true, false, currentStatus);
+      await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, true, false, currentStatus);
     } else if (currentStatus === 'PROBLEM') {
 
     } else {
@@ -115,6 +116,7 @@ module.exports = class {
     }).then(async (result) => {
       let deltaCredit = 0;
       let referralCredit = 0;
+      let addOrderFlag = 0;
       if (result === null) {
         console.log('Order not found');
       } else {
@@ -125,27 +127,32 @@ module.exports = class {
 
         if ((currentStatus === 'DELIVERED') && (!result?.isCod)) {
           deltaCredit = 0;
+          addOrderFlag = 1;
         } else if ((currentStatus === 'RETURN_TO_SELLER') && (result?.isCod)) {
           deltaCredit = -1 * deltaCredit;
           deltaCredit += parseFloat(result.detail.codFeeAdmin);
           referralCredit = -1 * referralCredit;
+          addOrderFlag = 1;
         } else if ((currentStatus === 'DELIVERED') && (result?.isCod)) {
           deltaCredit = parseFloat(result.detail.sellerReceivedAmount);
+          addOrderFlag = 1;
         }
 
         if (result.history === null) {
-          await OrderHistory.create({
-            orderId: result?.id,
-            deltaCredit,
-            isExecute,
-            onHold,
-            isCod: result?.isCod,
-            provider: result?.expedition,
-            note: currentStatus,
-            referralId: result?.detail?.referredSellerId,
-            referralCredit,
-            referralBonusExecuted: false,
-          });
+          if (addOrderFlag) {
+            await OrderHistory.create({
+              orderId: result?.id,
+              deltaCredit,
+              isExecute,
+              onHold,
+              isCod: result?.isCod,
+              provider: result?.expedition,
+              note: currentStatus,
+              referralId: result?.detail?.referredSellerId,
+              referralCredit,
+              referralBonusExecuted: false,
+            });
+          }
         } else {
           console.log('update history instead');
           await result.history.update(

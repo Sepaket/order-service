@@ -73,7 +73,7 @@ module.exports = class {
       let servCode = '';
       let resi = '';
       let totalAmount = 0;
-
+      let shippingCalculated = 0;
       const batchConditon = (body?.batch_id && body?.batch_id !== '' && body?.batch_id !== null);
       const locationIds = body.order_items.map((item) => item.receiver_location_id);
       const sellerId = await jwtSelector({ request: this.request });
@@ -143,9 +143,8 @@ module.exports = class {
           const shippingCharge = 0;
 
           if (body.type === 'LALAMOVE') {
-            const tes_lalamove = '{"data":{"serviceType":"MOTORCYCLE","specialRequests":["TOLL_FEE_10"],"language":"en_HK","stops":[{"coordinates":{"lat":"22.33547351186244","lng":"114.17615807116502"},"address":"Innocentre, 72 Tat Chee Ave, Kowloon Tong"},{"coordinates":{"lat":"22.29553167157697","lng":"114.16885175766998"},"address":"Canton Rd, Tsim Sha Tsui"}],"isRouteOptimized":false,"item":{"quantity":"12","weight":"LESS_THAN_3_KG","categories":["FOOD_DELIVERY","OFFICE_ITEM"],"handlingInstructions":["KEEP_UPRIGHT"]}}}';
             // var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-            resi = '999999999999';
+            resi = '9999999';
           }
 
           const payload = {
@@ -160,15 +159,19 @@ module.exports = class {
             destination,
             origin,
             seller,
+            resi,
+            shippingCalculated,
             ...item,
             ...body,
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await lalamove.validate(payload);
+          console.log('before lalamove parameter : ', payload)
           if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
 
-          console.log('messages :')
-          console.log(messages)
+
+          // console.log('messages :')
+          // console.log(messages)
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
 
@@ -198,16 +201,17 @@ module.exports = class {
         }),
       );
       if (querySuccess?.length > 0) {
+
         await orderSuccessLogger(querySuccess);
 
         await orderLogger({
           items: queryrLogger,
           sellerId: seller.id,
         });
-      console.log('after order logger')
+
 
       }
-      console.log('after order logger 2')
+
       const filtered = response?.filter((item) => item);
       const orderResponse = {
         info: {
