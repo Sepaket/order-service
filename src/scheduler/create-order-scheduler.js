@@ -109,9 +109,11 @@ const sapExecutor = async (payload) => {
 
 
 const lalamoveExecutor = async (payload) => {
-  console.log('lalamove EXECUTOR');
+  console.log('lalamove EXECUTOR : ', payload);
   try {
-    const created = await lalamove.createOrder(JSON.parse(payload.parameter));
+    const passedPayload = JSON.parse(payload.parameter);
+    console.log('passedpayload : ', passedPayload);
+    const created = await lalamove.createOrder(passedPayload);
     // if (created.status) {
     //   await OrderBackground.update(
     //     { isExecute: true },

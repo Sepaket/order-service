@@ -35,6 +35,7 @@
   "license": "ISC",
   "dependencies": {
     "@joi/date": "^2.1.0",
+    "@lalamove/lalamove-js": "^1.1.0",
     "@nestjs/mapped-types": "*",
     "@sentry/node": "^7.11.1",
     "@sentry/tracing": "^7.11.1",

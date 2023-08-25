@@ -413,34 +413,40 @@ const orderLogger = (params) => new Promise(async (resolve, reject) => {
 });
 
 const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) => {
+  // console.log('paramter map : ', parameter);
   const dbTransaction = await sequelize.transaction();
   try {
 
     const queryMapped = parameter.map((item) => {
 
       const payload = { ...item };
+
       // delete payload.type;
 
+      let expedition = '';
       if (payload.type === 'NINJA') {
         let track_no = payload.requested_tracking_number;
         let ninja_resi_no = track_no.split(process.env.JNE_ORDER_PREFIX)?.pop();
         payload.requested_tracking_number = ninja_resi_no;
+        expedition = item.type;
       }
       if (payload.type === 'SICEPAT') {
-
+        expedition = item.type;
       }
       if (payload.type === 'JNE') {
-
+        expedition = item.type;
       }
       if (payload.type === 'LALAMOVE') {
         // console.log('LALAMOVE PAYLOAD');
-        // console.log(payload);
+        expedition = 'LALAMOVE';
+        delete payload['type'];
+        delete payload['resi'];
       }
 
       return {
         id: `${shortid.generate()}${moment().format('HHmmss')}`,
         resi: item.resi,
-        expedition: item.type,
+        expedition: expedition,
         parameter: JSON.stringify(payload),
       };
     });
@@ -450,7 +456,7 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
       queryMapped,
       { transaction: dbTransaction },
     );
-    console.log('0-1');
+    // console.log('0-1');
     await dbTransaction.commit();
     resolve(true);
   } catch (error) {

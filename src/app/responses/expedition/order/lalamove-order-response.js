@@ -84,7 +84,7 @@ module.exports = class {
       });
 
       const insurance = await this.insurance.findOne({
-        where: { expedition: body.type },
+        where: { expedition: 'LALAMOVE' },
       });
 
       const seller = await this.seller.findOne({
@@ -121,7 +121,7 @@ module.exports = class {
         batch = await batchCreator({
           dbTransaction,
           sellerId: sellerId.id,
-          expedition: body.type,
+          expedition: 'LALAMOVE',
           batchCode: `B${body?.order_items?.length}${shortid.generate()}`,
           totalOrder: body?.order_items?.length || 0,
         });
@@ -142,10 +142,9 @@ module.exports = class {
 
           const shippingCharge = 0;
 
-          if (body.type === 'LALAMOVE') {
-            // var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+
             resi = '9999999';
-          }
+
 
           const payload = {
             // codFeeAdmin: codValueCalculated,
@@ -166,11 +165,11 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await lalamove.validate(payload);
-          console.log('before lalamove parameter : ', payload)
-          if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
+          // console.log('before lalamove parameter : ', payload)
+          parameter = await lalamoveParameter({ payload });
 
 
-          // console.log('messages :')
+          console.log('messages 1 :')
           // console.log(messages)
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
@@ -201,7 +200,6 @@ module.exports = class {
         }),
       );
       if (querySuccess?.length > 0) {
-
         await orderSuccessLogger(querySuccess);
 
         await orderLogger({
@@ -220,7 +218,7 @@ module.exports = class {
         },
         order: {
           pickup_info: {
-            expedition: body.type,
+            expedition: 'LALAMOVE',
             service_code: servCode,
             should_pickup_with: body.should_pickup_with,
             pickup_date: body.pickup_date,
@@ -277,7 +275,7 @@ module.exports = class {
     const servCode = payload?.service_code || null;
 
     return {
-      resi: payload?.resi,
+      resi: '999999',
       order: {
         order_code: payload?.orderCode,
         service: payload?.type,

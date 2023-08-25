@@ -241,6 +241,7 @@ module.exports = class {
             delete result?.cod_fee;
             const logHistory = [];
             result.riwayat = '';
+            // console.log('masuk riwayat : ', result?.order?.expedition);
             if (result?.order.expedition === 'NINJA') {
               // console.log('order detail ninja riwayat');
               // console.log(result.order.resi);
@@ -278,7 +279,9 @@ module.exports = class {
               }
 
               result.riwayat = JSON.stringify(logHistory);
-            } if (result?.order.expedition === 'JNE') {
+              // console.log('ninja logs : ', result.riwayat)
+            } else if (result?.order?.expedition === 'JNE') {
+              // console.log('jne riwayat');
               const jneLogs = await this.trackingHistory.findAll({
                 attributes: [
                   'orderId',
@@ -314,7 +317,7 @@ module.exports = class {
 
               }
               result.riwayat = JSON.stringify(logHistory);
-            } if (result?.order.expedition === 'SICEPAT') {
+            } else if (result?.order?.expedition === 'SICEPAT') {
               const sicepatLogs = await this.orderLog.findAll({
                 attributes: [
                   'id',
@@ -336,7 +339,7 @@ module.exports = class {
                 ],
               });
 
-              console.log('SICEPAT LOGS');
+              // console.log('SICEPAT LOGS');
               for (const index in sicepatLogs) {
                 const templog = {};
 
@@ -352,9 +355,11 @@ module.exports = class {
               }
               result.riwayat = JSON.stringify(logHistory);
             } else {
-
+              // console.log('ELSE RESET: ', result.riwayat)
               result.riwayat = '';
             }
+
+            // console.log('riwayat : ', result.riwayat);
             if (response) resolve(result);
             else reject(httpErrors(404, 'No Data Found', { data: null }));
 
