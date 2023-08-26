@@ -302,7 +302,7 @@ module.exports = class {
             // if (result?.order_log) {
             //   result.tracking = result.order_log;
             // }
-          } if (result?.order.expedition === 'JNE') {
+          } else if (result?.order.expedition === 'JNE') {
 
             const jneLogs = await this.trackingHistory.findAll({
               attributes: [
@@ -338,7 +338,7 @@ module.exports = class {
 
             }
             result.riwayat = JSON.stringify(logHistory);
-          } if (result?.order.expedition === 'SICEPAT') {
+          } else if (result?.order.expedition === 'SICEPAT') {
             console.log('enter SICEPAT');
             console.log(result);
 
