@@ -22,7 +22,9 @@ router.group('/service-code', (route) => {
 });
 
 router.group('/', (route) => {
-  route.post('/check-service-fee', CheckPriceController);
+  route.post('/check-service-fee', CheckPriceController.checkPrice);
+  route.post('/check-lalamove-fee', CheckPriceController.checkLalamovePrice);
+  route.get('/get-lalamove-city', CheckPriceController.getLalamoveCity);
 });
 
 router.group('/order', (route) => {

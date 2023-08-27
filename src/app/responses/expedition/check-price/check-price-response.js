@@ -5,6 +5,7 @@ const ninja = require('../../../../helpers/ninja');
 const sicepat = require('../../../../helpers/sicepat');
 const sap = require('../../../../helpers/sap');
 const idexpress = require('../../../../helpers/idexpress');
+
 const { idxServiceStatus } = require('../../../../constant/status');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
@@ -113,6 +114,7 @@ module.exports = class {
         if (idxPrice?.length > 0) fees.push(idxPrice);
       }
 
+
       if (body.type === 'ALL') {
         let result = [];
         let jnePrices = [];
@@ -126,6 +128,7 @@ module.exports = class {
         if (ninjaCondition) ninjaPrices = await this.ninjaFee();
         // if (sapCondition) sapPrices = await this.sapFee();
         if (idxCondition) idxPrices = await this.idxFee();
+
 
         result = result.concat(jnePrices);
         result = result.concat(sicepatPrices);
@@ -345,7 +348,6 @@ module.exports = class {
         }
 
         if (allowedServiceCodeDiscount.includes(item.service)) {
-          console.log(item.service);
           allowDiscount = 1;
           dupeSelectedDiscount = JSON.parse(JSON.stringify(this.selectedDiscount));
 
@@ -635,4 +637,6 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
+
+
 };

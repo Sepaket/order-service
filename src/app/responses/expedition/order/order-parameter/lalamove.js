@@ -5,23 +5,27 @@ const paramsMapper = ({ payload }) => ({
     language: 'en_ID',
     stops: [
       {
-        coordinates: {
-          lat: '-6.278963',
-          lng: '106.814267',
-        },
-        address: 'Jl Benda 70, Cilandak Timur, Jakarta selatan',
+        // coordinates: {
+        //   lat: '-6.278963',
+        //   lng: '106.814267',
+        // },
+        address: payload?.sellerLocation?.address,
+
       },
       {
-        coordinates: {
-          lat: '-6.273184',
-          lng: '106.839068',
-        },
-        address: 'RS Siaga, Pejaten',
+        // coordinates: {
+        //   lat: '-6.273184',
+        //   lng: '106.839068',
+        // },
+        address: payload?.receiver_address,
       }],
-    isRouteOptimized: false,
+    isRouteOptimized: true,
     item: {
-      quantity: '12',
+      quantity: payload?.order_items.goods_qty,
       weight: 'LESS_THAN_3_KG',
+      //
+      // quantity: payload?.order_items.goods_qty,
+      // weight: payload?.weight,
       categories: ['FOOD_DELIVERY', 'OFFICE_ITEM'],
       handlingInstructions: ['KEEP_UPRIGHT'],
     },

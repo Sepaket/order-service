@@ -172,6 +172,21 @@ const getDestination = () => new Promise((resolve, reject) => {
   });
 });
 
+
+const getCity = (payload) => new Promise(async (resolve) => {
+  try {
+    const res = await sdkGetCity();
+    resolve(res);
+  } catch (error) {
+    console.log(`this is error: ${error}`);
+    resolve({
+      status: false,
+      message: error?.message || 'Something Wrong',
+    });
+  }
+});
+
+
 const checkPrice = (payload) => new Promise((resolve) => {
   const {
     origin,
@@ -179,21 +194,85 @@ const checkPrice = (payload) => new Promise((resolve) => {
     weight,
   } = payload;
 
-  axios.post(`${process.env.JNE_BASE_URL}/tracing/api/pricedev`, qs.stringify({
-    username: process.env.JNE_USERNAME,
-    api_key: process.env.JNE_APIKEY,
-    from: origin,
-    thru: destination,
-    weight: weight || 1,
-  }), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  }).then((response) => {
-    resolve(response?.data?.price || []);
-  }).catch(() => {
-    resolve([]);
-  });
+  try {
+    // console.log('test sdk');
+    // testsdk();
+    // console.log('test sdk finish');
+
+    const payloadFormatted = payloadFormatter(payload);
+    const payloadStringify = qs.stringify({
+      // username: process.env.JNE_USERNAME,
+      // api_key: process.env.JNE_APIKEY,
+      ...payloadFormatted,
+    });
+
+    const SECRET = process.env.LALAMOVE_APISECRET;
+    const API_KEY = process.env.LALAMOVE_APIKEY;
+
+    const time = new Date().getTime().toString();
+    const method = 'POST';
+    const path = '/v3/quotations';
+    const body = JSON.stringify(payload);
+    console.log('lalamove payload from db : ',body)
+    const rawSignature = `${time}\r\n${method}\r\n${path}\r\n\r\n${body}`;
+    console.log('rawSignature : ', rawSignature);
+    const SIGNATURE = CryptoJS.HmacSHA256(rawSignature, SECRET).toString();
+    const LALATOKEN = `${API_KEY}:${time}:${SIGNATURE}`;
+    console.log('token : ', LALATOKEN);
+
+    console.log('payload string : ', payloadStringify);
+    // const payloadObj = payloadStringify.replace(/\n/gi, ' ');
+    const auth = `hmac ${LALATOKEN}`;
+    // const auth2 = 'hmac 914c9e52e6414d9494e299708d176a41:1545880607433:5133946c6a0ba25932cc18fa3aa1b5c3dfa2c7f99de0f8599b28c2da88ed9d42';
+    console.log(auth);
+    axios.post(`${process.env.LALAMOVE_BASE_URL}/v3/quotations`, body, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: auth,
+        // 'Request-ID': '213131',
+        Market: 'ID',
+      },
+    }).then((response) => {
+      console.log('inside axios : ', response.data);
+      if (response.data.status === false) {
+        console.log('error : '.response.data.error);
+      }
+      if (!response?.data?.detail) {
+        resolve({
+          status: false,
+          message: response?.data?.error || 'Something Wrong',
+        });
+        return;
+      }
+
+      const status = (response.data.detail[0].status).toLowerCase();
+      if (status === 'error') {
+        console.log('error');
+        resolve({
+          status: false,
+          message: response.data.detail[0].reason,
+        });
+        return;
+      }
+      resolve({
+        status: true,
+        message: response,
+      });
+    }).catch((error) => {
+      console.log(`this is error 1: ${error}`);
+      console.log(`this is error 1 detail: ${error.response.data.error}`);
+      resolve({
+        status: false,
+        message: error?.response?.data?.reason || error?.message || 'Something Wrong',
+      });
+    });
+  } catch (error) {
+    console.log(`this is error 2: ${error}`);
+    resolve({
+      status: false,
+      message: error?.message || 'Something Wrong',
+    });
+  }
 });
 
 const createOrder = (payload) => new Promise((resolve) => {
@@ -340,36 +419,51 @@ const required = (param) => new Promise((resolve) => {
   else resolve(false);
 });
 
-const testsdk = () => new Promise(async (resolve, reject) => {
+const sdkGetQuotation = () => new Promise(async (resolve, reject) => {
   const co = {
-    lat: '22.3353139',
-    lng: '114.1758402',
+    lat: '-6.278963',
+    lng: '106.814267',
   };
 
   const co2 = {
-    lat: '22.3203648',
-    lng: '114.169773',
+    lat: '-6.273184',
+    lng: '106.839068',
   };
 
   const stop1 = {
     coordinates: co,
-    address: 'Wu Kai Sha Road',
+    address: 'benda 70',
   };
 
   const stop2 = {
     coordinates: co2,
-    address: 'Wu Kai Sha Road',
+    address: 'rs siaga',
   };
 
   const quotationPayload = SDKClient.QuotationPayloadBuilder.quotationPayload()
     .withLanguage('en_ID')
-    .withServiceType('COURIER')
+    .withServiceType('MOTORCYCLE')
     .withStops([stop1, stop2])
     .build();
 
-  const res = await sdkClient.Quotation.create('HK', quotationPayload);
+  const res = await sdkClient.Quotation.create('ID', quotationPayload);
   console.log('res : ', res);
+  return res;
 });
+
+
+const sdkGetCity = () => new Promise(async (resolve, reject) => {
+  try {
+    const res = await sdkClient.Market.retrieve('ID');
+    console.log('res : ', res);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+
+});
+
+
 const validate = (payload) => new Promise(async (resolve, reject) => {
   try {
     const error = [];
@@ -437,4 +531,5 @@ module.exports = {
   cancel,
   parameter,
   validate,
+  getCity,
 };

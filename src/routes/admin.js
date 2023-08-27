@@ -17,6 +17,7 @@ const OrderController = require('../app/controllers/admin/order-controller');
 const DashboardController = require('../app/controllers/admin/dashboard-controller');
 const TicketController = require('../app/controllers/admin/ticket-controller');
 const NotificationController = require('../app/controllers/admin/notification-controller');
+const CancelController = require('../app/controllers/expedition/cancel-order-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -83,6 +84,7 @@ router.group('/order', (route) => {
   route.post('/print', Authorization, OrderController.print);
   route.get('/:id', Authorization, OrderController.detail);
   route.post('/set-return-status', Authorization, OrderController.setReturnStatus);
+  route.get('/cancel/:id', Authorization, OrderController.cancel);
 });
 
 router.group('/notification', (route) => {

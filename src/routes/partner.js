@@ -21,7 +21,8 @@ router.group('/auth', (route) => {
 });
 
 router.group('/', (route) => {
-  route.post('/check-service-fee', Authorization, CheckPriceController);
+  route.post('/check-service-fee', Authorization, CheckPriceController.checkPrice);
+  route.post('/check-service-fee', Authorization, CheckPriceController.checkLalamovePrice);
 });
 
 router.group('/address', (route) => {

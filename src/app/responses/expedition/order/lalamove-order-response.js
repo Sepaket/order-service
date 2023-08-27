@@ -165,7 +165,7 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await lalamove.validate(payload);
-          // console.log('before lalamove parameter : ', payload)
+          console.log('before lalamove parameter : ', payload)
           parameter = await lalamoveParameter({ payload });
 
 

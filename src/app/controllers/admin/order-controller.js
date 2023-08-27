@@ -12,6 +12,10 @@ const PrintResponse = require('../../responses/admin/order/order-print-response'
 const OrderListallResponse = require('../../responses/admin/order/order-listall-response');
 const SellerSetReferralCodeResponse = require('../../responses/admin/seller/seller-set-referral-code-response');
 const SetReturnStatusResponse = require('../../responses/admin/order/order-set-return-status-response');
+const CancelValidator = require('../../validators/admin/order/cancel-validator');
+const JneCancelResponse = require('../../responses/expedition/cancel/jne-cancel-response');
+const NinjaCancelResponse = require('../../responses/expedition/cancel/ninja-cancel-response');
+const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat-cancel-response');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -127,6 +131,27 @@ module.exports = {
     } catch (error) {
       next(error);
     }
+  },
+
+  cancel: async (request, response, next) => {
+    try {
+      let result = null;
+      console.log('cancelling order...');
+      const order = await CancelValidator(request);
+      const expedition = order?.id?.expedition;
+      if (expedition === 'JNE') result = await new JneCancelResponse({ request });
+      if (expedition === 'NINJA') result = await new NinjaCancelResponse({ request });
+      if (expedition === 'SICEPAT') result = await new SicepatCancelResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+
   },
 
 };
