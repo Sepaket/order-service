@@ -5,6 +5,7 @@ const CheckPriceValidator = require('../../validators/expedition/check-price/che
 const CheckPriceResponse = require('../../responses/expedition/check-price/check-price-response');
 const CheckLalamovePriceResponse = require('../../responses/expedition/check-price/check-lalamove-price-response');
 const GetLalamoveCityResponse = require('../../responses/expedition/check-price/get-lalamove-city-response');
+const GetLalamoveServiceResponse = require('../../responses/expedition/check-price/get-lalamove-service-response');
 const cors = require('cors');
 
 module.exports = {
@@ -87,17 +88,36 @@ module.exports = {
 
   getLalamoveCity: async (request, response, next) => {
     try {
-      console.log('get lalamove city');
+
       // await CheckPriceValidator(request.body);
       const result = await new GetLalamoveCityResponse({ request });
-      console.log('after check city response');
+
       var items = result.data;
       var cod = JSON.parse(JSON.stringify(items));
       var codItemIndex = 0;
       response.send({
         code: 200,
         message: 'OK',
-        data: result,
+        data: items,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getLalamoveService: async (request, response, next) => {
+    try {
+
+      // await CheckPriceValidator(request.body);
+      const result = await new GetLalamoveServiceResponse({ request });
+
+      var items = result.data;
+      var cod = JSON.parse(JSON.stringify(items));
+      var codItemIndex = 0;
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: items,
       });
     } catch (error) {
       next(error);

@@ -57,10 +57,10 @@ module.exports = class {
     });
     const orderDetail = await OrderDetail.findOne({ where: { orderId: order.id } });
     let deltaCredit = 0;
-    const referralCredit = 0;
-    // console.log(converted.tracking_ref_no);
+    let referralCredit = 0;
+
     if (currentStatus === 'WAITING_PICKUP') {
-      // console.log(' WAITING PICKUP ');
+
 
     } else if (currentStatus === 'PROCESSED') {
       console.log('this is processed');
@@ -85,6 +85,7 @@ module.exports = class {
       deltaCredit = -1 * deltaCredit;
       deltaCredit += parseFloat(order.detail.codFeeAdmin);
       referralCredit = -1 * referralCredit;
+      console.log('this is RETURN_TO_SELLER 2');
       await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
     } else if ((currentStatus === 'RETURN_TO_SELLER') && (!order.isCod)) {
       console.log('this is RETURN_TO_SELLER NON COD');

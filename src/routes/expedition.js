@@ -25,6 +25,7 @@ router.group('/', (route) => {
   route.post('/check-service-fee', CheckPriceController.checkPrice);
   route.post('/check-lalamove-fee', CheckPriceController.checkLalamovePrice);
   route.get('/get-lalamove-city', CheckPriceController.getLalamoveCity);
+  route.get('/get-lalamove-service', CheckPriceController.getLalamoveService);
 });
 
 router.group('/order', (route) => {

@@ -32,8 +32,8 @@ module.exports = class {
       try {
         console.log('inside chack lalamove CITY response');
         let result = [];
-        result = await lalamove.getCity();
-
+        result = await lalamove.getService();
+        console.log(result);
         const { body } = this.request;
         resolve({
           data: result,

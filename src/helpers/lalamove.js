@@ -176,6 +176,19 @@ const getDestination = () => new Promise((resolve, reject) => {
 const getCity = (payload) => new Promise(async (resolve) => {
   try {
     const res = await sdkGetCity();
+
+    resolve(res);
+  } catch (error) {
+    console.log(`this is error: ${error}`);
+    resolve({
+      status: false,
+      message: error?.message || 'Something Wrong',
+    });
+  }
+});
+const getService = (payload) => new Promise(async (resolve) => {
+  try {
+    const res = await sdkGetService();
     resolve(res);
   } catch (error) {
     console.log(`this is error: ${error}`);
@@ -455,6 +468,17 @@ const sdkGetQuotation = () => new Promise(async (resolve, reject) => {
 const sdkGetCity = () => new Promise(async (resolve, reject) => {
   try {
     const res = await sdkClient.Market.retrieve('ID');
+
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+
+});
+
+const sdkGetService = () => new Promise(async (resolve, reject) => {
+  try {
+    const res = await sdkClient.City.retrieve('ID', 'ID JKT');
     console.log('res : ', res);
     resolve(res);
   } catch (error) {
@@ -532,4 +556,5 @@ module.exports = {
   parameter,
   validate,
   getCity,
+  getService,
 };

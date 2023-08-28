@@ -491,7 +491,7 @@ const orderFailedLogger = async (parameter) => new Promise(async (resolve, rejec
 
 
 async function addOrderHistory(orderId, isCod, deltaCredit, referralCredit, isExecute, onHold,note) {
-// console.log('addOrderHistory');
+console.log('addOrderHistory');
   await OrderHistory.findOne({
     where: { orderId: orderId},
   }).then(async (result) => {
