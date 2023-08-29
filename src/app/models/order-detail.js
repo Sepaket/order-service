@@ -112,6 +112,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    returnStatus: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   };
 
   const OrderDetail = sequelize.define('OrderDetail', schema, {

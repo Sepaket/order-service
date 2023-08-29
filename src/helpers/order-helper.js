@@ -194,12 +194,14 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
     }
 
     if (expedition === 'SICEPAT') {
+      console.log('sicepaet origin code ', origin);
+      console.log('si cepat dest code ', destination);
       const prices = await sicepat.checkPrice({
         origin: origin?.sicepatOriginCode,
         destination: destination?.sicepatDestinationCode,
         weight,
       });
-
+      console.log('inside si cepat shipping fee ', prices);
       const service = await prices?.find((item) => item.service === serviceCode);
       price = service?.tariff || 0;
     }
@@ -436,8 +438,10 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
       if (payload.type === 'JNE') {
         expedition = item.type;
       }
+      if (payload.type === 'SAP') {
+        expedition = item.type;
+      }
       if (payload.type === 'LALAMOVE') {
-        // console.log('LALAMOVE PAYLOAD');
         expedition = 'LALAMOVE';
         delete payload['type'];
         delete payload['resi'];
@@ -450,8 +454,8 @@ const orderSuccessLogger = (parameter) => new Promise(async (resolve, reject) =>
         parameter: JSON.stringify(payload),
       };
     });
-    console.log('0-0');
-    console.log(queryMapped);
+    // console.log('0-0');
+    // console.log(queryMapped);
     await OrderBackground.bulkCreate(
       queryMapped,
       { transaction: dbTransaction },

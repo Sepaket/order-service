@@ -80,8 +80,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       message: 'OK',
     });
   }).catch((error) => {
-    console.log('sicepat createorder error');
-    console.log(error);
+    console.log('sicepat createorder error : ', error?.response?.data?.error_message || error?.message || 'Something Wrong');
     resolve({
       status: false,
       message: error?.response?.data?.error_message || error?.message || 'Something Wrong',

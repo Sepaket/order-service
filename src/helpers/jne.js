@@ -200,8 +200,7 @@ const createOrder = (payload) => new Promise((resolve) => {
         // 'Content-Length' : 1000000000000,
       },
     }).then((response) => {
-      console.log('======================inside then');
-      console.log(response?.data);
+      console.log('JNE createorder error : ', response?.data?.detail);
       if (response.data.status === false) {
         console.log('error : '.response.data.error);
       }
@@ -215,7 +214,7 @@ const createOrder = (payload) => new Promise((resolve) => {
 
       const status = (response.data.detail[0].status).toLowerCase();
       if (status === 'error') {
-        console.log('error');
+        console.log('error : ', response.data.detail[0].reason);
         resolve({
           status: false,
           message: response.data.detail[0].reason,

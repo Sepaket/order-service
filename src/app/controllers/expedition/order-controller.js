@@ -40,7 +40,6 @@ module.exports = {
         data: result,
       });
     } catch (error) {
-      console.log("ade error");
       console.log(error);
       // console.log("error - validator - reno ");
       next(error);
@@ -52,7 +51,6 @@ module.exports = {
       await BulkOrderValidator(request);
       var success = '';
       var [result, successCount, failCount] = await new BulkOrderResponse({ request });
-      // console.log(JSON.stringify(result, null, 2));
       //if result ada error kirim return
       response.send({
         code: 200,

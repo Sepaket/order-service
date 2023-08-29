@@ -8,18 +8,14 @@ const errorCatcher = require('../helpers/error-catcher');
 const { OrderBackground } = require('../app/models');
 
 const sicepatExecutor = async (payload) => {
-  console.log('sicepat EXECUTOR');
   try {
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
-    console.log('sicepat EXECUTOR 2');
     if (created.status) {
-      console.log('sicepat EXECUTOR 3');
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
-      console.log('sicepat EXECUTOR error ');
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
@@ -34,7 +30,6 @@ const sicepatExecutor = async (payload) => {
 };
 
 const jneExecutor = async (payload) => {
-  console.log('JNE EXECUTOR');
   try {
     const created = await jne.createOrder(JSON.parse(payload.parameter));
 
@@ -85,8 +80,6 @@ const sapExecutor = async (payload) => {
   console.log(JSON.parse(payload.parameter));
   try {
     const created = await sap.createOrder(JSON.parse(payload.parameter));
-    // console.log('created SAP executor')
-    // console.log(payload)
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
@@ -133,39 +126,172 @@ const lalamoveExecutor = async (payload) => {
 };
 
 
+// const runner = cron.schedule('*/1 * * * *', async () => {
+//   // eslint-disable-next-line no-console
+//   console.info('create order scheduler run');
+//
+//   try {
+//     const orders = await OrderBackground.findAll({
+//       where: { isExecute: false },
+//       limit: 20,
+//     });
+//     // console.log('ORDERS')
+//     // console.log(orders[5].resi);
+//     // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
+//
+//     orders?.forEach((item, index) => {
+//       console.log('order to push : ', item.expedition);
+//       setTimeout(async () => {
+//         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+//         if (item.expedition === 'JNE') await jneExecutor(item);
+//         if (item.expedition === 'NINJA') await ninjaExecutor(item);
+//         if (item.expedition === 'SAP') sapExecutor(item);
+//         if (item.expedition === 'LALAMOVE') await lalamoveExecutor(item);
+//         //   }, index * 20000);
+//       }, 8000);
+//     });
+//   } catch (error) {
+//     // eslint-disable-next-line no-console
+//     console.log('pesan error : ');
+//     console.log(error.message);
+//   }
+// }, {
+//   scheduled: true,
+//   timezone: 'Asia/Jakarta',
+// });
 
-const runner = cron.schedule('*/1 * * * *', async () => {
+
+const runner_jne = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('create order scheduler run');
+  console.info('jne runner');
 
   try {
     const orders = await OrderBackground.findAll({
-      where: { isExecute: false },
-      limit: 20,
+      where: { isExecute: false, expedition: 'JNE'},
+      limit: 10,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
     // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
 
     orders?.forEach((item, index) => {
-      console.log(item.expedition);
+      console.log('order to push : ', item.expedition);
       setTimeout(async () => {
-        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+
         if (item.expedition === 'JNE') await jneExecutor(item);
-        if (item.expedition === 'NINJA') await ninjaExecutor(item);
-        if (item.expedition === 'SAP') sapExecutor(item);
-        if (item.expedition === 'LALAMOVE') await lalamoveExecutor(item);
+
     //   }, index * 20000);
     }, 8000);
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log('pesan error : ');
-    console.log(error.message);
+    // console.log(error.message);
   }
 }, {
   scheduled: true,
   timezone: 'Asia/Jakarta',
 });
 
-module.exports = runner;
+const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
+  // eslint-disable-next-line no-console
+  console.info('sicepat runner');
+
+  try {
+    const orders = await OrderBackground.findAll({
+      where: { isExecute: false, expedition: 'SICEPAT' },
+      limit: 10,
+    });
+    // console.log('ORDERS')
+    // console.log(orders[5].resi);
+    // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
+
+    orders?.forEach((item, index) => {
+      console.log('order to push : ', item.expedition);
+      setTimeout(async () => {
+        if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
+
+        //   }, index * 20000);
+      }, 8000);
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    // console.log(error.message);
+  }
+}, {
+  scheduled: true,
+  timezone: 'Asia/Jakarta',
+});
+
+const runner_ninja = cron.schedule('*/1 * * * *', async () => {
+  // eslint-disable-next-line no-console
+  console.info('ninja runner');
+
+  try {
+    const orders = await OrderBackground.findAll({
+      where: { isExecute: false,
+        expedition: 'NINJA'},
+      limit: 10,
+    });
+    // console.log('ORDERS')
+    // console.log(orders[5].resi);
+    // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
+
+    orders?.forEach((item, index) => {
+      console.log('order to push : ', item.expedition);
+      setTimeout(async () => {
+
+        if (item.expedition === 'NINJA') await ninjaExecutor(item);
+
+        //   }, index * 20000);
+      }, 8000);
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    // console.log(error.message);
+  }
+}, {
+  scheduled: true,
+  timezone: 'Asia/Jakarta',
+});
+
+const runner_sap = cron.schedule('*/1 * * * *', async () => {
+  // eslint-disable-next-line no-console
+  console.info('sap runner');
+
+  try {
+    const orders = await OrderBackground.findAll({
+      where: { isExecute: false, expedition: 'SAP'},
+      limit: 10,
+    });
+    // console.log('ORDERS')
+    // console.log(orders[5].resi);
+    // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
+
+    orders?.forEach((item, index) => {
+      console.log('order to push : ', item.expedition);
+      setTimeout(async () => {
+
+        if (item.expedition === 'SAP') await sapExecutor(item);
+
+        //   }, index * 20000);
+      }, 8000);
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    // console.log(error.message);
+  }
+}, {
+  scheduled: true,
+  timezone: 'Asia/Jakarta',
+});
+
+
+// module.exports = runner;
+module.exports = {
+  runner_jne,
+  runner_sicepat,
+  runner_ninja,
+  runner_sap,
+  // creditUpdate, // creditUpdate is done from batch-updater. not tracking updater
+};
+

@@ -11,6 +11,7 @@ const BatchResponse = require('../../responses/seller/order/order-batch-response
 const OrderListResponse = require('../../responses/seller/order/order-list-response');
 const OrderListallResponse = require('../../responses/seller/order/order-listall-response');
 const OrderDetailResponse = require('../../responses/seller/order/order-detail-response');
+const OrderReturResponse = require('../../responses/seller/order/order-retur-response');
 const OrderMutasiResponse = require('../../responses/seller/order/order-mutasi-response');
 const ExportResponse = require('../../responses/seller/order/order-export-response');
 const PrintResponse = require('../../responses/seller/order/order-print-response');
@@ -87,6 +88,23 @@ module.exports = {
     try {
       await OrderDetailValidator(request);
       const result = await new OrderDetailResponse({ request });
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  retur: async (request, response, next) => {
+    try {
+
+      await OrderListValidator(request.query);
+
+      const result = await new OrderReturResponse({ request });
+
       response.send({
         code: 200,
         message: 'OK',

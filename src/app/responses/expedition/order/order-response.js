@@ -72,7 +72,6 @@ module.exports = class {
   }
 
   async createOrder() {
-    console.log('order-response.js - createOrder')
     const dbTransaction = await sequelize.transaction();
     try {
       const error = [];
@@ -223,7 +222,6 @@ module.exports = class {
           }
 
           let parameter = null;
-
           const origin = sellerLocation?.location;
 
           const destination = destinationLocation?.find((location) => {
@@ -232,6 +230,7 @@ module.exports = class {
             return location.id === locationId;
           });
 
+
           let shippingCharge = await shippingFee({
             origin,
             destination,
@@ -239,7 +238,6 @@ module.exports = class {
             expedition: body.type,
             serviceCode: servCode,
           });
-
           let codValueCalculated = 0;
           let vatCalculated = this.tax.vat;
           let codFeeCalculated = trxFee?.codFee || 0;
@@ -415,7 +413,7 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
-
+          console.log('body type : ', body.type)
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
