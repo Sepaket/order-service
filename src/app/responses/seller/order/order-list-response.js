@@ -63,30 +63,7 @@ module.exports = class {
             'codFeeAdmin',
           ],
           include: [
-            // {
-            //   model: this.orderAddress,
-            //   as: 'receiverAddress',
-            //   required: true,
-            //   attributes: [
-            //     ['id', 'receiver_id'],
-            //     'receiverName',
-            //   ],
-            // },
-            // {
-            //   model: this.ticket,
-            //   as: 'ticket',
-            //   required: false,
-            //   attributes: [
-            //     'id',
-            //     'title',
-            //     'message',
-            //     'category',
-            //     'priority',
-            //     'status',
-            //     'created_at',
-            //     'updated_at'
-            //   ],
-            // },
+
             {
               model: this.order,
               as: 'order',

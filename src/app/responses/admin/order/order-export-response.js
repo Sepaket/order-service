@@ -38,7 +38,7 @@ module.exports = class {
 
     return new Promise((resolve, reject) => {
       try {
-        this.orderDetail.findAll({
+        this.orderDetail.findAndCountAll({
           attributes: [
             'orderId',
             'totalItem',
@@ -124,7 +124,7 @@ module.exports = class {
             {
               model: this.orderTax,
               as: 'tax',
-              required: true,
+              required: false,
               attributes: [
                 ['id', 'tax_id'],
                 'taxAmount',
@@ -147,14 +147,15 @@ module.exports = class {
           where: { ...search },
           order: [['id', 'DESC']],
         }).then((response) => {
+          console.log('count : ', response.count)
           const result = this.converter.arrayToSnakeCase(
-            JSON.parse(JSON.stringify(response)),
+            JSON.parse(JSON.stringify(response.rows)),
           );
 
           const mapped = result?.map((item) => {
             const itemResponse = item;
 
-            let vatCalculated = item?.tax?.vatTax;
+            let vatCalculated = item?.tax?.vatTax ? item?.tax?.vatTax : 0;
             if (item?.tax && item?.tax?.vatType === 'PERCENTAGE') {
               vatCalculated = (
                 parseFloat(item?.shipping_charge)
@@ -174,9 +175,10 @@ module.exports = class {
             itemResponse.shipping_charge_discount = Number(shippingDiscount).toFixed(2);
             itemResponse.shipping_charge_total = Number(shippingChargeTotal).toFixed(2);
             itemResponse.order = this.converter.objectToSnakeCase(item.order);
-            itemResponse.tax.vat_calculated = Number(vatCalculated).toFixed(2);
+
             itemResponse.cod_value = item.cod_fee || 0;
             itemResponse.tax = this.converter.objectToSnakeCase(item.tax);
+            itemResponse.vat_calculated = Number(vatCalculated).toFixed(2);
             itemResponse.receiver_address = {
               ...this.converter.objectToSnakeCase(item?.receiver_address),
               location: this.converter.objectToSnakeCase(item?.receiver_address?.location) || null,

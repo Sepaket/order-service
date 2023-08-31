@@ -1,6 +1,8 @@
 const moment = require('moment');
 const httpErrors = require('http-errors');
-const { Sequelize } = require('sequelize');
+const { Sequelize,
+  Op
+} = require('sequelize');
 const snakeCaseConverter = require('../../../../helpers/snakecase-converter');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const {
@@ -34,12 +36,24 @@ module.exports = class {
     const { query } = this.request;
     const search = this.querySearch();
     const seller = await jwtSelector({ request: this.request });
+    console.log('this is where the wherecondition for retur', query?.batch_id)
     const whereCondition = query?.batch_id
-      ? { batchId: query.batch_id }
-      : { };
+      ? {
+        batchId: query.batch_id,
+        returnStatus: {
+          [Op.ne]: null,
+        }
+      }
+      : {
+      returnStatus: {
+      [Op.ne]: null,
+    }
+
+      };
+
 
     const total = await this.orderDetail.count({ where: whereCondition });
-
+    // console.log('total : ', total);
     const nextPage = (
       (parseInt(query.page, 10) - parseInt(1, 10)) * parseInt(10, 10)
     ) || parseInt(offset, 10);
@@ -64,35 +78,11 @@ module.exports = class {
             'returnStatus',
           ],
           include: [
-            // {
-            //   model: this.orderAddress,
-            //   as: 'receiverAddress',
-            //   required: true,
-            //   attributes: [
-            //     ['id', 'receiver_id'],
-            //     'receiverName',
-            //   ],
-            // },
-            {
-              model: this.ticket,
-              as: 'ticket',
-              required: false,
-              attributes: [
-                'id',
-                'title',
-                'message',
-                'category',
-                'priority',
-                'status',
-                'created_at',
-                'updated_at'
-              ],
-            },
             {
               model: this.order,
               as: 'order',
-              required: true,
-              where: search,
+              // required: true,
+              // where: search,
               attributes: [
                 'orderCode',
                 'resi',
@@ -106,38 +96,13 @@ module.exports = class {
                 'createdAt',
               ],
             },
-            {
-              model: this.sellerAddress,
-              as: 'sellerAddress',
-              required: false,
-              attributes: [
-                ['id', 'seller_address_id'],
-                'address',
-                'picName',
-                'picPhoneNumber',
-              ],
-              include: [
-                {
-                  model: this.location,
-                  as: 'location',
-                  required: false,
-                  attributes: [
-                    ['id', 'location_id'],
-                    'province',
-                    'city',
-                    'district',
-                    'subDistrict',
-                    'postalCode',
-                  ],
-                },
-              ],
-            },
           ],
           where: whereCondition,
           order: [['id', 'DESC']],
           limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           offset: nextPage,
         }).then((response) => {
+          console.log('whereConditions : ', JSON.stringify(response));
           const result = this.converter.arrayToSnakeCase(
             JSON.parse(JSON.stringify(response)),
           );

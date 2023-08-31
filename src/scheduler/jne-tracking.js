@@ -87,7 +87,7 @@ const tracking = async () => {
   console.log('tracking jne');
   try {
     const trackHistories = [];
-    const order = await Order.findAll({
+    const order = await Order.findAndCountAll({
       include: [
         {
           model: OrderDetail,
@@ -107,8 +107,8 @@ const tracking = async () => {
 
       ],
       where: {
-        expedition: 'JNE',
-        [Sequelize.Op.or]: [
+
+        [Sequelize.Op.and]: [
           {
             status: {
               [Sequelize.Op.notIn]: [
@@ -117,12 +117,21 @@ const tracking = async () => {
               ],
             },
           },
+          {
+            expedition: {
+              [Sequelize.Op.in]: [
+                'JNE',
+              ],
+            },
+          }
         ],
       },
     });
 
+  console.log('order : ', order.count);
+
     await Promise.all(
-      order?.map(async (item) => {
+      order.rows?.map(async (item) => {
         const track = await jne.tracking({ resi: item?.resi });
         if (!track?.error) {
           // const trackingStatus = track?.history[track?.history?.length - 1];

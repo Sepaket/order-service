@@ -163,12 +163,12 @@ const lalamoveExecutor = async (payload) => {
 
 const runner_jne = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('jne runner');
+  // console.info('jne runner');
 
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'JNE'},
-      limit: 10,
+      limit: 50,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
@@ -194,7 +194,7 @@ const runner_jne = cron.schedule('*/1 * * * *', async () => {
 
 const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('sicepat runner');
+  // console.info('sicepat runner');
 
   try {
     const orders = await OrderBackground.findAll({
@@ -224,7 +224,7 @@ const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
 
 const runner_ninja = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('ninja runner');
+  // console.info('ninja runner');
 
   try {
     const orders = await OrderBackground.findAll({
@@ -256,7 +256,7 @@ const runner_ninja = cron.schedule('*/1 * * * *', async () => {
 
 const runner_sap = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  console.info('sap runner');
+  // console.info('sap runner');
 
   try {
     const orders = await OrderBackground.findAll({

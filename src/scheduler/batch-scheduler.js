@@ -258,7 +258,6 @@ const referralUpdater = async () => {
 
     if (item.referred === null) {
 
-        console.log(item.orderId + ' IS NULL')
 
     } else {
       if (sellerUpdateObject[item.referred.id] === undefined) {

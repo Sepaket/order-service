@@ -1,6 +1,7 @@
 const moment = require('moment');
 const shortid = require('shortid-36');
 const { Sequelize } = require('sequelize');
+const { stringify } = require('querystring');
 const jne = require('../../../../helpers/jne');
 const tax = require('../../../../constant/tax');
 const ninja = require('../../../../helpers/ninja');
@@ -36,7 +37,6 @@ const {
   TransactionFee,
   ResiTracker,
 } = require('../../../models');
-const { stringify } = require('querystring');
 
 module.exports = class {
   constructor({ request }) {
@@ -79,7 +79,7 @@ module.exports = class {
       const querySuccess = [];
       const queryrLogger = [];
       const { body } = this.request;
-      var servCode = '';
+      let servCode = '';
       let referralRate = null;
       let referralRateType = null;
       let referredSellerId = null;
@@ -105,7 +105,9 @@ module.exports = class {
       const seller = await this.seller.findOne({
         where: { id: sellerId.id },
         include: [
-          { model: this.sellerDetail, as: 'sellerDetail',
+          {
+            model: this.sellerDetail,
+            as: 'sellerDetail',
             include: [
               {
                 model: this.seller,
@@ -135,11 +137,10 @@ module.exports = class {
         where: { id: locationIds },
       });
 
-
-      if(seller.sellerDetail.referred !== null) {
-        referralRate = seller.sellerDetail.referred.referredDetail.rateReferal
-        referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType
-        referredSellerId = seller.sellerDetail.referred.id
+      if (seller.sellerDetail.referred !== null) {
+        referralRate = seller.sellerDetail.referred.referredDetail.rateReferal;
+        referralRateType = seller.sellerDetail.referred.referredDetail.rateReferalType;
+        referredSellerId = seller.sellerDetail.referred.id;
       } else {
         // console.log('NO REFERRAL')
 
@@ -188,30 +189,29 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-      let lastresi = await ResiTracker.findOne({
+      const lastresi = await ResiTracker.findOne({
         where: { logisticsProvider: 'sicepat' },
       });
-
 
       const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
         ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
         : '0000';
 
-      var sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
-      var nextId = 0;
+      let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
+      let nextId = 0;
       const latestOrder = await this.order.findOne({
         order: [['id', 'DESC']],
       });
 
-      let increment = 1;
+      const increment = 1;
 
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
-          var codCondition = (item.is_cod) ? (this.codValidator()) : true;
+          const codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
-          if (body.service_code === 'JNECOD'){
+          if (body.service_code === 'JNECOD') {
             servCode = 'REG23';
-          } else if (body.service_code === 'NINJACOD'){
+          } else if (body.service_code === 'NINJACOD') {
             servCode = 'Standard';
           } else if (body.service_code === 'SICEPATCOD') {
             servCode = 'SIUNT';
@@ -230,8 +230,7 @@ module.exports = class {
             return location.id === locationId;
           });
 
-
-          let shippingCharge = await shippingFee({
+          const shippingCharge = await shippingFee({
             origin,
             destination,
             weight: item.weight,
@@ -271,12 +270,10 @@ module.exports = class {
                 parseFloat(item.cod_value) * parseFloat(sellerCodFee || 0)
               ) / 100;
             }
-          } else {
-            if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
-              codFeeCalculated = (
-                parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
-              ) / 100;
-            }
+          } else if (trxFee?.codFeeType === 'PERCENTAGE' && item.is_cod) {
+            codFeeCalculated = (
+              parseFloat(item.cod_value) * parseFloat(trxFee?.codFee || 0)
+            ) / 100;
           }
           if (this.tax.vatType === 'PERCENTAGE') {
             vatCalculated = (
@@ -312,7 +309,6 @@ module.exports = class {
                     parseFloat(insurance?.insuranceValue) * parseFloat(goodsAmountInsurance)
                   ) / 100;
                 }
-
               } else {
                 insuranceSelected = (
                   parseFloat(insurance?.insuranceValue) * parseFloat(item.goods_amount)
@@ -328,7 +324,6 @@ module.exports = class {
               + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
           } else {
-
             shippingCalculated = parseFloat(shippingWithDiscount)
             + parseFloat(vatCalculated)
             + parseFloat(insuranceSelected);
@@ -352,20 +347,30 @@ module.exports = class {
 
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
-            var resi = await resiMapper({ expedition: body.type, currentResi: nextId, id: index, batchId: batch.id });
-          } else if (body.type === 'SICEPAT'){
+            var resi = await resiMapper({
+              expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
+            });
+          } else if (body.type === 'SICEPAT') {
             sicepatResi += 1;
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'NINJA'){
-            console.log('ninja order') //current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'SAP'){
-            console.log('sap order') //current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
-          } else if (body.type === 'LALAMOVE'){
-            console.log('lalamove order')
+            var resi = await resiMapper({
+              expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+            });
+          } else if (body.type === 'NINJA') {
+            console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
+            var resi = await resiMapper({
+              expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+            });
+          } else if (body.type === 'SAP') {
+            console.log('sap order'); // current resi is ignores. resi is generated from timestamp
+            var resi = await resiMapper({
+              expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+            });
+          } else if (body.type === 'LALAMOVE') {
+            console.log('lalamove order');
             // console.log(tes_lalamove);
-            var resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi, id: index,batchId: batch.id });
+            var resi = await resiMapper({
+              expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+            });
           }
 
           const resiIsExist = await this.order.findOne({
@@ -374,17 +379,26 @@ module.exports = class {
 
           if (resiIsExist) {
             if (body.type === 'JNE') {
-              nextId = nextId + 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: nextId,id: index,batchId: batch.id });
-            } else if (body.type === 'SICEPAT'){
+              nextId += 1;
+              resi = await resiMapper({
+                expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
+              });
+            } else if (body.type === 'SICEPAT') {
               sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            } else if (body.type === 'NINJA'){
+
+              resi = await resiMapper({
+                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+              });
+            } else if (body.type === 'NINJA') {
               sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
-            } else if (body.type === 'SAP'){
+              resi = await resiMapper({
+                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+              });
+            } else if (body.type === 'SAP') {
               sicepatResi += 1;
-              resi = await resiMapper({ expedition: body.type, currentResi: sicepatResi,id: index,batchId: batch.id });
+              resi = await resiMapper({
+                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+              });
             }
           }
 
@@ -413,15 +427,20 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
-          console.log('body type : ', body.type)
+          console.log('body type : ', body.type);
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
-          if (body.type === 'SICEPAT') parameter = await sicepatParameter({ payload });
+          if (body.type === 'SICEPAT') {
+            console.log('RESPO')
+            // const sicepatresi = await sicepat.getResi(body);
+            console.log('get resi sicepat : ', sicepatresi);
+            parameter = await sicepatParameter({ payload });
+          }
+
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
           if (body.type === 'SAP') parameter = await sapParameter({ payload });
           if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
-
             querySuccess.push({
               ...parameter,
               resi,
@@ -440,14 +459,13 @@ module.exports = class {
             });
             result.push(resultResponse);
           } else {
-            console.log(messages)
+            console.log(messages);
           }
 
           return error?.shift();
           // return error;
         }),
       );
-
 
       if (querySuccess?.length > 0) {
         console.log('query success');
@@ -457,9 +475,7 @@ module.exports = class {
           items: queryrLogger,
           sellerId: seller.id,
         });
-
       }
-
 
       const filtered = response?.filter((item) => item);
       const orderResponse = {
@@ -514,29 +530,30 @@ module.exports = class {
       throw new Error(error?.message || 'Something Wrong');
     }
   }
+
   codValidator() {
     let result;
     const { body } = this.request;
     if (body.type === 'JNE') result = (body.service_code === 'JNECOD');
-    if (body.type === 'SICEPAT') result = (body.service_code === 'SICEPATCOD');
+    if (body.type === 'SICEPAT') {
+      result = (body.service_code === 'SICEPATCOD');
+    }
     if (body.type === 'NINJA') result = (body.service_code === 'NINJACOD');
     if (body.type === 'SAP') result = (body.service_code === 'SAPCOD');
     return result;
   }
 
-
-
   // eslint-disable-next-line class-methods-use-this
   responseMapper(payload) {
-    const truncatedAddress = (payload?.receiver_address).substring(0,200) || null;
-    const truncatedAddressNote = (payload?.receiver_address_note).substring(0,100) || null;
-    const truncatedGoodsContent = (payload?.goods_content).substring(0,50) || null;
-    const truncatedGoodsNotes = (payload?.notes).substring(0,100) || null;
-    var servCode = payload?.service_code || null;
-    if (payload.service_code === "JNECOD") {
-      servCode = "REG23";
-    } else if (payload.service_code === "NINJACOD") {
-      servCode = "Standard";
+    const truncatedAddress = (payload?.receiver_address).substring(0, 200) || null;
+    const truncatedAddressNote = (payload?.receiver_address_note).substring(0, 100) || null;
+    const truncatedGoodsContent = (payload?.goods_content).substring(0, 50) || null;
+    const truncatedGoodsNotes = (payload?.notes).substring(0, 100) || null;
+    let servCode = payload?.service_code || null;
+    if (payload.service_code === 'JNECOD') {
+      servCode = 'REG23';
+    } else if (payload.service_code === 'NINJACOD') {
+      servCode = 'Standard';
     }
     return {
       resi: payload?.resi,

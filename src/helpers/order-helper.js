@@ -495,12 +495,12 @@ const orderFailedLogger = async (parameter) => new Promise(async (resolve, rejec
 
 
 async function addOrderHistory(orderId, isCod, deltaCredit, referralCredit, isExecute, onHold,note) {
-console.log('addOrderHistory');
   await OrderHistory.findOne({
     where: { orderId: orderId},
   }).then(async (result) => {
     if (result === null) {
       const order = await Order.findByPk(orderId);
+      console.log('addOrderHistory : ', orderId);
       const orderDetail = await OrderDetail.findOne({ where: { orderId: orderId } });
 
       const referralRate = Number(orderDetail.referralRate);

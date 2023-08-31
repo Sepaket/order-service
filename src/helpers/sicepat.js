@@ -1,5 +1,8 @@
 const axios = require('axios');
 require('dotenv').config();
+const {
+  AwbList,
+} = require('../app/models');
 
 const getOrigin = () => new Promise((resolve, reject) => {
   axios.get(`${process.env.SICEPAT_BASE_URL_TRACKING}/customer/origin`, {
@@ -126,8 +129,24 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
   }).catch((error) => {
     console.log('ERROR ');
     reject(new Error(`Sicepat: ${error?.response?.data?.error_message || 'Something Wrong'}`));
-
   });
+});
+
+const getResi = (payload) => new Promise(async (resolve, reject) => {
+  try {
+console.log('inside get resi');
+    // HERE GET SICEPAT RESI FROM AWB_LIST
+
+    const awb = await AwbList.findOne({
+      where: { expedition: 'SICEPAT' },
+    });
+
+    console.log('awb : ', awb);
+    resolve('90909090');
+  } catch (error) {
+    console.log('Error : ', error);
+    reject(error);
+  }
 });
 
 module.exports = {
@@ -137,4 +156,5 @@ module.exports = {
   createOrder,
   tracking,
   cancel,
+  getResi,
 };
