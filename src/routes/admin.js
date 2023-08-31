@@ -83,7 +83,7 @@ router.group('/order', (route) => {
   route.post('/export', Authorization, OrderController.export);
   route.post('/print', Authorization, OrderController.print);
   route.get('/:id', Authorization, OrderController.detail);
-  route.post('/set-return-status', Authorization, OrderController.setReturnStatus);
+  route.post('/set-return-status/:id', Authorization, OrderController.setReturnStatus);
   route.get('/cancel/:id', Authorization, OrderController.cancel);
 });
 

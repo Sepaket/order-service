@@ -6,54 +6,38 @@ const jwtSelector = require('../../../../helpers/jwt-selector');
 module.exports = class {
   constructor({ request }) {
     this.request = request;
-    this.order = Order;
+    this.orderDetail = OrderDetail;
     return this.process();
   }
 
   async process() {
-    const seller = await jwtSelector({ request: this.request });
     return new Promise(async (resolve, reject) => {
       try {
-        this.seller = await jwtSelector({ request: this.request });
+        const { params, body } = this.request;
 
-        this.order.findAndCountAll({
+        // console.log(body);
+        this.orderDetail.findOne({
           where: {
-            '$detail.seller_id$': seller.id,
-            status: 'RETURN_TO_SELLER',
-            // isCod: true,
-            ...this.querySearch(),
+            orderId: params.id,
           },
           include: [{
-            model: OrderDetail,
-            as: 'detail',
-          },{
-            model: ReturnStatus,
-            as: 'returnStatus',
+            model: Order,
+            as: 'order',
           }],
-        }).then((response) => {
+        }).then(async (response) => {
+          // console.log('response : ', response.rows);
+
+          await response.update(
+            {
+              returnStatus: body.status,
+            },
+          );
+
           resolve(response);
         });
       } catch (error) {
         reject(error);
       }
     });
-  }
-
-  querySearch() {
-    const { query } = this.request;
-    if (query.start_date && query.end_date) {
-      const condition = {
-        createdAt: {
-          [Op.between]: [
-            moment(query.start_date).startOf('day').format(),
-            moment(query.end_date).endOf('day').format(),
-          ],
-        },
-      };
-
-      return condition;
-    }
-
-    return {};
   }
 };
