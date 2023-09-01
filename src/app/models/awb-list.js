@@ -14,30 +14,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    orderId: {
+    order_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    deletedAt: {
+    deleted_at: {
       type: DataTypes.DATE,
       allowNull: true,
     },
   };
 
   const AwbList = sequelize.define('AwbList', schema, {
-    timestamps: true,
+    timestamps: false,
     paranoid: true,
-    underscored: true,
-    freezeTableName: true,
+    underscored: false,
+    freezeTableName: false,
     engine: 'InnoDB',
     charset: 'utf8',
     tableName: 'awb_list',
@@ -46,6 +46,8 @@ module.exports = (sequelize, DataTypes) => {
   AwbList.associate = (model) => {
     model.AwbList.belongsTo(model.Order, {
       as: 'order',
+      targetKey: 'id',
+      foreignKey: 'order_id',
     });
   };
 

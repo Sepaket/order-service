@@ -78,34 +78,6 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
     const batchno = zerofill(batchId.toString(), 4).substring(0, 4);
     const idno = zerofill(id.toString(), 3);
 
-    /*
-reno
-untuk generation jneResi :
-JNE PREFIX
-timestamp di potong sampai 8 digit
-random 3 karakter
-id
-const jneResi-deprecated = `
-  ${process.env.JNE_ORDER_PREFIX}
-  ${await random({ min: 10000, max: 99999, integer: true })}
-  ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
-  ${id.length > 1 ? id : `0${id}`}
-`;
-    const ninjaResi-deprecated = `
-  ${process.env.NINJA_ORDER_PREFIX}
-  ${await random({ min: 10000, max: 99999, integer: true })}
-  ${moment().format('ss')}${moment()?.valueOf()?.toString()?.substring(0, 2)}
-  ${id.length > 1 ? id : `0${id}`}
-`;
-*/
-    // const jneResi = `
-    //   ${process.env.JNE_ORDER_PREFIX}
-    //   ${zerofill(currentResi,7)}
-    //   ${await random({ min: 1000, max: 9999, integer: true })}
-    // `;
-
-
-
 
     const ninjaResi = `
       ${process.env.NINJA_ORDER_PREFIX}
@@ -194,14 +166,14 @@ const shippingFee = (payload) => new Promise(async (resolve, reject) => {
     }
 
     if (expedition === 'SICEPAT') {
-      console.log('sicepaet origin code ', origin);
-      console.log('si cepat dest code ', destination);
+      // console.log('sicepaet origin code ', origin);
+      // console.log('si cepat dest code ', destination);
       const prices = await sicepat.checkPrice({
         origin: origin?.sicepatOriginCode,
         destination: destination?.sicepatDestinationCode,
         weight,
       });
-      console.log('inside si cepat shipping fee ', prices);
+      // console.log('inside si cepat shipping fee ', prices);
       const service = await prices?.find((item) => item.service === serviceCode);
       price = service?.tariff || 0;
     }

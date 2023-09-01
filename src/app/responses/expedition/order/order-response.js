@@ -351,7 +351,8 @@ module.exports = class {
               expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
             });
           } else if (body.type === 'SICEPAT') {
-            sicepatResi += 1;
+            sicepatResi = await sicepat.getResi(body);
+            console.log('get resi sicepat : ', sicepatResi);
             var resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
@@ -384,7 +385,8 @@ module.exports = class {
                 expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
               });
             } else if (body.type === 'SICEPAT') {
-              sicepatResi += 1;
+              sicepatResi = await sicepat.getResi(body);
+              console.log('get resi sicepat : ', sicepatResi);
 
               resi = await resiMapper({
                 expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
@@ -427,12 +429,11 @@ module.exports = class {
           };
           const orderCode = `${shortid.generate()}${moment().format('mmss')}`;
           const messages = await orderValidator(payload);
-          console.log('body type : ', body.type);
+
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
-            console.log('RESPO')
-            // const sicepatresi = await sicepat.getResi(body);
-            console.log('get resi sicepat : ', sicepatresi);
+
+
             parameter = await sicepatParameter({ payload });
           }
 
@@ -468,8 +469,8 @@ module.exports = class {
       );
 
       if (querySuccess?.length > 0) {
-        console.log('query success');
-        console.log(querySuccess);
+        // console.log('query success');
+        // console.log(querySuccess);
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,
