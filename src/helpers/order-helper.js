@@ -104,14 +104,14 @@ const resiMapper = (params) => new Promise(async (resolve, reject) => {
 
 
 
-    let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
-    const currentResiString = currentResi.toString();
-    if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`000${currentResi}`}`;
-    if (currentResiString.length === 2) sicepatResi = `${sicepatResi}${`00${currentResi}`}`;
-    if (currentResiString.length === 3) sicepatResi = `${sicepatResi}${`0${currentResi}`}`;
-    if (currentResiString.length === 4) sicepatResi = `${sicepatResi}${currentResi}`;
+    // let sicepatResi = `${process.env.SICEPAT_CUSTOMER_ID}`;
+    // const currentResiString = currentResi.toString();
+    // if (currentResiString.length === 1) sicepatResi = `${sicepatResi}${`000${currentResi}`}`;
+    // if (currentResiString.length === 2) sicepatResi = `${sicepatResi}${`00${currentResi}`}`;
+    // if (currentResiString.length === 3) sicepatResi = `${sicepatResi}${`0${currentResi}`}`;
+    // if (currentResiString.length === 4) sicepatResi = `${sicepatResi}${currentResi}`;
 
-    if (expedition === 'SICEPAT') resi = sicepatResi;
+    if (expedition === 'SICEPAT') resi = currentResi.toString();
     if (expedition === 'JNE') resi = jneResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'NINJA') resi = ninjaResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
     if (expedition === 'SAP') resi = sapResi.replace(/\r?\n|\r/g, '').replace(/\s{6,}/g, '').trim();
