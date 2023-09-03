@@ -362,7 +362,7 @@ module.exports = class {
             // var resi = await resiMapper({
             //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             // });
-            console.log(' resi resi : ', resi);
+            // console.log(' resi resi : ', resi);
           } else if (body.type === 'NINJA') {
             console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
             resi = await resiMapper({
@@ -414,7 +414,7 @@ module.exports = class {
               });
             }
           }
-
+          console.log(' 1 sicepat : ', resi);
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
 
           payload = {
@@ -443,9 +443,9 @@ module.exports = class {
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
-            console.log('sicepat resi 1 dan parameter : ', resi);
+            // console.log('sicepat resi 1 dan parameter : ', resi);
             parameter = await sicepatParameter({ payload });
-            console.log('sicepat resi 2 dan parameter : ', sicepatResi);
+            // console.log('sicepat resi 2 dan parameter : ', sicepatResi);
           }
 
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
