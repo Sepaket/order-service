@@ -386,7 +386,7 @@ module.exports = class {
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
-          console.log(' 0-1 sicepat : ', resi);
+          console.log(index, ' 0-1 sicepat : ', resi);
           if (resiIsExist) {
             if (body.type === 'JNE') {
               nextId += 1;
