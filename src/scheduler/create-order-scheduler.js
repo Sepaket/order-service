@@ -9,13 +9,16 @@ const { OrderBackground } = require('../app/models');
 
 const sicepatExecutor = async (payload) => {
   try {
+    // console.log(' created 0 : ');
     const created = await sicepat.createOrder(JSON.parse(payload.parameter));
+    // console.log(' created : ', created);
     if (created.status) {
       await OrderBackground.update(
         { isExecute: true },
         { where: { id: payload.id } },
       );
     } else {
+      // console.log('payload error cacher : ', payload)
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
@@ -23,9 +26,10 @@ const sicepatExecutor = async (payload) => {
         ...created,
       });
     }
+    // console.log(' created  x : ');
   } catch (error) {
-    console.log('error sicepat executor')
-    throw new Error(error?.message);
+    // console.log('error sicepat executor')
+    throw new Error(error);
   }
 };
 
@@ -163,19 +167,19 @@ const lalamoveExecutor = async (payload) => {
 
 const runner_jne = cron.schedule('*/1 * * * *', async () => {
   // eslint-disable-next-line no-console
-  // console.info('jne runner');
+  console.info('jne runner');
 
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'JNE'},
-      limit: 50,
+      limit: 5,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
     // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
 
     orders?.forEach((item, index) => {
-      console.log('order to push : ', item.expedition);
+      console.log('order to push : ', item.resi);
       setTimeout(async () => {
 
         if (item.expedition === 'JNE') await jneExecutor(item);
@@ -209,13 +213,12 @@ const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
       console.log('order to push : ', item.expedition);
       setTimeout(async () => {
         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
-
         //   }, index * 20000);
       }, 8000);
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    // console.log(error.message);
+    console.log('runner sicepat : ', error.message);
   }
 }, {
   scheduled: true,
@@ -230,7 +233,7 @@ const runner_ninja = cron.schedule('*/1 * * * *', async () => {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false,
         expedition: 'NINJA'},
-      limit: 10,
+      limit: 5,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
@@ -261,7 +264,7 @@ const runner_sap = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'SAP'},
-      limit: 10,
+      limit: 5,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);

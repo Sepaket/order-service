@@ -12,7 +12,7 @@ const catcher = async (payload) => {
   } catch (e) {
     // eslint-disable-next-line no-console
     // console.log('error with payload : ', payload.message);
-    console.log("telegram error catcher error : " , e.response.data.description);
+    // console.log("telegram error catcher error : " , e.response.data.description);
     // console.log(e);
   }
 };

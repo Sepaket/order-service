@@ -1,9 +1,9 @@
 const axios = require('axios');
 require('dotenv').config();
+const { Op } = require('sequelize');
 const {
   AwbList,
 } = require('../app/models');
-const { Op } = require('sequelize');
 
 const getOrigin = () => new Promise((resolve, reject) => {
   axios.get(`${process.env.SICEPAT_BASE_URL_TRACKING}/customer/origin`, {
@@ -84,10 +84,11 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       message: 'OK',
     });
   }).catch((error) => {
-    console.log('sicepat createorder error : ', error?.response?.data?.error_message || error?.message || 'Something Wrong');
+    // console.log('error rrrrrr : ', error);
+    // console.log('sicepat createorder error : ', error?.response?.data?.error_message || error?.message || 'Something Wrong');
     resolve({
       status: false,
-      message: error?.response?.data?.error_message || error?.message || 'Something Wrong',
+      // message: error?.response?.data?.error_message || error?.message || 'Something Wrong',
     });
   });
 });
@@ -135,17 +136,19 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
 
 const getResi = (payload) => new Promise(async (resolve, reject) => {
   try {
-        console.log('inside get resi : ', payload);
+    console.log('inside get resi : ', payload);
     // HERE GET SICEPAT RESI FROM AWB_LIST
 
     const awb = await AwbList.findOne({
       where: {
         [Op.and]: [
           { expedition: 'SICEPAT' },
-          { order_id : {
-              [Op.eq]: null
-            } }
-        ]
+          {
+            order_id: {
+              [Op.eq]: null,
+            },
+          },
+        ],
       },
       order: [
         ['id', 'ASC'],
@@ -154,8 +157,7 @@ const getResi = (payload) => new Promise(async (resolve, reject) => {
     });
     await awb.update({
       order_id: 0,
-    }
-    );
+    });
     // console.log('awb : ', awb.resi);
     resolve(awb.resi);
   } catch (error) {
