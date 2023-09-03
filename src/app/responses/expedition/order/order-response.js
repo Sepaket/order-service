@@ -356,9 +356,10 @@ module.exports = class {
             sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
             console.log('get resi sicepat : ', sicepatResi);
             await sicepat.updateResi(sicepatResi);
-            var resi = await resiMapper({
-              expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
-            });
+            var resi = sicepatResi;
+            // var resi = await resiMapper({
+            //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+            // });
           } else if (body.type === 'NINJA') {
             console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({
