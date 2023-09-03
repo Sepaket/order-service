@@ -138,7 +138,7 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
 const getResi = (payload) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
   try {
-    console.log('inside get resi : ', payload);
+    // console.log('inside get resi : ', payload);
     // HERE GET SICEPAT RESI FROM AWB_LIST
 
     const awb = await AwbList.findOne({

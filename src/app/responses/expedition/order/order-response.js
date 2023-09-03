@@ -351,6 +351,7 @@ module.exports = class {
               expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
             });
           } else if (body.type === 'SICEPAT') {
+            console.log('batch id : ', batch.id);
             sicepatResi = await sicepat.getResi(body);
             console.log('get resi sicepat : ', sicepatResi);
             var resi = await resiMapper({
