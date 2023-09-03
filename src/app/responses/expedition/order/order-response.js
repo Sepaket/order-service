@@ -189,15 +189,15 @@ module.exports = class {
           totalOrder: body?.order_items?.length || 0,
         });
       }
-      const lastresi = await ResiTracker.findOne({
-        where: { logisticsProvider: 'sicepat' },
-      });
-
-      const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
-        ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
-        : '0000';
-
-      let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
+      // const lastresi = await ResiTracker.findOne({
+      //   where: { logisticsProvider: 'sicepat' },
+      // });
+      //
+      // const currentResi = order?.resi?.includes(process.env.SICEPAT_CUSTOMER_ID)
+      //   ? order?.resi?.split(process.env.SICEPAT_CUSTOMER_ID)?.pop() || '0000'
+      //   : '0000';
+      let sicepatResi = '0';
+      // let sicepatResi = currentResi === '9999' ? parseInt('0000', 10) : parseInt(currentResi, 10);
       let nextId = 0;
       const latestOrder = await this.order.findOne({
         order: [['id', 'DESC']],
@@ -473,8 +473,8 @@ module.exports = class {
       );
 
       if (querySuccess?.length > 0) {
-        // console.log('query success');
-        // console.log(querySuccess);
+        console.log('query success');
+        console.log(querySuccess);
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,
