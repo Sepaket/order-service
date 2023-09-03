@@ -210,6 +210,9 @@ module.exports = class {
       const sicepatResi_basenumber = await sicepat.getResiBase(body);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
+          setTimeout(function() {
+            // console.log('This printed after about 1 second');
+          }, 1000);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
           if (body.service_code === 'JNECOD') {
@@ -381,8 +384,8 @@ module.exports = class {
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
-          console.log(index, ' 0-0 sicepat : ', resi);
-          console.log(index, ' 0-1 sicepat : ', resi);
+          // console.log(index, ' 0-0 sicepat : ', resi);
+          // console.log(index, ' 0-1 sicepat : ', resi);
           // const resiIsExist = await this.order.findOne({
           //   where: { resi, expedition: body.type },
           // });
