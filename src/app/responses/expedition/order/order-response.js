@@ -365,7 +365,7 @@ module.exports = class {
             // var resi = await resiMapper({
             //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             // });
-            // console.log(' resi resi : ', resi);
+            console.log(' resi resi : ', resi);
           } else if (body.type === 'NINJA') {
             console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
             resi = await resiMapper({
@@ -446,7 +446,7 @@ module.exports = class {
           if (body.type === 'SICEPAT') {
 
             parameter = await sicepatParameter({ payload, resi });
-            console.log('resi : ' , resi, ' parameter : ', parameter)
+            console.log('resi : ' , resi)
           }
 
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
