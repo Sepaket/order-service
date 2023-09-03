@@ -356,7 +356,7 @@ module.exports = class {
           } else if (body.type === 'SICEPAT') {
             // console.log('batch id : ', batch.id);
             sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
-            console.log('get resi sicepat : ', sicepatResi);
+            // console.log('get resi sicepat : ', sicepatResi);
             resi = await sicepat.updateResi(sicepatResi);
             // resi = sicepatResi;
             // var resi = await resiMapper({
@@ -394,9 +394,9 @@ module.exports = class {
                 expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
               });
             } else if (body.type === 'SICEPAT') {
-              console.log('batch id : ', batch.id);
+              // console.log('batch id : ', batch.id);
               sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
-              console.log('get resi sicepat (resi is exist) : ', sicepatResi);
+              // console.log('get resi sicepat (resi is exist) : ', sicepatResi);
               resi = await sicepat.updateResi(sicepatResi);
               // resi = sicepatResi;
               // var resi = await resiMapper({

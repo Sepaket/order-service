@@ -214,7 +214,7 @@ const getResi = (payload) => new Promise(async (resolve, reject) => {
 const updateResi = (payload) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
   try {
-    console.log('update resi : ', payload);
+    // console.log('update resi : ', payload);
     // HERE GET SICEPAT RESI FROM AWB_LIST
 
     const awb = await AwbList.findOne({
