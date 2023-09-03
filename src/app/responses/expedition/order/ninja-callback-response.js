@@ -95,7 +95,7 @@ module.exports = class {
     } else if (currentStatus === 'PROBLEM') {
 
     } else {
-      console.log('PROBLEM');
+      console.log('ninja status : PROBLEM');
     }
   }
 
