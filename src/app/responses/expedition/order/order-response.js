@@ -80,7 +80,7 @@ module.exports = class {
       const queryrLogger = [];
       const { body } = this.request;
       let servCode = '';
-      let resi = '';
+
       let payload;
       let referralRate = null;
       let referralRateType = null;
@@ -210,9 +210,6 @@ module.exports = class {
       const sicepatResi_basenumber = await sicepat.getResiBase(body);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
-          setTimeout(function() {
-            // console.log('This printed after about 1 second');
-          }, 1000);
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
 
           if (body.service_code === 'JNECOD') {
@@ -350,6 +347,8 @@ module.exports = class {
           const ongkirminuscod = item?.is_cod
             ? (parseFloat(item?.cod_value) - parseFloat(shippingCharge))
             : 0;
+
+          let resi = '';
 
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
