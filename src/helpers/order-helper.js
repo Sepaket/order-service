@@ -294,10 +294,9 @@ const orderQueryDiscount = async (payload) => {
 };
 
 const orderLogger = (params) => new Promise(async (resolve, reject) => {
-  // console.log('order logger');
-  // console.log(params);
+  console.log('order logger');
+  console.log(params);
   const dbTransaction = await sequelize.transaction();
-
   try {
 
     const queryOrder = await orderQuery(params.items);
