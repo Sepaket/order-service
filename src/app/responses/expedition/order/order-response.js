@@ -357,11 +357,12 @@ module.exports = class {
             // console.log('batch id : ', batch.id);
             sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
             console.log('get resi sicepat : ', sicepatResi);
-            await sicepat.updateResi(sicepatResi);
-            resi = sicepatResi;
+            resi = await sicepat.updateResi(sicepatResi);
+            // resi = sicepatResi;
             // var resi = await resiMapper({
             //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             // });
+            console.log(' resi resi : ', resi);
           } else if (body.type === 'NINJA') {
             console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
             resi = await resiMapper({
@@ -380,8 +381,8 @@ module.exports = class {
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
-          console.log(' 0 sicepat : ', sicepatResi);
-          console.log(' 0 resi  : ', resi);
+          console.log(' 0 sicepat : ', resi);
+          // console.log(' 0 resi  : ', resi);
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
@@ -396,8 +397,8 @@ module.exports = class {
               console.log('batch id : ', batch.id);
               sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
               console.log('get resi sicepat (resi is exist) : ', sicepatResi);
-              await sicepat.updateResi(sicepatResi);
-              resi = sicepatResi;
+              resi = await sicepat.updateResi(sicepatResi);
+              // resi = sicepatResi;
               // var resi = await resiMapper({
               //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
               // });
