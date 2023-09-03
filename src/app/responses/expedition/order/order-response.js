@@ -383,39 +383,37 @@ module.exports = class {
           }
           console.log(index, ' 0-0 sicepat : ', resi);
           console.log(index, ' 0-1 sicepat : ', resi);
-          const resiIsExist = await this.order.findOne({
-            where: { resi, expedition: body.type },
-          });
-
-          if (resiIsExist) {
-            if (body.type === 'JNE') {
-              nextId += 1;
-              resi = await resiMapper({
-                expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
-              });
-            } else if (body.type === 'SICEPAT') {
-              // console.log('batch id : ', batch.id);
-              sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
-              // console.log('get resi sicepat (resi is exist) : ', sicepatResi);
-              resi = await sicepat.updateResi(sicepatResi);
-              // resi = sicepatResi;
-              // var resi = await resiMapper({
-              //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
-              // });
-            } else if (body.type === 'NINJA') {
-              sicepatResi += 1;
-              resi = await resiMapper({
-                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
-              });
-            } else if (body.type === 'SAP') {
-              sicepatResi += 1;
-              resi = await resiMapper({
-                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
-              });
-            }
-          }
-          // console.log(' 1 sicepat : ', resi);
-          // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
+          // const resiIsExist = await this.order.findOne({
+          //   where: { resi, expedition: body.type },
+          // });
+          //
+          // if (resiIsExist) {
+          //   if (body.type === 'JNE') {
+          //     nextId += 1;
+          //     resi = await resiMapper({
+          //       expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
+          //     });
+          //   } else if (body.type === 'SICEPAT') {
+          //     // console.log('batch id : ', batch.id);
+          //     sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
+          //     // console.log('get resi sicepat (resi is exist) : ', sicepatResi);
+          //     resi = await sicepat.updateResi(sicepatResi);
+          //     // resi = sicepatResi;
+          //     // var resi = await resiMapper({
+          //     //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+          //     // });
+          //   } else if (body.type === 'NINJA') {
+          //     sicepatResi += 1;
+          //     resi = await resiMapper({
+          //       expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+          //     });
+          //   } else if (body.type === 'SAP') {
+          //     sicepatResi += 1;
+          //     resi = await resiMapper({
+          //       expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+          //     });
+          //   }
+          // }
 
           payload = {
             codFeeAdmin: codValueCalculated,
