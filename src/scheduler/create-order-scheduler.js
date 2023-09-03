@@ -210,7 +210,7 @@ const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
     // if (orders[5].expedition === 'NINJA') ninjaExecutor(orders[0]);
 
     orders?.forEach((item, index) => {
-      console.log('order to push : ', item.expedition);
+      // console.log('order to push : ', item.expedition);
       setTimeout(async () => {
         if (item.expedition === 'SICEPAT') await sicepatExecutor(item);
         //   }, index * 20000);

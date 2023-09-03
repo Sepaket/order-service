@@ -8,6 +8,7 @@ const {
   OrderDetail,
   SellerDetail,
   OrderHistory,
+  sequelize,
 } = require('../app/models');
 
 const getLastStatus = (trackingStatus) => {
@@ -31,8 +32,8 @@ const getLastStatus = (trackingStatus) => {
 };
 
 const tracking = async () => {
-  console.log('enter sicepat tracking');
   try {
+
     const trackHistories = [];
     const order = await Order.findAll({
       where: {
@@ -42,10 +43,9 @@ const tracking = async () => {
         },
       },
     });
-
+    const dbTransaction = await sequelize.transaction()
     await Promise.all(
       order?.map(async (item) => {
-
         const track = await sicepat.tracking({ resi: item.resi });
 
         if (track?.sicepat?.status?.code === 200) {
@@ -67,7 +67,9 @@ const tracking = async () => {
               pod_status: trackingStatus?.status,
             },
             { where: { resi: item.resi } },
+            { transaction: dbTransaction },
           );
+
 
 
           // NEED 4 Cases: cod & ncod and delivered & RTS
@@ -100,7 +102,7 @@ const tracking = async () => {
         return item;
       }),
     );
-
+    await dbTransaction.commit();
     await Promise.all(
       trackHistories?.map(async (item) => {
         const log = await OrderLog.findOne({
@@ -123,6 +125,8 @@ const tracking = async () => {
         }
       }),
     );
+
+    return (order);
   } catch (error) {
     throw new Error(error);
   }
