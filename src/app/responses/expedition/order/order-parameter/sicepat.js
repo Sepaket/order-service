@@ -22,12 +22,12 @@ const receiverAddressFormatter = async ({ payload }) => {
   `;
 };
 
-const paramsMapper = async ({ payload }) => {
+const paramsMapper = async ({ payload, resi }) => {
   const pickupAddress = await pickupAddressFormatter({ payload });
   const receiverAddress = await receiverAddressFormatter({ payload });
 
   return {
-    reference_number: `${process.env.SICEPAT_ORDER_PREFIX}${payload.resi}`,
+    reference_number: `${process.env.SICEPAT_ORDER_PREFIX}${resi}`,
     pickup_request_date: `${payload?.pickup_date} ${payload?.pickup_time}`,
     pickup_method: 'PICKUP',
     pickup_merchant_code: `Sepaket-${payload?.seller?.id}`,
@@ -40,7 +40,7 @@ const paramsMapper = async ({ payload }) => {
       {
         cod_value: payload?.is_cod ? payload?.cod_value : null,
         insurance_value: payload?.is_insurance ? payload.insuranceSelected : 0,
-        receipt_number: payload?.resi || '',
+        receipt_number: resi || '',
         origin_code: payload?.origin?.sicepatOriginCode,
         delivery_type: payload?.service_code === 'SICEPATCOD' ? 'SIUNT' : payload?.service_code,
         parcel_category: payload?.goods_category,

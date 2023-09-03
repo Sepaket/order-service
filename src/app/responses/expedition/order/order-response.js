@@ -442,8 +442,8 @@ module.exports = class {
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
 
-            parameter = await sicepatParameter({ payload });
-
+            parameter = await sicepatParameter({ payload, resi });
+            console.log('resi : ' , resi, ' parameter : ', parameter)
           }
 
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
@@ -451,7 +451,7 @@ module.exports = class {
           if (body.type === 'LALAMOVE') parameter = await lalamoveParameter({ payload });
           if (messages?.length > 0) error.push({ order: item, errors: messages });
           if (messages?.length < 1) {
-            console.log('resi : ' , resi, ' parameter : ', parameter)
+
             querySuccess.push({
               ...parameter,
               resi,
