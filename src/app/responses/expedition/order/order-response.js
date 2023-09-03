@@ -380,7 +380,8 @@ module.exports = class {
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
-
+          console.log(' 0 sicepat : ', sicepatResi);
+          console.log(' 0 resi  : ', resi);
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
@@ -394,7 +395,7 @@ module.exports = class {
             } else if (body.type === 'SICEPAT') {
               console.log('batch id : ', batch.id);
               sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
-              console.log('get resi sicepat : ', sicepatResi);
+              console.log('get resi sicepat (resi is exist) : ', sicepatResi);
               await sicepat.updateResi(sicepatResi);
               resi = sicepatResi;
               // var resi = await resiMapper({
@@ -412,7 +413,7 @@ module.exports = class {
               });
             }
           }
-          console.log('sicepat resi 0 dan parameter : ', resi);
+
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
 
           payload = {
