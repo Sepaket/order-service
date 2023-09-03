@@ -80,6 +80,8 @@ module.exports = class {
       const queryrLogger = [];
       const { body } = this.request;
       let servCode = '';
+      let resi = '';
+      let payload;
       let referralRate = null;
       let referralRateType = null;
       let referredSellerId = null;
@@ -348,33 +350,33 @@ module.exports = class {
 
           if (body.type === 'JNE') {
             nextId = latestOrder.id + increment;
-            var resi = await resiMapper({
+            resi = await resiMapper({
               expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
             });
           } else if (body.type === 'SICEPAT') {
-            console.log('batch id : ', batch.id);
+            // console.log('batch id : ', batch.id);
             sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
             console.log('get resi sicepat : ', sicepatResi);
             await sicepat.updateResi(sicepatResi);
-            var resi = sicepatResi;
+            resi = sicepatResi;
             // var resi = await resiMapper({
             //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             // });
           } else if (body.type === 'NINJA') {
             console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({
+            resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
             console.log('ini yg penting : RESI ', resi)
           } else if (body.type === 'SAP') {
             console.log('sap order'); // current resi is ignores. resi is generated from timestamp
-            var resi = await resiMapper({
+            resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           } else if (body.type === 'LALAMOVE') {
             console.log('lalamove order');
             // console.log(tes_lalamove);
-            var resi = await resiMapper({
+            resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
@@ -394,9 +396,10 @@ module.exports = class {
               sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
               console.log('get resi sicepat : ', sicepatResi);
               await sicepat.updateResi(sicepatResi);
-              var resi = await resiMapper({
-                expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
-              });
+              resi = sicepatResi;
+              // var resi = await resiMapper({
+              //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
+              // });
             } else if (body.type === 'NINJA') {
               sicepatResi += 1;
               resi = await resiMapper({
@@ -412,7 +415,7 @@ module.exports = class {
 
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
 
-          const payload = {
+          payload = {
             codFeeAdmin: codValueCalculated,
             discuontSelected: discountAmount,
             shippingCalculated,
