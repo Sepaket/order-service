@@ -381,7 +381,7 @@ module.exports = class {
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
-          console.log(' 0 sicepat : ', resi);
+          console.log(index, ' 0-0 sicepat : ', resi);
           // console.log(' 0 resi  : ', resi);
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
