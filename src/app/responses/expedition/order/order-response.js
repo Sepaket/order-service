@@ -364,6 +364,7 @@ module.exports = class {
             var resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
+            console.log('ini yg penting : RESI ', resi)
           } else if (body.type === 'SAP') {
             console.log('sap order'); // current resi is ignores. resi is generated from timestamp
             var resi = await resiMapper({
@@ -388,10 +389,11 @@ module.exports = class {
                 expedition: body.type, currentResi: nextId, id: index, batchId: batch.id,
               });
             } else if (body.type === 'SICEPAT') {
-              sicepatResi = await sicepat.getResi(body);
+              console.log('batch id : ', batch.id);
+              sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
               console.log('get resi sicepat : ', sicepatResi);
-
-              resi = await resiMapper({
+              await sicepat.updateResi(sicepatResi);
+              var resi = await resiMapper({
                 expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
               });
             } else if (body.type === 'NINJA') {
@@ -436,6 +438,7 @@ module.exports = class {
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
             parameter = await sicepatParameter({ payload });
+            console.log('sicepat resi dan parameter : ', resi);
           }
 
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
