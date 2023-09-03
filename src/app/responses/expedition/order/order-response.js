@@ -81,7 +81,7 @@ module.exports = class {
       const { body } = this.request;
       let servCode = '';
 
-      let payload;
+
       let referralRate = null;
       let referralRateType = null;
       let referredSellerId = null;
@@ -417,7 +417,7 @@ module.exports = class {
           //   }
           // }
 
-          payload = {
+          let payload = {
             codFeeAdmin: codValueCalculated,
             discuontSelected: discountAmount,
             shippingCalculated,
