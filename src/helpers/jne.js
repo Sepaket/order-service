@@ -200,7 +200,7 @@ const createOrder = (payload) => new Promise((resolve) => {
         // 'Content-Length' : 1000000000000,
       },
     }).then((response) => {
-      console.log('JNE createorder error : ', response?.data?.detail);
+      // console.log('JNE createorder error : ', response?.data?.detail);
       if (response.data.status === false) {
         console.log('error : '.response.data.error);
       }

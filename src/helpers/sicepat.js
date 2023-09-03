@@ -3,6 +3,7 @@ require('dotenv').config();
 const { Op } = require('sequelize');
 const {
   AwbList,
+  sequelize,
 } = require('../app/models');
 
 const getOrigin = () => new Promise((resolve, reject) => {
@@ -135,6 +136,7 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
 });
 
 const getResi = (payload) => new Promise(async (resolve, reject) => {
+  const dbTransaction = await sequelize.transaction();
   try {
     console.log('inside get resi : ', payload);
     // HERE GET SICEPAT RESI FROM AWB_LIST
@@ -154,13 +156,18 @@ const getResi = (payload) => new Promise(async (resolve, reject) => {
         ['id', 'ASC'],
       ],
 
-    });
+    },
+      { transaction: dbTransaction });
     await awb.update({
       order_id: 0,
-    });
+    },
+      { transaction: dbTransaction },
+      );
+    await dbTransaction.commit();
     // console.log('awb : ', awb.resi);
     resolve(awb.resi);
   } catch (error) {
+    await dbTransaction.rollback();
     console.log('Error : ', error);
     reject(error);
   }

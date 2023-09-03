@@ -172,7 +172,7 @@ const runner_jne = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'JNE'},
-      limit: 5,
+      limit: 80,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
