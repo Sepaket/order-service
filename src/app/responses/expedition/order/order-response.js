@@ -480,8 +480,8 @@ module.exports = class {
       );
 
       if (querySuccess?.length > 0) {
-        console.log('query success');
-        console.log(querySuccess);
+        // console.log('query success');
+        // console.log(querySuccess);
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,
