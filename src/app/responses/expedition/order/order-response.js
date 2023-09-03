@@ -412,7 +412,7 @@ module.exports = class {
               });
             }
           }
-
+          console.log('sicepat resi 0 dan parameter : ', resi);
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
 
           payload = {
@@ -441,8 +441,9 @@ module.exports = class {
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
+            console.log('sicepat resi 1 dan parameter : ', resi);
             parameter = await sicepatParameter({ payload });
-            console.log('sicepat resi dan parameter : ', resi);
+            console.log('sicepat resi 2 dan parameter : ', sicepatResi);
           }
 
           if (body.type === 'JNE') parameter = await jneParameter({ payload });
