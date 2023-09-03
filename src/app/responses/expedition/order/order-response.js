@@ -205,6 +205,7 @@ module.exports = class {
 
       const increment = 1;
 
+      const sicepatResi_basenumber = await sicepat.getResiBase(body);
       const response = await Promise.all(
         body.order_items.map(async (item, index) => {
           const codCondition = (item.is_cod) ? (this.codValidator()) : true;
@@ -352,8 +353,9 @@ module.exports = class {
             });
           } else if (body.type === 'SICEPAT') {
             console.log('batch id : ', batch.id);
-            sicepatResi = await sicepat.getResi(body);
+            sicepatResi = (parseInt(sicepatResi_basenumber) + parseInt(index)).toString().padStart(12, "0");
             console.log('get resi sicepat : ', sicepatResi);
+            await sicepat.updateResi(sicepatResi);
             var resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
@@ -433,8 +435,6 @@ module.exports = class {
 
           if (body.type === 'NINJA') parameter = await ninjaParameter({ payload });
           if (body.type === 'SICEPAT') {
-
-
             parameter = await sicepatParameter({ payload });
           }
 

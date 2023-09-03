@@ -135,6 +135,44 @@ const cancel = (payload) => new Promise(async (resolve, reject) => {
   });
 });
 
+const getResiBase = (payload) => new Promise(async (resolve, reject) => {
+  const dbTransaction = await sequelize.transaction();
+  try {
+    // console.log('inside get resi : ', payload);
+    // HERE GET SICEPAT RESI FROM AWB_LIST
+
+    const awb = await AwbList.findOne({
+        where: {
+          [Op.and]: [
+            { expedition: 'SICEPAT' },
+            {
+              order_id: {
+                [Op.eq]: null,
+              },
+            },
+          ],
+        },
+        order: [
+          ['id', 'ASC'],
+        ],
+
+      },
+      { transaction: dbTransaction });
+    // await awb.update({
+    //     order_id: 0,
+    //   },
+    //   { transaction: dbTransaction },
+    // );
+    await dbTransaction.commit();
+    // console.log('awb : ', awb.resi);
+    resolve(awb.resi);
+  } catch (error) {
+    await dbTransaction.rollback();
+    console.log('Error : ', error);
+    reject(error);
+  }
+});
+
 const getResi = (payload) => new Promise(async (resolve, reject) => {
   const dbTransaction = await sequelize.transaction();
   try {
@@ -173,6 +211,33 @@ const getResi = (payload) => new Promise(async (resolve, reject) => {
   }
 });
 
+const updateResi = (payload) => new Promise(async (resolve, reject) => {
+  const dbTransaction = await sequelize.transaction();
+  try {
+    console.log('update resi : ', payload);
+    // HERE GET SICEPAT RESI FROM AWB_LIST
+
+    const awb = await AwbList.findOne({
+        where: {
+            resi: payload,
+        },
+      },
+      { transaction: dbTransaction });
+    await awb.update({
+        order_id: 0,
+      },
+      { transaction: dbTransaction },
+    );
+    await dbTransaction.commit();
+    // console.log('awb : ', awb.resi);
+    resolve(awb.resi);
+  } catch (error) {
+    await dbTransaction.rollback();
+    console.log('Error : ', error);
+    reject(error);
+  }
+});
+
 module.exports = {
   getOrigin,
   getDestination,
@@ -181,4 +246,6 @@ module.exports = {
   tracking,
   cancel,
   getResi,
+  getResiBase,
+  updateResi,
 };
