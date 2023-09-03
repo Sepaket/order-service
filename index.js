@@ -15,7 +15,7 @@ const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-schedule
 // //
 const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
 const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
-// const trackingScheduler = require('./src/scheduler/tracking-scheduler');
+const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 
 const port = process.env.APP_PORT || 6000;
