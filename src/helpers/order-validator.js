@@ -22,7 +22,7 @@ const validate = (payload) => new Promise(async (resolve, reject) => {
       creditCondition,
       weight,
     } = payload;
-    console.log('ordfer validator ')
+    // console.log('ordfer validator ')
 
     const categories = ['Normal', 'Organic', 'FragileElectronic'];
 

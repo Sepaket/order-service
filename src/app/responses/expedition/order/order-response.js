@@ -382,11 +382,11 @@ module.exports = class {
             });
           }
           console.log(index, ' 0-0 sicepat : ', resi);
-          // console.log(' 0 resi  : ', resi);
+          console.log(index, ' 0-1 sicepat : ', resi);
           const resiIsExist = await this.order.findOne({
             where: { resi, expedition: body.type },
           });
-          console.log(index, ' 0-1 sicepat : ', resi);
+
           if (resiIsExist) {
             if (body.type === 'JNE') {
               nextId += 1;
@@ -414,7 +414,7 @@ module.exports = class {
               });
             }
           }
-          console.log(' 1 sicepat : ', resi);
+          // console.log(' 1 sicepat : ', resi);
           // shippingCharge = 1; //RENO INI MESTI DIGANTI. INI HANYA BUAT TESTING SAP SEBELUM SHIPPING CALCULATION DI FIX
 
           payload = {
