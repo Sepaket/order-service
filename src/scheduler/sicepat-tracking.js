@@ -42,6 +42,7 @@ const tracking = async () => {
           [Sequelize.Op.notIn]: ['DELIVERED','CANCELED','RETURN_TO_SELLER'],
         },
       },
+      limit: 30,
     });
     const dbTransaction = await sequelize.transaction()
     await Promise.all(

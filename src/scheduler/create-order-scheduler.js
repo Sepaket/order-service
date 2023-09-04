@@ -172,7 +172,7 @@ const runner_jne = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'JNE'},
-      limit: 80,
+      limit: 5,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
@@ -203,7 +203,7 @@ const runner_sicepat = cron.schedule('*/1 * * * *', async () => {
   try {
     const orders = await OrderBackground.findAll({
       where: { isExecute: false, expedition: 'SICEPAT' },
-      limit: 10,
+      limit: 5,
     });
     // console.log('ORDERS')
     // console.log(orders[5].resi);
