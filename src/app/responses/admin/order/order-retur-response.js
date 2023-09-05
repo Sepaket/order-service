@@ -81,7 +81,7 @@ module.exports = class {
             {
               model: this.order,
               as: 'order',
-              // required: true,
+              required: true,
               // where: search,
               attributes: [
                 'orderCode',
