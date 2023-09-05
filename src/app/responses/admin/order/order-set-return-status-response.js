@@ -18,7 +18,7 @@ module.exports = class {
         // console.log(body);
         this.orderDetail.findOne({
           where: {
-            orderId: params.id,
+            resi: params.id,
           },
           include: [{
             model: Order,
