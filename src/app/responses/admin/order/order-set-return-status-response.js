@@ -25,17 +25,22 @@ module.exports = class {
             as: 'order',
           }],
         }).then(async (response) => {
-          // console.log('response : ', response.rows);
+          console.log('response : ', response);
+if (response != null) {
+  await response.update(
+    {
+      returnStatus: body.status,
+    },
+  );
 
-          await response.update(
-            {
-              returnStatus: body.status,
-            },
-          );
+  resolve(response);
+} else {
+  reject('no resi exist');
+}
 
-          resolve(response);
         });
       } catch (error) {
+        // console.log('error here ', error)
         reject(error);
       }
     });
