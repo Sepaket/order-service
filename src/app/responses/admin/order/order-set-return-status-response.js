@@ -17,11 +17,11 @@ module.exports = class {
 
         // console.log(body);
         this.orderDetail.findOne({
-          where: {
-            resi: params.id,
-          },
           include: [{
             model: Order,
+            where: {
+              resi: params.id,
+            },
             as: 'order',
           }],
         }).then(async (response) => {
