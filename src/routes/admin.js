@@ -85,6 +85,7 @@ router.group('/order', (route) => {
   route.get('/:id', Authorization, OrderController.detail);
   route.post('/set-return-status/:id', Authorization, OrderController.setReturnStatus);
   route.get('/cancel/:id', Authorization, OrderController.cancel);
+  route.get('/retur/all', Authorization, OrderController.retur);
 });
 
 router.group('/notification', (route) => {

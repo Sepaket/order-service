@@ -16,6 +16,7 @@ const CancelValidator = require('../../validators/admin/order/cancel-validator')
 const JneCancelResponse = require('../../responses/expedition/cancel/jne-cancel-response');
 const NinjaCancelResponse = require('../../responses/expedition/cancel/ninja-cancel-response');
 const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat-cancel-response');
+const OrderReturResponse = require('../../responses/admin/order/order-retur-response');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -106,6 +107,23 @@ module.exports = {
       await PrintValidator(request.body);
 
       const result = await new PrintResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  retur: async (request, response, next) => {
+    try {
+    console.log('admin retur');
+      // await OrderListValidator(request.query);
+
+      const result = await new OrderReturResponse({ request });
 
       response.send({
         code: 200,
