@@ -82,8 +82,8 @@ module.exports = class {
     } else if ((currentStatus === 'RETURN_TO_SELLER') && (order?.isCod)) {
       console.log('this is RETURN_TO_SELLER');
       // COD dan NONCOD ongkir tidak dikembalikan
+      deltaCredit = (parseFloat(order.detail.shippingCalculated) - parseFloat(order.detail.codFeeAdmin));
       deltaCredit = -1 * deltaCredit;
-      deltaCredit += parseFloat(order.detail.codFeeAdmin);
       referralCredit = -1 * referralCredit;
       console.log('this is RETURN_TO_SELLER 2');
       await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
