@@ -120,6 +120,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
       message: 'OK',
     });
   }).catch((error) => {
+    // console.log('ninja axios create otder fail : ', error);
     resolve({
       status: false,
       message: error?.response?.data?.error?.message || error?.code,

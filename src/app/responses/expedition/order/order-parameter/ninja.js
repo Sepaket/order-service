@@ -12,7 +12,7 @@ const paramsMapper = ({ payload }) => ({
     phone_number: payload?.sender_phone,
     email: payload?.seller?.email,
     address: {
-      address1: payload?.sellerLocation?.address || '',
+      address1: payload?.sellerLocation?.address.slice(0, 250) || '',
       address2: '',
       area: payload?.origin?.subDistrict || '',
       city: payload?.origin?.city || '',
@@ -27,7 +27,7 @@ const paramsMapper = ({ payload }) => ({
     phone_number: payload?.receiver_phone,
     email: '',
     address: {
-      address1: `${payload?.receiver_address}, Note: ${payload?.receiver_address_note}`,
+      address1: `${payload?.receiver_address.slice(0, 250)}, Note: ${payload?.receiver_address_note}`,
       address2: '',
       area: payload?.destination?.subDistrict || '',
       city: payload?.destination?.city || '',

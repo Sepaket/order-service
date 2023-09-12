@@ -67,6 +67,7 @@ const ninjaExecutor = async (payload) => {
         { where: { id: payload.id } },
       );
     } else {
+      // console.log('crate ninja order fail : ', created);
       await errorCatcher({
         id: payload.id,
         expedition: payload.expedition,
