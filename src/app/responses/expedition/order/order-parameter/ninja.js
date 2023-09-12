@@ -95,8 +95,8 @@ const paramsMapperParcel = ({ payload }) => ({
     phone_number: payload?.receiver_phone,
     email: '',
     address: {
-      address1: `${payload?.receiver_address}, Note: ${payload?.receiver_address_note}`,
-      address2: '',
+      address1: `${payload?.receiver_address}`,
+      address2: `${payload?.receiver_address_note}`,
       area: payload?.destination?.subDistrict || '',
       city: payload?.destination?.city || '',
       state: payload?.destination?.province || '',
