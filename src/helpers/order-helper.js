@@ -488,7 +488,7 @@ async function addOrderHistory(orderId, isCod, deltaCredit, referralCredit, isEx
       //   referralCredit = referralRate;
       // }
 
-      await OrderHistory.create({
+      await OrderHistory.upsert({
         orderId: orderId,
         deltaCredit: deltaCredit,
         isExecute: isExecute,
