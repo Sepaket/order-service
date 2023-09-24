@@ -30,6 +30,10 @@ router.group('/', (route) => {
 
 router.group('/order', (route) => {
   route.post('/', Authorization, OrderController.commonOrder);
+  route.get('/lalaorder', Authorization, OrderController.getLalaOrder);
+  route.post('/lalaorder', Authorization, OrderController.lalaOrder);
+  route.post('/lalaquotation', Authorization, OrderController.lalaQuotation);
+
   route.post('/bulk', Authorization, OrderController.bulkOrder);
   route.get('/transaction-fee', Authorization, OrderController.transactionFee);
   route.get('/draft/:batch_id', Authorization, OrderController.draftOrder);

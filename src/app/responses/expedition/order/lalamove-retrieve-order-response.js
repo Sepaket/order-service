@@ -64,62 +64,14 @@ module.exports = class {
   async createOrder() {
     console.log('lalamove-order-response.js - createOrder');
     const dbTransaction = await sequelize.transaction();
-
-
-
-
     try {
-      const error = [];
-      const result = [];
-      const querySuccess = [];
-      const queryrLogger = [];
+
       const { body } = this.request;
 
-      const quotationId = body.quotation_id;
-      const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
-
-      const order = await this.lalamove.sdkOrder(quotationDetail);
+      const orderId = body.order_id;
+      const order = await this.lalamove.retrieveOrder(orderId);
       console.log('order detail : ', order);
 
-      let servCode = '';
-      let resi = '';
-      let totalAmount = 0;
-      let shippingCalculated = 0;
-
-      const sellerId = await jwtSelector({ request: this.request });
-
-
-      let batch = await this.batch.findOne({
-        where: { id: body?.batch_id || 0, sellerId: sellerId.id },
-      });
-
-      const insurance = await this.insurance.findOne({
-        where: { expedition: 'LALAMOVE' },
-      });
-
-      const seller = await this.seller.findOne({
-        where: { id: sellerId.id },
-        include: [
-          {
-            model: this.sellerDetail,
-            as: 'sellerDetail',
-            include: [
-              {
-                model: this.seller,
-                as: 'referred',
-                required: false,
-                include: [
-                  {
-                    model: this.sellerDetail,
-                    as: 'referredDetail',
-                    required: false,
-                  }],
-              }],
-          }],
-      });
-
-
-      console.log(order);
       return order;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');

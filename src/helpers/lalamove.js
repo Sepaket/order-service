@@ -46,36 +46,34 @@ String.prototype.escapeSpecialCharsInJSONString = function () {
     .replace(/[\t]/g, ' ');
 };
 
-const payloadFormatter = (payload) => {
-  // eslint-disable-next-line no-unused-vars
-  // payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
-  // payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\n/gi, " ");
-  // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
-  // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
+const payloadFormatter = (payload) =>
+// eslint-disable-next-line no-unused-vars
+// payload['GOODS_DESC'] = payload['GOODS_DESC'].replace(/\n/gi, " ");
+// payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].replace(/\n/gi, " ");
+// payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].replace(/\n/gi, " ");
+// payload['SPECIAL_INS'] = payload['SPECIAL_INS'].replace(/\n/gi, " ");
 
-  // payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
-  // payload['PICKUP_PIC'] = payload['PICKUP_PIC'].escapeSpecialCharsInJSONString();
-  // payload['PICKUP_NAME'] = payload['PICKUP_NAME'].escapeSpecialCharsInJSONString();
-  // payload['SHIPPER_NAME'] = payload['SHIPPER_NAME'].escapeSpecialCharsInJSONString();
-  // payload['SHIPPER_CONTACT'] = payload['SHIPPER_CONTACT'].escapeSpecialCharsInJSONString();
-  // payload['SHIPPER_ADDR1'] = payload['SHIPPER_ADDR1'].escapeSpecialCharsInJSONString();
-  // payload['SHIPPER_ADDR2'] = payload['SHIPPER_ADDR2'].escapeSpecialCharsInJSONString();
-  // payload['SHIPPER_ADDR3'] = payload['SHIPPER_ADDR3'].escapeSpecialCharsInJSONString();
-  //
-  // payload['RECEIVER_NAME'] = payload['RECEIVER_NAME'].escapeSpecialCharsInJSONString();
-  // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
-  // payload['RECEIVER_ADDR2'] = payload['RECEIVER_ADDR2'].escapeSpecialCharsInJSONString();
-  // payload['RECEIVER_ADDR3'] = payload['RECEIVER_ADDR3'].escapeSpecialCharsInJSONString();
-  // payload['RECEIVER_CONTACT'] = payload['RECEIVER_CONTACT'].escapeSpecialCharsInJSONString();
-  // payload['GOODS_DESC'] = payload['GOODS_DESC'].escapeSpecialCharsInJSONString();
-  // payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
-  // payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
-  // payload['SPECIAL_INS'] = payload['SPECIAL_INS'].escapeSpecialCharsInJSONString();
+// payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
+// payload['PICKUP_PIC'] = payload['PICKUP_PIC'].escapeSpecialCharsInJSONString();
+// payload['PICKUP_NAME'] = payload['PICKUP_NAME'].escapeSpecialCharsInJSONString();
+// payload['SHIPPER_NAME'] = payload['SHIPPER_NAME'].escapeSpecialCharsInJSONString();
+// payload['SHIPPER_CONTACT'] = payload['SHIPPER_CONTACT'].escapeSpecialCharsInJSONString();
+// payload['SHIPPER_ADDR1'] = payload['SHIPPER_ADDR1'].escapeSpecialCharsInJSONString();
+// payload['SHIPPER_ADDR2'] = payload['SHIPPER_ADDR2'].escapeSpecialCharsInJSONString();
+// payload['SHIPPER_ADDR3'] = payload['SHIPPER_ADDR3'].escapeSpecialCharsInJSONString();
+//
+// payload['RECEIVER_NAME'] = payload['RECEIVER_NAME'].escapeSpecialCharsInJSONString();
+// payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
+// payload['RECEIVER_ADDR2'] = payload['RECEIVER_ADDR2'].escapeSpecialCharsInJSONString();
+// payload['RECEIVER_ADDR3'] = payload['RECEIVER_ADDR3'].escapeSpecialCharsInJSONString();
+// payload['RECEIVER_CONTACT'] = payload['RECEIVER_CONTACT'].escapeSpecialCharsInJSONString();
+// payload['GOODS_DESC'] = payload['GOODS_DESC'].escapeSpecialCharsInJSONString();
+// payload['PICKUP_ADDRESS'] = payload['PICKUP_ADDRESS'].escapeSpecialCharsInJSONString();
+// payload['RECEIVER_ADDR1'] = payload['RECEIVER_ADDR1'].escapeSpecialCharsInJSONString();
+// payload['SPECIAL_INS'] = payload['SPECIAL_INS'].escapeSpecialCharsInJSONString();
 
   // console.log(`payload formatter goods desc ${payload.GOODS_DESC}`);
-  return { data: payload };
-};
-
+  ({ data: payload });
 const parameter = (payload) => new Promise((resolve, reject) => {
   try {
     const params = {
@@ -172,7 +170,6 @@ const getDestination = () => new Promise((resolve, reject) => {
   });
 });
 
-
 const getCity = (payload) => new Promise(async (resolve) => {
   try {
     const res = await sdkGetCity();
@@ -188,7 +185,8 @@ const getCity = (payload) => new Promise(async (resolve) => {
 });
 const getService = (payload) => new Promise(async (resolve) => {
   try {
-    const res = await sdkGetService();
+    // console.log('payload : ', payload)
+    const res = await sdkGetService(payload);
     resolve(res);
   } catch (error) {
     console.log(`this is error: ${error}`);
@@ -198,7 +196,6 @@ const getService = (payload) => new Promise(async (resolve) => {
     });
   }
 });
-
 
 const checkPrice = (payload) => new Promise((resolve) => {
   const {
@@ -226,7 +223,7 @@ const checkPrice = (payload) => new Promise((resolve) => {
     const method = 'POST';
     const path = '/v3/quotations';
     const body = JSON.stringify(payload);
-    console.log('lalamove payload from db : ',body)
+    console.log('lalamove payload from db : ', body);
     const rawSignature = `${time}\r\n${method}\r\n${path}\r\n\r\n${body}`;
     console.log('rawSignature : ', rawSignature);
     const SIGNATURE = CryptoJS.HmacSHA256(rawSignature, SECRET).toString();
@@ -310,7 +307,7 @@ const createOrder = (payload) => new Promise((resolve) => {
     // const tes = '{"data":{"serviceType":"MOTORCYCLE","specialRequests":["DOOR_TO_DOOR"],"language":"en_ID","stops":[{"coordinates":{"lat":"-6.278963","lng":"106.814267"},"address":"Jl Benda 70, Cilandak Timur, Jakarta selatan"},{"coordinates":{"lat":"-6.273184","lng":"106.839068"},"address":"RS Siaga, Pejaten"}],"isRouteOptimized":false,"item":{"quantity":"12","weight":"LESS_THAN_3_KG","categories":["FOOD_DELIVERY","OFFICE_ITEM"],"handlingInstructions":["KEEP_UPRIGHT"]}}}';
     const body = JSON.stringify(payload);
     // console.log('lalamove tes payload in JSON : ',tes)
-    console.log('lalamove payload from db : ',body)
+    console.log('lalamove payload from db : ', body);
     const rawSignature = `${time}\r\n${method}\r\n${path}\r\n\r\n${body}`;
     console.log('rawSignature : ', rawSignature);
     const SIGNATURE = CryptoJS.HmacSHA256(rawSignature, SECRET).toString();
@@ -464,7 +461,6 @@ const sdkGetQuotation = () => new Promise(async (resolve, reject) => {
   return res;
 });
 
-
 const sdkGetCity = () => new Promise(async (resolve, reject) => {
   try {
     const res = await sdkClient.Market.retrieve('ID');
@@ -473,20 +469,105 @@ const sdkGetCity = () => new Promise(async (resolve, reject) => {
   } catch (error) {
     reject(error);
   }
-
 });
 
-const sdkGetService = () => new Promise(async (resolve, reject) => {
+const sdkGetService = (payload) => new Promise(async (resolve, reject) => {
   try {
-    const res = await sdkClient.City.retrieve('ID', 'ID JKT');
-    console.log('res : ', res);
+    const res = await sdkClient.City.retrieve('ID', payload);
+    // console.log('res : ', res);
     resolve(res);
   } catch (error) {
     reject(error);
   }
-
 });
 
+const sdkOrder = (payload) => new Promise(async (resolve, reject) => {
+  try {
+    console.log('sdkOrder : ', payload.id);
+    const orderPayload = SDKClient.OrderPayloadBuilder.orderPayload()
+      .withIsPODEnabled(true)
+      .withQuotationID(payload.id)
+      .withSender({
+        stopId: payload.stops[0].id,
+        name: 'Michal',
+        phone: '+62811913848',
+      })
+      .withRecipients([
+        {
+          stopId: payload.stops[1].id,
+          name: 'Rustam',
+          phone: '+62811913848',
+        },
+      ])
+      .withMetadata({
+        internalId: '123123',
+      })
+      .build();
+    console.log('before sending order ');
+    const res = await sdkClient.Order.create('ID', orderPayload);
+
+    console.log('LALA ORDER : ', res);
+    // const res = await sdkClient.Market.retrieve('ID');
+
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+});
+
+const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
+  try {
+    // console.log('sdkQuotation : ', payload.order_items[0].stops);
+
+    const stops = [];
+    const payload_stops = payload.order_items[0].stops;
+
+    console.log('sdkQuotation : ', payload_stops);
+
+    for (const s in payload_stops) {
+      stops.push(payload_stops[s]);
+    }
+
+    const items = {
+      quantity: '3',
+      weight: 'LESS_THAN_3KG',
+      categories: ['FOOD_DELIVERY', 'OFFICE_ITEM8'],
+      handlingInstructions: ['KEEP_UPRIGHT'],
+    };
+
+    const quotationPayload = SDKClient.QuotationPayloadBuilder.quotationPayload()
+      .withLanguage('en_ID')
+      .withServiceType(payload.service_code)
+      .withScheduleAt(payload.schedule_at)
+      // .withSpecialRequests
+      .withIsRouteOptimized(true)
+      .withStops(stops)
+      .withItem(items)
+      .build();
+    const res = await sdkClient.Quotation.create('ID', quotationPayload);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+});
+
+const retrieveQuotation = (payload) => new Promise(async (resolve, reject) => {
+  try {
+    const res = await sdkClient.Quotation.retrieve('ID', payload);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+});
+
+const retrieveOrder = (payload) => new Promise(async (resolve, reject) => {
+  try {
+    const res = await sdkClient.Order.retrieve('ID', payload);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+});
 
 const validate = (payload) => new Promise(async (resolve, reject) => {
   try {
@@ -557,4 +638,8 @@ module.exports = {
   validate,
   getCity,
   getService,
+  sdkOrder,
+  sdkQuotation,
+  retrieveQuotation,
+  retrieveOrder,
 };

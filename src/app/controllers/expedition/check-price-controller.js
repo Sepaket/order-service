@@ -88,7 +88,7 @@ module.exports = {
 
   getLalamoveCity: async (request, response, next) => {
     try {
-
+      console.log('getlalamovecity')
       // await CheckPriceValidator(request.body);
       const result = await new GetLalamoveCityResponse({ request });
 
@@ -107,7 +107,7 @@ module.exports = {
 
   getLalamoveService: async (request, response, next) => {
     try {
-
+      console.log('getlalamoveservice')
       // await CheckPriceValidator(request.body);
       const result = await new GetLalamoveServiceResponse({ request });
 

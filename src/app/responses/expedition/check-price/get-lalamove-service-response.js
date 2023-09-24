@@ -30,11 +30,13 @@ module.exports = class {
   process() {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('inside chack lalamove CITY response');
+        console.log('inside chack lalamove Service response');
         let result = [];
-        result = await lalamove.getService();
-        console.log(result);
+
+        // console.log(result);
         const { body } = this.request;
+        // console.log(body.id);
+        result = await lalamove.getService(body.id);
         resolve({
           data: result,
           meta: null,

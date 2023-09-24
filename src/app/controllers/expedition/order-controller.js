@@ -8,6 +8,9 @@ const CommonOrderValidator = require('../../validators/expedition/order/common-o
 // responses
 const OrderResponse = require('../../responses/expedition/order/order-response');
 const LalamoveOrderResponse = require('../../responses/expedition/order/lalamove-order-response');
+const LalamoveRetrieveOrderResponse = require('../../responses/expedition/order/lalamove-retrieve-order-response');
+const LalamoveQuotationResponse = require('../../responses/expedition/order/lalamove-quotation-response');
+
 const OrderDraft = require('../../responses/expedition/order/order-draft-response');
 const BulkOrderResponse = require('../../responses/expedition/order/bulk-order-response');
 const TransactionFeeResponse = require('../../responses/expedition/order/transaction-fee-response');
@@ -45,6 +48,73 @@ module.exports = {
       next(error);
     }
   },
+
+  lalaQuotation: async (request, response, next) => {
+    try {
+      console.log('LALA quotation');
+      // console.log(request);
+      const { body } = request;
+
+      let result;
+      // await CommonOrderValidator(request);
+      result = await new LalamoveQuotationResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      console.log(error);
+      // console.log("error - validator - reno ");
+      next(error);
+    }
+  },
+
+  lalaOrder: async (request, response, next) => {
+    try {
+      console.log('LALA order');
+      // console.log(request);
+      const { body } = request;
+
+      let result;
+        // await CommonOrderValidator(request);
+        result = await new LalamoveOrderResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      console.log(error);
+      // console.log("error - validator - reno ");
+      next(error);
+    }
+  },
+
+  getLalaOrder: async (request, response, next) => {
+    try {
+      console.log('retrieve LALA order');
+      // console.log(request);
+      const { body } = request;
+
+      let result;
+      // await CommonOrderValidator(request);
+      result = await new LalamoveRetrieveOrderResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      console.log(error);
+      // console.log("error - validator - reno ");
+      next(error);
+    }
+  },
+
 
     bulkOrder: async (request, response, next) => {
     try {
