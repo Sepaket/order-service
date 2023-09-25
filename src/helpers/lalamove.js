@@ -535,7 +535,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       handlingInstructions: ['KEEP_UPRIGHT'],
     };
     console.log('payload schedule : ', payload);
-    const quotationPayload = SDKClient.QuotationPayloadBuilder.quotationPayload()
+    const quotationPayload = await sdkClient.QuotationPayloadBuilder.quotationPayload()
       .withLanguage('en_ID')
       .withServiceType(payload.service_code)
       .withScheduleAt(payload.schedule_at)
