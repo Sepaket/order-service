@@ -534,7 +534,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       categories: ['FOOD_DELIVERY', 'OFFICE_ITEM8'],
       handlingInstructions: ['KEEP_UPRIGHT'],
     };
-
+    console.log('payload schedule : ', payload);
     const quotationPayload = SDKClient.QuotationPayloadBuilder.quotationPayload()
       .withLanguage('en_ID')
       .withServiceType(payload.service_code)
@@ -544,6 +544,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       .withStops(stops)
       .withItem(items)
       .build();
+    console.log('after quotation payload builder')
     const res = await sdkClient.Quotation.create('ID', quotationPayload);
     resolve(res);
   } catch (error) {
