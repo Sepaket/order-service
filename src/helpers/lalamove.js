@@ -522,7 +522,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
     const stops = [];
     const payload_stops = payload.order_items[0].stops;
 
-    console.log('sdkQuotation : ', payload_stops);
+    // console.log('sdkQuotation : ', payload_stops);
 
     for (const s in payload_stops) {
       stops.push(payload_stops[s]);
@@ -534,7 +534,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       categories: ['FOOD_DELIVERY', 'OFFICE_ITEM8'],
       handlingInstructions: ['KEEP_UPRIGHT'],
     };
-    console.log('payload schedule : ', payload);
+    // console.log('payload schedule : ', payload);
     const quotationPayload = await SDKClient.QuotationPayloadBuilder.quotationPayload()
       .withLanguage('en_ID')
       .withServiceType(payload.service_code)
@@ -544,7 +544,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       .withStops(stops)
       .withItem(items)
       .build();
-    console.log('after quotation payload builder')
+    console.log('after quotation payload builder : ', quotationPayload)
     const res = await sdkClient.Quotation.create('ID', quotationPayload);
     resolve(res);
   } catch (error) {
