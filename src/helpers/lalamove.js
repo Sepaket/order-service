@@ -538,11 +538,11 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
     const quotationPayload = await SDKClient.QuotationPayloadBuilder.quotationPayload()
       .withLanguage('en_ID')
       .withServiceType(payload.service_code)
-      // .withScheduleAt(payload.schedule_at)
+      .withScheduleAt(payload.schedule_at)
       // .withSpecialRequests
-      // .withIsRouteOptimized(true)
+      .withIsRouteOptimized(true)
       .withStops(stops)
-      // .withItem(items)
+      .withItem(items)
       .build();
     console.log('after quotation payload builder')
     const res = await sdkClient.Quotation.create('ID', quotationPayload);
