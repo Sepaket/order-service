@@ -539,7 +539,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       .withLanguage('en_ID')
       .withServiceType(payload.service_code)
       .withScheduleAt(payload.schedule_at)
-      // .withSpecialRequests
+      .withSpecialRequests(payload.special_requests)
       .withIsRouteOptimized(true)
       .withStops(stops)
       .withItem(items)
