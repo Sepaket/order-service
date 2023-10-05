@@ -66,8 +66,7 @@ module.exports = class {
       console.log('this is processed');
     } else if ((currentStatus === 'DELIVERED') && (order?.isCod)) {
       console.log('this is DELIVERED');
-      deltaCredit = parseFloat(order.detail.shippingCalculated);
-
+      deltaCredit = parseFloat(order.detail.codFee) - parseFloat(order.detail.shippingCalculated);
       await orderHelper.addOrderHistory(order.id, order.isCod, deltaCredit, referralCredit, false, false, currentStatus);
     } else if ((currentStatus === 'DELIVERED') && (!order?.isCod)) {
       // NON COD berarti tidak ada proses penambahan saldo
