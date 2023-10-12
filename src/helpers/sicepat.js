@@ -96,6 +96,7 @@ const createOrder = (payload) => new Promise(async (resolve) => {
 
 const tracking = (payload) => new Promise(async (resolve) => {
   const { resi } = payload;
+  // console.log('sicepat tracking resi : ', resi)
   axios.get(`${process.env.SICEPAT_BASE_URL_TRACKING}/customer/waybill`, {
     params: {
       waybill: resi,
@@ -104,6 +105,7 @@ const tracking = (payload) => new Promise(async (resolve) => {
       'api-key': process.env.SICEPAT_APIKEY_TRACKING,
     },
   }).then((response) => {
+    // console.log('sicepat tracking response : ', response.data)
     resolve(response?.data);
   }).catch((error) => {
     resolve({

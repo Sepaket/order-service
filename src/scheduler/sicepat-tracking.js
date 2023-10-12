@@ -39,16 +39,16 @@ const tracking = async () => {
       where: {
         expedition: 'SICEPAT',
         status: {
-          [Sequelize.Op.notIn]: ['DELIVERED','CANCELED','RETURN_TO_SELLER'],
+          [Sequelize.Op.notIn]: ['DELIVERED','CANCELED','RETURN_TO_SELLER', 'WAITING_PICKUP_EXP', 'PROCESSED_EXP', 'PROBLEM_EXP'],
         },
       },
-      limit: 30,
+      limit: 300,
     });
     const dbTransaction = await sequelize.transaction()
     await Promise.all(
       order?.map(async (item) => {
         const track = await sicepat.tracking({ resi: item.resi });
-
+        console.log('sicepat tracking : ', track);
         if (track?.sicepat?.status?.code === 200) {
 
           const trackingStatus = track?.sicepat?.result?.last_status;
