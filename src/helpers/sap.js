@@ -102,15 +102,24 @@ const createOrder = (payload) => new Promise(async (resolve) => {
 
 const tracking = (payload) => new Promise(async (resolve) => {
   const { resi } = payload;
-  axios.get(`${process.env.SAP_BASE_URL_TRACKING}/customer/waybill`, {
+  axios.get(`${process.env.SAP_BASE_URL_TRACKING}/shipment/tracking/awb`, {
     params: {
-      waybill: resi,
+      awb_no: resi,
     },
     headers: {
       'api_key': 'S3P@kEt#_2023',
     },
   }).then((response) => {
-    resolve(response?.data);
+    // console.log('SAP response resi : ' , resi, 'success : ', response?.data)
+    resolve({
+      sap: {
+        status: {
+          code: 200,
+          description: 'success',
+        },
+        result: response?.data,
+      },
+    });
   }).catch((error) => {
     resolve({
       sap: {

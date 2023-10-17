@@ -87,6 +87,7 @@ module.exports = class {
             // ...item,
             id: item.order_id,
             user: item.detail.seller?.name,
+            email: item.detail.seller?.email,
             nominal: item?.history?.delta_credit ? item?.history?.delta_credit : '0',
             deskripsi: item.status,
             tanggal: item.updated_at,
@@ -129,6 +130,7 @@ module.exports = class {
                         attributes: [
                           'id',
                           'name',
+                          'email'
                         ],
                       },
                     ],
@@ -145,11 +147,12 @@ module.exports = class {
                   JSON.parse(JSON.stringify(response2)),
                 );
 
-
+                // console.log(result2[0]);
                 const mapped2 = result2?.map((item) => ({
                   // ...item,
                   id: item.credit_id,
                   user: item.seller?.seller.name,
+                  email: item.seller?.seller?.email,
                   nominal: item.topup ? item.topup : item.withdraw,
                   deskripsi: item.topup ? 'TOPUP' : 'WITHDRAW',
                   tanggal: item.updated_at,
@@ -158,17 +161,17 @@ module.exports = class {
                   status: item.status,
                 }));
 
-                console.log('mapped 2 : ', mapped2);
+                // console.log('mapped 2 : ', mapped2);
 
 
-                mapped.concat(mapped2);
+                const combined = mapped.concat(mapped2);
 
                 resolve({
-                  data: mapped,
+                  data: combined,
                   meta: {
                     // total,
-                    total_result: mapped.length,
-                    total_order_count: mapped.length - mapped2.length,
+                    total_result: combined.length,
+                    total_order_count: mapped.length,
                     total_credit_count: mapped2.length,
                     limit: parseInt(query.limit, 10) || limit,
                     page: parseInt(query.page, 10) || (offset + 1),

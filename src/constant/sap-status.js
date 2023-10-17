@@ -16,18 +16,21 @@ const sapStatus = {
     'OUTGOING RETURN',
     'INCOMING RETURN',
     'DELIVERY RETURN',
+    'ENTRI'
   ],
   DELIVERED: [
     'POD - DELIVERED',
   ],
   CANCELED: [
-    'VOID PICKUP',
+    'VOID_PICKUP', //
   ],
   RETURN_TO_SELLER: [
     'SHIPMENT RETURN TO CLIENT',
   ],
   PROBLEM: [
     'POD - UNDELIVERED',
+    'SHIPMENT LOST',
+    'SHIPMENT DAMAGE'
   ],
 };
 

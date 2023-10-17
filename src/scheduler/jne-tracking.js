@@ -128,7 +128,6 @@ const tracking = async () => {
       },
     });
 
-  console.log('order : ', order.count);
 
     await Promise.all(
       order.rows?.map(async (item) => {
@@ -373,7 +372,7 @@ const force_retracking = async () => {
 
           if (currentStatus === 'RETURN_TO_SELLER' && item.isCod && log.length > 0) {
             calculated_1 = parseFloat(orderDetail.codFeeAdmin) - parseFloat(orderDetail.shippingCalculated);
-            console.log(`${item.resi} calculated : ${calculated_1}`);
+            // console.log(`${item.resi} calculated : ${calculated_1}`);
             // await updateSaldo(calculated_1, orderDetail);
             await OrderHistory.create({
               orderId: item.id,
