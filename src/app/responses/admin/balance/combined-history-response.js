@@ -83,13 +83,15 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
 
-          const mapped = result?.map((item) => ({
+
+          const mapped = result?.map((item) => (
+            {
             // ...item,
             id: item.order_id,
             user: item.detail.seller?.name,
             email: item.detail.seller?.email,
             nominal: item?.history?.delta_credit ? item?.history?.delta_credit : '0',
-            deskripsi: item.status,
+            deskripsi: item.resi + ' '  + (item.is_cod ? 'COD' : 'NON COD') +' : ' + item.status,
             tanggal: item.updated_at,
             jam: item.updated_at,
             tipe: item.status,
