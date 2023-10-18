@@ -23,6 +23,7 @@ module.exports = class {
     const offset = 0;
     const { query } = this.request;
     const search = this.querySearch();
+    const search2 = this.querySearch2();
     const total = await this.credit.count();
 
     const nextPage = (
@@ -73,7 +74,15 @@ module.exports = class {
               ],
             },
           ],
-          where: { ...search },
+          where: {
+
+                status: {
+                  [Sequelize.Op.notIn]: [
+                    'PROCESSED','PROBLEM',
+                  ],
+                },
+
+            },
           order: [['id', 'DESC']],
           // limit: parseInt(query.limit, 10) || parseInt(limit, 10),
           // offset: nextPage,
@@ -86,6 +95,7 @@ module.exports = class {
 
           const mapped = result?.map((item) => (
             {
+
             // ...item,
             id: item.order_id,
             user: item.detail.seller?.name,
@@ -94,7 +104,10 @@ module.exports = class {
             deskripsi: item.resi + ' '  + (item.is_cod ? 'COD' : 'NON COD') +' : ' + item.status,
             tanggal: item.updated_at,
             jam: item.updated_at,
-            tipe: item.status,
+            tipe: ['DELIVERED', 'RETURN_TO_SELLER'].includes(item.status) ?
+              (item.status === 'DELIVERED') ? (!item.is_cod ? 'ONGKIR NON COD' : 'DELIVERED') :
+                (!item.is_cod ? 'RETURN NON COD' : 'RETURN')
+            : item.status,
             status: item?.history?.is_execute ? 'PAID' : 'NOT YET PAID',
             // type: item?.topup ? 'TOPUP' : 'WITHDRAW',
             // description: item?.topup ? 'Topup Saldo' : 'Tarik Saldo',
@@ -103,7 +116,7 @@ module.exports = class {
           if (mapped.length > 0) {
             // console.log('mapped : ', mapped[0]);
             // console.log('result : ', result[0]);
-            console.log('map lengthe : ', mapped.length)
+            // console.log('map lengthe : ', mapped.length)
 
 
             try {
@@ -138,7 +151,7 @@ module.exports = class {
                     ],
                   },
                 ],
-                where: { ...search },
+                where: { ...search2 },
                 order: [['id', 'DESC']],
                 // limit: parseInt(query.limit, 10) || parseInt(limit, 10),
                 // offset: nextPage,
@@ -220,6 +233,57 @@ module.exports = class {
   }
 
   querySearch() {
+    const { query } = this.request;
+    let filtered = {};
+    if (query?.filter_by === 'DATE_RANGE') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.date_start).tz('Asia/Jakarta').startOf('day').format(),
+            moment(query.date_end).endOf('day').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'MONTH') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.month, 'M').startOf('month').format(),
+            moment(query.month, 'M').endOf('month').format(),
+          ],
+        },
+      };
+    }
+
+    if (query.filter_by === 'YEAR') {
+      filtered = {
+        updatedAt: {
+          [this.op.between]: [
+            moment(query.year, 'YYYY').startOf('year').format(),
+            moment(query.year, 'YYYY').endOf('year').format(),
+          ],
+        },
+      };
+    }
+
+    // console.log('query statys : ', query.status)
+    const condition = {
+      [this.op.or]: {
+        status: {[Sequelize.Op.notIn]: [
+            'PROBLEM', 'PROCESSED',
+          ],},
+      },
+      [this.op.and]: {
+        ...filtered,
+      },
+    };
+
+    return query?.status || query?.filter_by ? condition : {};
+  }
+
+  querySearch2() {
     const { query } = this.request;
     let filtered = {};
     if (query?.filter_by === 'DATE_RANGE') {
