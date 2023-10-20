@@ -12,6 +12,7 @@ module.exports = class {
     this.order = Order;
     this.seller = Seller;
     this.sellerDetail = SellerDetail;
+    this.sellerDetail2 = SellerDetail;
     this.orderDetail = OrderDetail;
     this.orderHistory = OrderHistory;
     this.converter = snakeCaseConverter;
@@ -60,6 +61,16 @@ module.exports = class {
                     'name',
                     'email'
                   ],
+                  include: [
+                    {
+
+                      model: this.sellerDetail2,
+                      as: 'sellerDetail',
+                      attributes: [
+                        'credit',
+                      ],
+                    }
+                    ],
                 },
               ],
             },
@@ -92,10 +103,9 @@ module.exports = class {
             JSON.parse(JSON.stringify(response)),
           );
 
-
+          // console.log(JSON.stringify(result, null, 2));
           const mapped = result?.map((item) => (
             {
-
             // ...item,
             id: item.order_id,
             user: item.detail.seller?.name,
@@ -109,6 +119,8 @@ module.exports = class {
                 (!item.is_cod ? 'RETURN NON COD' : 'RETURN')
             : item.status,
             status: item?.history?.is_execute ? 'PAID' : 'NOT YET PAID',
+              // credit: 0,
+              credit: item.detail.seller?.sellerDetail?.credit ? item.detail.seller?.sellerDetail?.credit : 0,
             // type: item?.topup ? 'TOPUP' : 'WITHDRAW',
             // description: item?.topup ? 'Topup Saldo' : 'Tarik Saldo',
           }));
@@ -174,6 +186,8 @@ module.exports = class {
                   jam: item.updated_at,
                   tipe: item.topup ? 'TOPUP' : 'WITHDRAW',
                   status: item.status,
+                  // credit: 0,
+                  credit: item.seller?.credit,
                 }));
 
                 // console.log('mapped 2 : ', mapped2);
