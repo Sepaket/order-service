@@ -22,7 +22,7 @@ const sdkClient = new SDKClient.ClientModule(
   new SDKClient.Config(
     process.env.LALAMOVE_APIKEY,
     process.env.LALAMOVE_APISECRET,
-    'sandbox',
+    process.env.LALAMOVE_API_ENVIRONMENT
   ),
 );
 
