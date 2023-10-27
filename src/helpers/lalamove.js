@@ -481,32 +481,33 @@ const sdkGetService = (payload) => new Promise(async (resolve, reject) => {
   }
 });
 
-const sdkOrder = (payload) => new Promise(async (resolve, reject) => {
+const sdkOrder = (payload, payload2) => new Promise(async (resolve, reject) => {
   try {
-    console.log('sdkOrder : ', payload.id);
+    // console.log('sdkOrder all : ', payload2);
+    // console.log('sdkOrder : ', payload.id);
     const orderPayload = SDKClient.OrderPayloadBuilder.orderPayload()
       .withIsPODEnabled(true)
       .withQuotationID(payload.id)
       .withSender({
         stopId: payload.stops[0].id,
-        name: 'Michal',
-        phone: '+62811913848',
+        name: payload2.sender_name,
+        phone: payload2.sender_phone,
       })
       .withRecipients([
         {
           stopId: payload.stops[1].id,
-          name: 'Rustam',
-          phone: '+62811913848',
+          name: payload2.recipient_name,
+          phone: payload2.recipient_phone,
         },
       ])
       .withMetadata({
         internalId: '123123',
       })
       .build();
-    console.log('before sending order ');
+    // console.log('before sending order ');
     const res = await sdkClient.Order.create('ID', orderPayload);
 
-    console.log('LALA ORDER : ', res);
+    // console.log('LALA ORDER : ', res);
     // const res = await sdkClient.Market.retrieve('ID');
 
     resolve(res);
@@ -542,7 +543,7 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       .withSpecialRequests(payload.special_requests)
       .withIsRouteOptimized(true)
       .withStops(stops)
-      .withItem(items)
+      // .withItem(items)
       .build();
     console.log('after quotation payload builder : ', quotationPayload)
     const res = await sdkClient.Quotation.create('ID', quotationPayload);

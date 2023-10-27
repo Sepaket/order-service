@@ -78,7 +78,7 @@ module.exports = class {
       const quotationId = body.quotation_id;
       const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
 
-      const order = await this.lalamove.sdkOrder(quotationDetail);
+      const order = await this.lalamove.sdkOrder(quotationDetail, body);
       console.log('order detail : ', order);
 
       let servCode = '';
