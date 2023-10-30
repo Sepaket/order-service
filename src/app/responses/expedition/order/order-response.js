@@ -337,7 +337,7 @@ module.exports = class {
             : parseFloat(item.cod_value) - (parseFloat(shippingCharge || 0) + parseFloat(codFee));
 
           const creditCondition = parseFloat(calculatedCredit) >= parseFloat(shippingCalculated);
-          // console.log(creditCondition);
+
           if (!item.is_cod) calculatedCredit -= parseFloat(shippingCalculated);
 
           const totalAmount = item?.is_cod
@@ -364,27 +364,23 @@ module.exports = class {
             // var resi = await resiMapper({
             //   expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             // });
-            console.log(' resi resi : ', resi);
+
           } else if (body.type === 'NINJA') {
-            console.log('ninja order'); // current resi is ignores. resi is generated from timestamp
             resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
-            console.log('ini yg penting : RESI ', resi)
+
           } else if (body.type === 'SAP') {
-            console.log('sap order'); // current resi is ignores. resi is generated from timestamp
+
             resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           } else if (body.type === 'LALAMOVE') {
-            console.log('lalamove order');
-            // console.log(tes_lalamove);
             resi = await resiMapper({
               expedition: body.type, currentResi: sicepatResi, id: index, batchId: batch.id,
             });
           }
-          // console.log(index, ' 0-0 sicepat : ', resi);
-          // console.log(index, ' 0-1 sicepat : ', resi);
+
           // const resiIsExist = await this.order.findOne({
           //   where: { resi, expedition: body.type },
           // });
@@ -481,8 +477,7 @@ module.exports = class {
       );
 
       if (querySuccess?.length > 0) {
-        // console.log('query success');
-        // console.log(querySuccess);
+
         await orderSuccessLogger(querySuccess);
         await orderLogger({
           items: queryrLogger,

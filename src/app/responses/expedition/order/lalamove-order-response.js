@@ -28,6 +28,8 @@ const {
   SellerAddress,
   TransactionFee,
   ResiTracker,
+  LalamoveTracking,
+  TrackingHistory,
 } = require('../../../models');
 
 module.exports = class {
@@ -46,6 +48,7 @@ module.exports = class {
     this.address = SellerAddress;
     this.sellerDetail = SellerDetail;
     this.resiTracker = ResiTracker;
+    this.lalamoveTracking = LalamoveTracking;
 
     return this.process();
   }
@@ -78,8 +81,14 @@ module.exports = class {
       const quotationId = body.quotation_id;
       const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
 
-      const order = await this.lalamove.sdkOrder(quotationDetail, body);
-      console.log('order detail : ', order);
+      const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
+      console.log('order detail : ', orderResponse.shareLink);
+
+      await LalamoveTracking.create({
+        raw: JSON.stringify(orderResponse),
+        trackingUrl: orderResponse.shareLink,
+      });
+
 
       let servCode = '';
       let resi = '';
@@ -119,8 +128,8 @@ module.exports = class {
       });
 
 
-      console.log(order);
-      return order;
+      // console.log(order);
+      return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
     }
