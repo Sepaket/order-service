@@ -50,6 +50,7 @@ router.group('/address', (route) => {
 router.group('/order', (route) => {
   route.get('/', Authorization, OrderController.index);
   route.get('/all', Authorization, OrderController.listall);
+  route.get('/lala-all', Authorization, OrderController.lalalistall);
   route.get('/retur', Authorization, OrderController.retur);
   route.get('/mutasi', Authorization, OrderController.mutasi);
   route.get('/batch', Authorization, OrderController.batch);

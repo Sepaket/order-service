@@ -82,13 +82,14 @@ module.exports = class {
       const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
 
       const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
-      // console.log('order detail : ', orderResponse.shareLink);
+      console.log('order detail : ', orderResponse.priceBreakdown.total);
       const sellerId = await jwtSelector({ request: this.request });
       await LalamoveTracking.create({
         rawResponse: JSON.stringify(orderResponse),
         rawPayload: JSON.stringify(quotationDetail),
         sellerId: sellerId.id,
         trackingUrl: orderResponse.shareLink,
+        total: orderResponse.priceBreakdown.total,
       });
 
 

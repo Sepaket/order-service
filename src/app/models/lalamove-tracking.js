@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    total: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
     trackingUrl: {
       type: DataTypes.TEXT,
       allowNull: true,

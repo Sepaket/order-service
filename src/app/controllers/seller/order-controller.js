@@ -10,6 +10,7 @@ const PrintValidator = require('../../validators/seller/order/print-validator');
 const BatchResponse = require('../../responses/seller/order/order-batch-response');
 const OrderListResponse = require('../../responses/seller/order/order-list-response');
 const OrderListallResponse = require('../../responses/seller/order/order-listall-response');
+const OrderLalaListallResponse = require('../../responses/seller/order/order-lala-listall-response');
 const OrderDetailResponse = require('../../responses/seller/order/order-detail-response');
 const OrderReturResponse = require('../../responses/seller/order/order-retur-response');
 const OrderMutasiResponse = require('../../responses/seller/order/order-mutasi-response');
@@ -67,7 +68,21 @@ module.exports = {
     }
   },
 
+  lalalistall: async (request, response, next) => {
+    try {
+      await OrderListValidator(request.query);
 
+      const result = await new OrderLalaListallResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   mutasi: async (request, response, next) => {
     try {
