@@ -529,6 +529,10 @@ const sdkQuotation = (payload) => new Promise(async (resolve, reject) => {
       stops.push(payload_stops[s]);
     }
 
+    const date1 = new Date(payload.schedule_at);
+    var offset = date1.getTimezoneOffset()
+    var offset_date = date1 + "-" + offset + ":00";
+  console.log('duration : ', offset_date);
     const items = {
       quantity: '3',
       weight: 'LESS_THAN_3KG',
