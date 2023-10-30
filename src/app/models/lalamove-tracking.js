@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       unique: true,
     },
+    sellerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: true,
+    },
     status: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -19,7 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    raw: {
+    rawPayload: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    rawResponse: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

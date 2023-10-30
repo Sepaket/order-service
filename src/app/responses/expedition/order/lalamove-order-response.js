@@ -82,10 +82,12 @@ module.exports = class {
       const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
 
       const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
-      console.log('order detail : ', orderResponse.shareLink);
-
+      // console.log('order detail : ', orderResponse.shareLink);
+      const sellerId = await jwtSelector({ request: this.request });
       await LalamoveTracking.create({
-        raw: JSON.stringify(orderResponse),
+        rawResponse: JSON.stringify(orderResponse),
+        rawPayload: JSON.stringify(quotationDetail),
+        sellerId: sellerId.id,
         trackingUrl: orderResponse.shareLink,
       });
 
@@ -95,7 +97,7 @@ module.exports = class {
       let totalAmount = 0;
       let shippingCalculated = 0;
 
-      const sellerId = await jwtSelector({ request: this.request });
+
 
 
       let batch = await this.batch.findOne({
