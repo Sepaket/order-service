@@ -79,6 +79,7 @@ router.group('/balance', (route) => {
 });
 
 router.group('/order', (route) => {
+  route.get('/lala-all', Authorization, OrderController.lalalistall);
   route.get('/', Authorization, OrderController.index);
   route.get('/all', Authorization, OrderController.listall);
   route.get('/batch', Authorization, OrderController.batch);
@@ -88,6 +89,7 @@ router.group('/order', (route) => {
   route.post('/set-return-status/:id', Authorization, OrderController.setReturnStatus);
   route.get('/cancel/:id', Authorization, OrderController.cancel);
   route.get('/retur/all', Authorization, OrderController.retur);
+
 });
 
 router.group('/notification', (route) => {

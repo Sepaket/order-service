@@ -17,6 +17,8 @@ const JneCancelResponse = require('../../responses/expedition/cancel/jne-cancel-
 const NinjaCancelResponse = require('../../responses/expedition/cancel/ninja-cancel-response');
 const SicepatCancelResponse = require('../../responses/expedition/cancel/sicepat-cancel-response');
 const OrderReturResponse = require('../../responses/admin/order/order-retur-response');
+const OrderLalaListallResponse = require('../../responses/seller/order/order-lala-listall-response');
+const AdminOrderLalaListallResponse = require('../../responses/admin/order/admin-order-lala-listall-response');
 
 module.exports = {
   batch: async (request, response, next) => {
@@ -83,6 +85,20 @@ module.exports = {
     }
   },
 
+  lalalistall: async (request, response, next) => {
+    try {
+      await OrderListValidator(request.query);
+      const result = await new AdminOrderLalaListallResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
 
   export: async (request, response, next) => {
