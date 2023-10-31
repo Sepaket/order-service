@@ -7,6 +7,7 @@ const tax = require('../../../../constant/tax');
 const lalamoveParameter = require('./order-parameter/lalamove');
 const jwtSelector = require('../../../../helpers/jwt-selector');
 const orderValidator = require('../../../../helpers/order-validator');
+const lalaOrderValidator = require('../../../../helpers/lala-order-validator');
 const { formatCurrency } = require('../../../../helpers/currency-converter');
 const {
   batchCreator,
@@ -81,57 +82,46 @@ module.exports = class {
       const quotationId = body.quotation_id;
       const quotationDetail = await this.lalamove.retrieveQuotation(quotationId);
 
-      const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
-      console.log('order detail : ', orderResponse.priceBreakdown.total);
+
+      // console.log('order detail : ', quotationDetail.priceBreakdown.total);
       const sellerId = await jwtSelector({ request: this.request });
-      await LalamoveTracking.create({
-        rawResponse: JSON.stringify(orderResponse),
-        rawPayload: JSON.stringify(quotationDetail),
-        sellerId: sellerId.id,
-        trackingUrl: orderResponse.shareLink,
-        total: orderResponse.priceBreakdown.total,
-      });
+      const sellerDet = await this.sellerDetail.findOne({
+        where: {
+          sellerId: sellerId.id
+        }
+      })
+      // console.log('selelr  : ', sellerDet.credit)
+      let calculatedCredit = parseFloat(sellerDet.credit);
+      const creditCondition = parseFloat(calculatedCredit) >= parseFloat(quotationDetail.priceBreakdown.total);
+
+      let payload = {
+        creditCondition,
+      };
+
+      const messages = await lalaOrderValidator(payload);
+      // console.log('messages : ', messages);
+
+      if (messages.length > 0) {
+        throw new Error(messages[0].message || 'Something Wrong');
+      }
+      const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
+
+if (orderResponse?.id) {
+  await LalamoveTracking.create({
+    rawResponse: JSON.stringify(orderResponse),
+    rawPayload: JSON.stringify(quotationDetail),
+    sellerId: sellerId.id,
+    trackingUrl: orderResponse.shareLink,
+    total: orderResponse.priceBreakdown.total,
+  });
+
+  sellerDet.credit = sellerDet.credit - orderResponse.priceBreakdown.total;
+  // console.log('seller credit : ', sellerDet.credit);
+  sellerDet.save();
+}
 
 
-      let servCode = '';
-      let resi = '';
-      let totalAmount = 0;
-      let shippingCalculated = 0;
 
-
-
-
-      let batch = await this.batch.findOne({
-        where: { id: body?.batch_id || 0, sellerId: sellerId.id },
-      });
-
-      const insurance = await this.insurance.findOne({
-        where: { expedition: 'LALAMOVE' },
-      });
-
-      const seller = await this.seller.findOne({
-        where: { id: sellerId.id },
-        include: [
-          {
-            model: this.sellerDetail,
-            as: 'sellerDetail',
-            include: [
-              {
-                model: this.seller,
-                as: 'referred',
-                required: false,
-                include: [
-                  {
-                    model: this.sellerDetail,
-                    as: 'referredDetail',
-                    required: false,
-                  }],
-              }],
-          }],
-      });
-
-
-      // console.log(order);
       return orderResponse;
     } catch (error) {
       throw new Error(error?.message || 'Something Wrong');
