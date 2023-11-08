@@ -30,7 +30,13 @@ module.exports = class {
   }
 
   addTrackingData(converted) {
+
+// console.log('converted : ', converted.data.order);
     this.LalamoveTracking.create({
+      eventType: converted.eventType,
+      orderId: converted.data.order.orderId,
+      status: converted.data.order.status,
+      trackingUrl: converted.data.order.shareLink,
       rawResponse: JSON.stringify(converted),
     });
   }

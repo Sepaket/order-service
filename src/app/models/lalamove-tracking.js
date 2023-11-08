@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       unique: true,
     },
+    eventType: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.TEXT,
       allowNull: true,
