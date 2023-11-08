@@ -33,11 +33,15 @@ router.group('/order', (route) => {
   route.get('/lalaorder', Authorization, OrderController.getLalaOrder);
   route.post('/lalaorder', Authorization, OrderController.lalaOrder);
   route.post('/lalaquotation', Authorization, OrderController.lalaQuotation);
+  route.post('/lalacancelorder', Authorization, OrderController.lalaCancelOrder);
+  // route.delete('/lalacancelorder', Authorization, OrderController.lalaCancelOrder());
+  // route.delete('/lalachangedriver', Authorization, OrderController.lalaChangeDriver());
 
   route.post('/bulk', Authorization, OrderController.bulkOrder);
   route.get('/transaction-fee', Authorization, OrderController.transactionFee);
   route.get('/draft/:batch_id', Authorization, OrderController.draftOrder);
   route.post('/ninja/callback', OrderController.ninjaCallback);
+  route.post('/lalamove/callback', OrderController.lalaCallback);
 });
 
 router.group('/tracking', (route) => {

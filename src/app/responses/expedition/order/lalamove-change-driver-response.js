@@ -105,14 +105,12 @@ module.exports = class {
         throw new Error(messages[0].message || 'Something Wrong');
       }
       const orderResponse = await this.lalamove.sdkOrder(quotationDetail, body);
-// console.log('order reposen : ', orderResponse);
+
 if (orderResponse?.id) {
   await LalamoveTracking.create({
     rawResponse: JSON.stringify(orderResponse),
     rawPayload: JSON.stringify(quotationDetail),
     sellerId: sellerId.id,
-    orderId: orderResponse.id,
-    status: orderResponse.status,
     trackingUrl: orderResponse.shareLink,
     total: orderResponse.priceBreakdown.total,
   });
@@ -121,6 +119,8 @@ if (orderResponse?.id) {
   // console.log('seller credit : ', sellerDet.credit);
   sellerDet.save();
 }
+
+
 
       return orderResponse;
     } catch (error) {

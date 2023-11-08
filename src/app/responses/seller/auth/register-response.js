@@ -22,7 +22,6 @@ module.exports = class {
         { ...parameterMapper },
         { transaction: dbTransaction },
       );
-
         await this.sellerDetail.create(
           { sellerId: seller.id, referalCode: referalCode, referredSellerId: parameterMapper.referredSellerId},
           { transaction: dbTransaction },

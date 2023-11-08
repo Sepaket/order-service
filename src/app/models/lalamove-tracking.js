@@ -7,9 +7,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     orderId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.TEXT,
       allowNull: true,
-      unique: true,
     },
     sellerId: {
       type: DataTypes.INTEGER,

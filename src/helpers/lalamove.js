@@ -285,6 +285,20 @@ const checkPrice = (payload) => new Promise((resolve) => {
   }
 });
 
+
+
+const sdkCancelOrder = (payload, payload2) => new Promise(async (resolve, reject) => {
+  try {
+
+console.log('payload cancel order  : ', payload)
+    const res = await sdkClient.Order.cancel('ID', payload);
+console.log('response cancel order res : '. res);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+});
+
 const createOrder = (payload) => new Promise((resolve) => {
   try {
     // console.log('test sdk');
@@ -645,6 +659,7 @@ module.exports = {
   getCity,
   getService,
   sdkOrder,
+  sdkCancelOrder,
   sdkQuotation,
   retrieveQuotation,
   retrieveOrder,
