@@ -18,6 +18,7 @@ const DashboardController = require('../app/controllers/admin/dashboard-controll
 const TicketController = require('../app/controllers/admin/ticket-controller');
 const NotificationController = require('../app/controllers/admin/notification-controller');
 const CancelController = require('../app/controllers/expedition/cancel-order-controller');
+const ServiceDiscountController = require('../app/controllers/admin/service-discount-controller');
 
 router.group('/auth', (route) => {
   route.post('/login', AuthController.login);
@@ -66,6 +67,14 @@ router.group('/discount-rate', (route) => {
   route.get('/', Authorization, DiscountRateController.index);
   route.post('/update', Authorization, DiscountRateController.update);
 });
+
+
+router.group('/service-discount', (route) => {
+  route.get('/', Authorization, ServiceDiscountController.index);
+  // route.post('/update', Authorization, DiscountRateController.update);
+});
+
+
 
 router.group('/tracking', (route) => {
   route.post('/', Authorization, TrackingController);
