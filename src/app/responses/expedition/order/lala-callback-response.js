@@ -51,10 +51,13 @@ module.exports = class {
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
 
       // const currentStatus = this.getLastStatus(converted.status.toLowerCase());
+      // console.log('body data : ', converted.data);
+      if (converted.data !== undefined) {
+        await this.addTrackingData(converted);
 
-      await this.addTrackingData(converted);
+        await dbTransaction.commit();
+      }
 
-      await dbTransaction.commit();
       return true;
     } catch (error) {
       await dbTransaction.rollback();
