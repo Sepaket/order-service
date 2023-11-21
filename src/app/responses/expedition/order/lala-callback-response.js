@@ -30,8 +30,6 @@ module.exports = class {
   }
 
   addTrackingData(converted) {
-
-// console.log('converted : ', converted.data.order);
     this.LalamoveTracking.create({
       eventType: converted.eventType,
       orderId: converted.data.order.orderId,
@@ -45,14 +43,17 @@ module.exports = class {
 
   async process() {
     const dbTransaction = await sequelize.transaction();
-
+    console.log('lala callback')
     try {
       const { body, headers } = this.request;
       const converted = !headers['content-type'].includes('application/json') ? JSON.parse(body) : body;
 
       // const currentStatus = this.getLastStatus(converted.status.toLowerCase());
-      // console.log('body data : ', converted.data);
+
       if (converted.data !== undefined) {
+        if (converted.data.order.status == 'CANCELED') {
+          //kembalikan saldo user
+        }
         await this.addTrackingData(converted);
 
         await dbTransaction.commit();

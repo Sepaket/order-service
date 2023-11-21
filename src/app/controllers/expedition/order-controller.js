@@ -230,6 +230,20 @@ module.exports = {
     }
   },
 
+  lalaCallbackGet: async (request, response, next) => {
+    try {
+      // const result = await new LalaCallbackResponse({ request });
+
+      response.send({
+        code: 200,
+        message: 'OK',
+        // data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   lalaCallback: async (request, response, next) => {
     try {
       const result = await new LalaCallbackResponse({ request });

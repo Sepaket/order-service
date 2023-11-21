@@ -41,6 +41,7 @@ router.group('/order', (route) => {
   route.get('/transaction-fee', Authorization, OrderController.transactionFee);
   route.get('/draft/:batch_id', Authorization, OrderController.draftOrder);
   route.post('/ninja/callback', OrderController.ninjaCallback);
+  route.get('/lalamove/callback', OrderController.lalaCallbackGet);
   route.post('/lalamove/callback', OrderController.lalaCallback);
 });
 
