@@ -14,7 +14,7 @@ const batchScheduler = require('./src/scheduler/batch-scheduler');
 const cleanerNinjaTokenScheduler = require('./src/scheduler/clear-token-scheduler');
 // //
 const createOrderScheduler = require('./src/scheduler/create-order-scheduler');
-const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
+// const ninjaScheduler = require('./src/scheduler/ninja-scheduler')
 const trackingScheduler = require('./src/scheduler/tracking-scheduler');
 
 
