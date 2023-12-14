@@ -23,10 +23,10 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     entrypoint: ["/bin/sh","-c"]
-    command:
-      - |
-        apt-get update
-        apt-get install tzdata
+#    command:
+#      - |
+#        apt-get update
+#        apt-get install tzdata
   adminer:
     image:  "adminer"
     ports:

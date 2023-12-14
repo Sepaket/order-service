@@ -28,3 +28,8 @@ After the category, there should be a ":" announcing the commit description.
 example :
 
 git commit -m '<category: do something; do some other things>'
+
+
+docker-compose -f docker-compose.production.yml up --build -d
+
+docker-compose -f docker-compose.production.yml up --build -d
